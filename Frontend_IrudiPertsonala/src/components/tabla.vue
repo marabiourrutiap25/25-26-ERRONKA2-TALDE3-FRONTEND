@@ -2,21 +2,19 @@
   <div class="container my-5">
     <div v-if="filas.length" class="table-responsive">
       <table class="table table-hover border rounded mb-0">
+        <tbody class="bg-light">
+          <tr>
+            <td colspan="100%">
+                <div class="d-flex justify-content-between align-items-center">
+                    <span class="fw-bold">{{ Titulo }}</span>
+                </div>
+            </td>
+          </tr>
+        </tbody>
         <thead class="table-light">
           <tr>
-            <th colspan="100%">
-                <div class="d-flex justify-content-between align-items-center">
-                    <span>{{ Titulo }}</span>
-                    <div>
-                      <button type="button" class="btn p-0 me-2" @click="$emit('editar-servicio', fila.id)" title="Editar fila">
-                        <img src="@/assets/editatu.png" alt="Editar" width="24" height="24" />
-                      </button>
-                      <button type="button" class="btn p-0 me-2" @click="$emit('borrar-servicio', fila.id)" title="Borrar fila">
-                        <img src="@/assets/ezabatu.png" alt="Borrar" width="24" height="24" />
-                      </button>
-                    </div>
-                </div>
-            </th>
+            <th v-for="header in headers" :key="header">{{ header }}</th>
+            <th>Acciones</th>
           </tr>
         </thead>
         <tbody class="bg-white">
@@ -40,11 +38,10 @@
   </div>
 </template>
 
-<script setup>
+<script setup type="module">
   import { computed } from 'vue'
 
   const props = defineProps({
-    Titulo: { type: String, default: 'Tabla Dinámica' },
     filas: { type: Array, default: () => [] },
   })
 

@@ -1,12 +1,12 @@
 <template>
   <div class="container">
     <div class="d-flex justify-content-between align-items-center my-4">
-      <h2 class="mb-0">Gestión de Zerbitzuak</h2>
+      <h2 class="mb-0">Gestión de Egutegiak</h2>
     </div>
 
     <Tabla
       Titulo="Listado de servicios"
-      :filas="zerbitzuak"
+      :filas="Egutegia"
       @editar-servicio="editar"
       @borrar-servicio="borrar"
     />
@@ -18,11 +18,11 @@ import { ref, onMounted } from 'vue'
 import Tabla from '../components/tabla.vue'
 import Api from '../composables/Api.js'
 
-const zerbitzuak = ref([])
+const Egutegia = ref([])
 
 onMounted(async () => {
-  zerbitzuak.value = await Api.cargarObjetos("services")
-  console.log("Servicios cargados:", zerbitzuak.value) // <--- para debug
+  Egutegia.value = await Api.cargarObjetos("schedules")
+  console.log("Servicios cargados:", Egutegia.value) // <--- para debug
 })
 
 
