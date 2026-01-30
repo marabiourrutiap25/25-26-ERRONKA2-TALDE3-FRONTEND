@@ -1,22 +1,22 @@
 <template>
   <div>
     <!-- Header/Navbar -->
-    <div class="p-3 d-flex justify-content-between align-items-center" style="background-color: #005EAA;">
+    <div v-if="mostrarHeader" class="p-3 d-flex justify-content-between align-items-center" style="background-color: #005EAA;">
       <div class="d-flex align-items-center gap-3">
         <button v-if="!mostrarNav" class="btn btn-outline-light" style="width: 44px; height: 44px; padding: 0;" @click="mostrarNav = true">
-          <img src="@/assets/editatu.png" alt="Menú" width="24" height="24" />
+          <img src="@/assets/editatu.png" alt="Menú" class="img-fluid" style="max-width: 24px;" />
         </button>
         <button v-if="mostrarNav" class="btn btn-outline-light" style="width: 44px; height: 44px; padding: 0;" @click="mostrarNav = false">
-          <img src="@/assets/ezabatu.png" alt="Cerrar" width="24" height="24" />
+          <img src="@/assets/ezabatu.png" alt="Cerrar" class="img-fluid" style="max-width: 24px;" />
         </button>
-        <img src="@/assets/ezabatu.png" alt="Logo" width="32" height="32" />
+        <img src="@/assets/ezabatu.png" alt="Logo" class="img-fluid" style="max-width: 32px;" />
       </div>
       <button class="btn btn-light">Saioa itsi</button>
     </div>
 
     <!-- Main content -->
     <div class="d-flex">
-      <nav v-if="mostrarNav" class="bg-light border-end p-3" style="width: 200px; min-height: calc(100vh - 60px);">
+      <nav v-if="mostrarNav && mostrarHeader" class="bg-light border-end p-3" style="width: 200px; min-height: calc(100vh - 60px);">
         <div class="nav flex-column">
           <RouterLink to="/egutegiak" class="nav-link">Egutegia</RouterLink>
           <RouterLink to="/Ikasleak" class="nav-link">Ikasleak</RouterLink>
@@ -35,8 +35,13 @@
 </template>
 
 <script setup>
-  import { ref } from 'vue'
-  import { RouterLink, RouterView } from 'vue-router'
+  import { ref, computed } from 'vue'
+  import { RouterLink, RouterView, useRoute } from 'vue-router'
 
   const mostrarNav = ref(false)
+  const route = useRoute()
+  
+  const mostrarHeader = computed(() => {
+    return route.path !== '/saioa-hasi'
+  })
 </script>

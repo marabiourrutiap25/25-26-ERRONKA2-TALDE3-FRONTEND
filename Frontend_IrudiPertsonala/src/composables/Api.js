@@ -1,9 +1,10 @@
 const API_URL = 'http://127.0.0.1:8000/api';
+const token = "1|Xr2d43nuEFANkdsFYvvaZuwpcCjpqQ1DjI6xmHqr1a321027";
 
 // Funtzio orokorra API deietarako
 async function llamarAPI(metodo, table, datos = {}) {
     let url = `${API_URL}/${table}`;  // Asumimos API_URL definido arriba
-    const headers = { 'Content-Type': 'application/x-www-form-urlencoded' };
+    const headers = { 'Content-Type': 'application/x-www-form-urlencoded', 'Authorization': `Bearer ${token}` };
 
     const options = { method: metodo, headers };
 

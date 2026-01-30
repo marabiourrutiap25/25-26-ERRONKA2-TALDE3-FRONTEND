@@ -7,8 +7,8 @@
     <Tabla
       Titulo="Listado de servicios"
       :filas="materialak"
-      @editar-servicio="editar"
-      @borrar-servicio="borrar"
+      @editar="editar"
+      @borrar="borrar"
     />
   </div>
 </template>
@@ -35,12 +35,27 @@ tabla.appendChild(tr)
   console.log("Servicios cargados:", materialak.value) // <--- para debug
 })
 
-
-const editar = (id) => {
-  console.log("Editar", id)
+const editar = async (id) => {
+  try {
+    const objeto = await Api.cargarObjeto({ id }, "equipment")
+    console.log("Objeto a editar:", objeto)
+    // Aquí puedes abrir un modal o ir a una página de edición
+    // router.push({ name: 'EditarMaterial', params: { id } })
+  } catch (err) {
+    console.error("Error al cargar objeto:", err)
+  }
 }
 
-const borrar = (id) => {
-  console.log("Borrar", id)
+const borrar = async (id) => {
+  if (confirm("¿Estás seguro de que quieres borrar este material?")) {
+    try {
+      const resultado = await Api.ezabatuObjektua({ id }, "equipment")
+      console.log("Material borrado:", resultado)
+      // Recargar la lista
+      materialak.value = await Api.cargarObjetos("equipment")
+    } catch (err) {
+      console.error("Error al borrar:", err)
+    }
+  }
 }
 </script>

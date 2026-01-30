@@ -22,11 +22,11 @@
               <td v-for="header in headers" :key="header">{{ fila[header] }}</td>
               <td>
                   <div class="d-flex justify-content-end">
-                      <button type="button" class="btn p-0 me-2" @click="$emit('editar-servicio', fila.id)" title="Editar fila">
-                        <img src="@/assets/editatu.png" alt="Editar" width="24" height="24" />
+                      <button type="button" class="btn p-0 me-2" @click="$emit('editar', fila.id)" title="Editar fila">
+                        <img src="@/assets/editatu.png" alt="Editar" class="img-fluid" style="max-width: 24px;" />
                       </button>
-                      <button type="button" class="btn p-0 me-2" @click="$emit('borrar-servicio', fila.id)" title="Borrar fila">
-                        <img src="@/assets/ezabatu.png" alt="Borrar" width="24" height="24" />
+                      <button type="button" class="btn p-0 me-2" @click="$emit('borrar', fila.id)" title="Borrar fila">
+                        <img src="@/assets/ezabatu.png" alt="Borrar" class="img-fluid" style="max-width: 24px;" />
                       </button>
                   </div>
               </td>
