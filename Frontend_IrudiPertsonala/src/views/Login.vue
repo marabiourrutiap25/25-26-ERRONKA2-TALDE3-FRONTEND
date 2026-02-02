@@ -3,7 +3,7 @@
     <div class="login-card">
       <!-- Logo de la peluquería -->
       <div class="text-center mb-4">
-        <div class="logo-icon">✂️</div>
+        <img src="@/assets/IMP_Logotipoa.png" alt="Irudi Pertsonala Logo" class="logo-image mb-3" />
         <h1 class="brand-name">Irudi Pertsonala</h1>
         <p class="brand-subtitle">Peluquería & Estética</p>
       </div>
@@ -94,13 +94,7 @@ const iniciarSesion = async () => {
   cargando.value = true
 
   try {
-    const response = await login(email.value, password.value)
-    
-    // Si "recordar" no está marcado, no guardar en localStorage permanente
-    if (!recordar.value) {
-      sessionStorage.setItem('token', localStorage.getItem('token'))
-      sessionStorage.setItem('usuario', localStorage.getItem('usuario'))
-    }
+    const response = await login(email.value, password.value, recordar.value)
     
     emit('login-exitoso', response.user)
   } catch (err) {
@@ -124,7 +118,7 @@ const iniciarSesion = async () => {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #f0f0f0;
+  background: #2c4666;
   padding: 20px;
 }
 
@@ -149,6 +143,12 @@ const iniciarSesion = async () => {
   margin-bottom: 0;
 }
 
+.logo-image {
+  width: 120px;
+  height: auto;
+  object-fit: contain;
+}
+
 .brand-subtitle {
   color: #666;
   font-size: 1rem;
@@ -161,23 +161,23 @@ const iniciarSesion = async () => {
 }
 
 .form-control:focus {
-  border-color: #444;
-  box-shadow: 0 0 0 0.2rem rgba(0, 0, 0, 0.1);
+  border-color: #2c4666;
+  box-shadow: 0 0 0 0.2rem rgba(44, 70, 102, 0.25);
 }
 
 .btn-primary {
-  background: #333;
+  background: #2c4666;
   border: none;
   font-weight: 600;
   letter-spacing: 0.5px;
 }
 
 .btn-primary:hover {
-  background: #444;
+  background: #3d5a7f;
 }
 
 .btn-primary:disabled {
-  background: #333;
+  background: #2c4666;
   opacity: 0.7;
 }
 
