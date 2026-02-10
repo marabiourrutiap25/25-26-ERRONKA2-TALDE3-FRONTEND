@@ -1,21 +1,23 @@
 const API_URL = 'http://127.0.0.1:8000/api';
 const token = "1|Xr2d43nuEFANkdsFYvvaZuwpcCjpqQ1DjI6xmHqr1a321027";
 
-// Funtzio orokorra API deietarako
 async function llamarAPI(metodo, table, datos = {}) {
-    let url = `${API_URL}/${table}`;  // Asumimos API_URL definido arriba
-    const headers = { 'Content-Type': 'application/x-www-form-urlencoded', 'Authorization': `Bearer ${token}` };
-
+    let url = `${API_URL}/${table}`;  
+    const headers = { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` };
     const options = { method: metodo, headers };
 
+    // Separar id si existe
+    let bodyDatos = { ...datos };
+    if (datos.id) {
+        url += `/${datos.id}`; // id en la URL
+        delete bodyDatos.id;   // quitar id del body
+    }
+
+    // Enviar body solo para métodos distintos de GET/HEAD
     if (metodo !== "GET" && metodo !== "HEAD") {
-        const params = new URLSearchParams();
-        for (const [key, value] of Object.entries(datos)) {
-            if (value !== null && value !== undefined) params.append(key, value);
-        }
-        options.body = params.toString();
-    } else if (Object.keys(datos).length > 0) {
-        const query = new URLSearchParams(datos).toString();
+        options.body = JSON.stringify(bodyDatos);
+    } else if (Object.keys(bodyDatos).length > 0) {
+        const query = new URLSearchParams(bodyDatos).toString();
         url += `?${query}`;
     }
 
@@ -37,6 +39,7 @@ async function llamarAPI(metodo, table, datos = {}) {
 
     return resultado;
 }
+
 
 
 // GET --> Lortu lerro guztiak
@@ -82,7 +85,7 @@ async function cargarObjeto(aldagaia, table) {
     }
 }
 
-// PUT --> Sortu objektu bat
+// PUT --> Aldatu objektu bat
 async function aldatuObjeto(aldagaiak, table) {
     try {
         // API deia egin PUT metodoarekin

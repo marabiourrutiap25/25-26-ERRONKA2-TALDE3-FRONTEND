@@ -5,7 +5,6 @@
     </div>
 
     <Tabla
-      Titulo="Listado de servicios"
       :filas="ikasleak"
       @editar-servicio="editar"
       @borrar-servicio="borrar"
@@ -26,7 +25,7 @@ onMounted(async () => {
 })
 
 
-const editar = (id) => {
+const editar = (id, ) => {
   console.log("Editar", id)
 }
 
