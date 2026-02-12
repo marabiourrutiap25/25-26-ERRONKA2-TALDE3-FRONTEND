@@ -1,5 +1,16 @@
 <template>
   <div class="container my-5">
+
+    <!-- 🔵 BOTÓN CREAR -->
+    <div class="mb-3 d-flex justify-content-end">
+      <button 
+        class="btn btn-success"
+        @click="abrirCrear"
+      >
+        Crear {{ Titulo }}
+      </button>
+    </div>
+
     <div v-if="filas.length" class="table-responsive">
       <table class="table table-hover border rounded mb-0">
         <tbody class="bg-light">
@@ -19,7 +30,9 @@
         </thead>
         <tbody class="bg-white">
           <tr v-for="(fila, index) in filas" :key="index">
-            <td v-for="header in headers" :key="header">{{ fila[header] }}</td>
+            <td v-for="header in headers" :key="header">
+              {{ fila[header] }}
+            </td>
             <td>
               <div class="d-flex justify-content-end">
                 <button 
@@ -30,6 +43,7 @@
                 >
                   <img src="@/assets/editatu.png" alt="Editar" class="img-fluid" style="max-width: 24px;" />
                 </button>
+
                 <button 
                   type="button" 
                   class="btn p-0 me-2" 
@@ -44,23 +58,39 @@
         </tbody>
       </table>
     </div>
-    <div v-else class="text-center text-muted">No hay datos para mostrar</div>
 
+    <div v-else class="text-center text-muted">
+      No hay datos para mostrar
+    </div>
+
+    <!-- 🔵 DIALOGO EDITAR -->
     <EditatuDialog
       ref="editDialogRef"
       :title="`Editar ${Titulo}`"
       :headers="headers"
       @submit="handleEditSubmit"
     />
+
+    <!-- 🟢 DIALOGO CREAR -->
+    <CrearDialog
+      ref="crearDialogRef"
+      :title="`Crear ${Titulo}`"
+      :headers="headers"
+      @submit="handleCreateSubmit"
+    />
+
   </div>
 </template>
 
 <script setup>
 import { computed, ref } from "vue"
-import EditatuDialog from "./editatu.vue" // Ajusta la ruta según tu estructura
+import EditatuDialog from "./editatu.vue"
+import CrearDialog from "./sortu.vue" // 👈 nuevo
 
-const emit = defineEmits(['editar', 'borrar'])
+const emit = defineEmits(['editar', 'borrar', 'crear'])
+
 const editDialogRef = ref(null)
+const crearDialogRef = ref(null)
 
 const props = defineProps({
   filas: { 
@@ -78,9 +108,16 @@ const headers = computed(() => {
   return Object.keys(props.filas[0])
 })
 
-// Datos de la fila que se está editando
 const currentEditRow = ref(null)
 
+
+// 🔵 ABRIR CREAR
+const abrirCrear = () => {
+  crearDialogRef.value?.open()
+}
+
+
+// 🔵 EDITAR
 const editar = (fila) => {
   currentEditRow.value = fila
   if (editDialogRef.value) {
@@ -88,29 +125,31 @@ const editar = (fila) => {
     headers.value.forEach(header => {
       formData[header] = fila[header] || ""
     })
-    if (editDialogRef.value.setFormData) {
-      editDialogRef.value.setFormData(formData)
-    }
-    
+    editDialogRef.value.setFormData?.(formData)
     editDialogRef.value.open()
   }
 }
 
+
+// 🔵 BORRAR
 const borrarFila = (id) => {
   if (confirm('¿Estás seguro de que quieres borrar este registro?')) {
     emit('borrar', id)
   }
 }
 
+
+// 🔵 SUBMIT EDITAR
 const handleEditSubmit = (formData) => {
-  console.log(formData);
   emit('editar', {
     id: currentEditRow.value?.id,
     ...formData
   })
 }
 
-const handleEditCancel = () => {
-  currentEditRow.value = null
+
+// 🟢 SUBMIT CREAR
+const handleCreateSubmit = (formData) => {
+  emit('crear', formData)
 }
 </script>

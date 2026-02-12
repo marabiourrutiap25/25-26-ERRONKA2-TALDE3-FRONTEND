@@ -4,8 +4,10 @@
       <h2 class="mb-0">Gestión de Egutegiak</h2>
     </div>
 
+    <!-- Tabla con acciones crear, editar y borrar -->
     <Tabla
       :filas="Egutegia"
+      @crear="crear"
       @editar="editar"
       @borrar="borrar"
     />
@@ -20,27 +22,48 @@ import Api from '../composables/Api.js'
 const Egutegia = ref([])
 const tableName = "schedules" // Nombre de la tabla en la API
 
-// Cargar datos iniciales
+// 🔹 Cargar datos iniciales
 const cargarDatos = async () => {
-  Egutegia.value = await Api.cargarObjetos(tableName)
-  console.log("Datos cargados:", Egutegia.value)
+  try {
+    Egutegia.value = await Api.cargarObjetos(tableName)
+    console.log("Datos cargados:", Egutegia.value)
+  } catch (error) {
+    console.error("Error cargando datos:", error)
+    Egutegia.value = []
+  }
 }
 
+// Cargar datos cuando se ejecute el componente
 onMounted(() => {
   cargarDatos()
 })
 
-// Editar un registro
+// 🔹 Crear un registro
+const crear = async (data) => {
+  try {
+    console.log("Datos a crear:", data)
+
+    const resultado = await Api.crearObjektua(data,tableName)
+
+    if (resultado) {
+      alert("Registro creado correctamente")
+      await cargarDatos() // refresca la tabla
+    } else {
+      alert("Error al crear el registro")
+    }
+  } catch (error) {
+    console.error("Error en crear:", error)
+    alert("Error al crear: " + error.message)
+  }
+}
+
+// 🔹 Editar un registro
 const editar = async ({ id, ...data }) => {
   console.log("ID:", id)
   console.log("Datos:", data)
   
   try {
-    const datosParaAPI = {
-      id,
-      ...data
-    }
-    
+    const datosParaAPI = { id, ...data }
     const resultado = await Api.aldatuObjeto(datosParaAPI, tableName)
     
     if (resultado) {
@@ -55,13 +78,14 @@ const editar = async ({ id, ...data }) => {
   }
 }
 
-// Borrar un registro
+// 🔹 Borrar un registro
 const borrar = async (id) => {
   try {
-    const resultado = await Api.ezabatuObjektua({ id: id }, tableName)
+    const resultado = await Api.ezabatuObjektua({ id }, tableName)
     
     if (resultado) {
       alert("Registro eliminado correctamente")
+      await cargarDatos()
     } else {
       alert("Error al eliminar el registro")
     }
