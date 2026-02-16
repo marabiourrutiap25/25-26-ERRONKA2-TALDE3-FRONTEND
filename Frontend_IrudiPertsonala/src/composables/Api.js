@@ -1,16 +1,16 @@
 // src/composables/Api.js
 
 const API_URL = 'http://127.0.0.1:8000/api';
-const tokenFijo = "egOGVWfm7BIWJT6I1U1gtzvQ7r3y5iTO5IHAm7bu99ea31ea";
 
 // =======================
 // FUNCION GENÉRICA PARA LLAMAR API
 // =======================
 async function llamarAPI(metodo, endpoint, datos = {}) {
   let url = `${API_URL}/${endpoint}`;  
+  const token = localStorage.getItem('token') 
   const headers = { 
     'Content-Type': 'application/json', 
-    'Authorization': `Bearer ${tokenFijo}` 
+    'Authorization': `Bearer ${token}` 
   };
   const options = { method: metodo, headers };
 
