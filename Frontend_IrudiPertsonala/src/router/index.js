@@ -5,7 +5,6 @@ import Ikasleak from "../views/Ikasleak.vue";
 import Materialak from "../views/Materialak.vue";
 import Produktuak from "../views/Produktuak.vue";
 import Zerbitzuak from "../views/Zerbitzuak.vue";
-import Menu from "../views/Menu.vue";
 import Bezeroak from "../views/Bezeroak.vue";
 import Hitzorduak from "../views/Hitzorduak.vue";
 import Mugimenduak from "../views/Mugimenduak.vue";
@@ -21,7 +20,6 @@ const routes = [
   { path: "/materialak", name: "materialak", component: Materialak, meta: { requiresAuth: true } },
   { path: "/produktuak", name: "produktuak", component: Produktuak, meta: { requiresAuth: true } },
   { path: "/zerbitzuak", name: "zerbitzuak", component: Zerbitzuak, meta: { requiresAuth: true } },
-  { path: "/menu", name: "menu", component: Menu, meta: { requiresAuth: true } },
   { path: "/bezeroak", name: "bezeroak", component: Bezeroak, meta: { requiresAuth: true } },
   { path: "/hitzorduak", name: "hitzorduak", component: Hitzorduak, meta: { requiresAuth: true } },
   { path: "/mugimenduak", name: "mugimenduak", component: Mugimenduak, meta: { requiresAuth: true } },

@@ -1,28 +1,7 @@
 <template>
   <div class="dashboard">
-    <!-- Sidebar Menu Component -->
+    <!-- Sidebar Menu Component (incluye Navbar) -->
     <SidebarMenu v-model="menuAbierto" />
-
-    <!-- Navbar -->
-    <nav class="navbar">
-      <div class="container-fluid">
-        <button class="btn-menu" @click="menuAbierto = !menuAbierto">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="white" viewBox="0 0 16 16">
-            <path fill-rule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5z"/>
-          </svg>
-        </button>
-        <button 
-          class="btn btn-light btn-sm" 
-          @click="cerrarSesion"
-        >
-          Saioa Itxi
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" style="margin-left: 4px;">
-            <path fill-rule="evenodd" d="M10 12.5a.5.5 0 0 1-.5.5h-8a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5h8a.5.5 0 0 1 .5.5v2a.5.5 0 0 0 1 0v-2A1.5 1.5 0 0 0 9.5 2h-8A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h8a1.5 1.5 0 0 0 1.5-1.5v-2a.5.5 0 0 0-1 0v2z"/>
-            <path fill-rule="evenodd" d="M15.854 8.354a.5.5 0 0 0 0-.708l-3-3a.5.5 0 0 0-.708.708L14.293 7.5H5.5a.5.5 0 0 0 0 1h8.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3z"/>
-          </svg>
-        </button>
-      </div>
-    </nav>
 
     <!-- Logo y contenido principal -->
     <div class="container py-4">
@@ -120,50 +99,16 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { logout as apiLogout } from '@/composables/Api.js'
 import SidebarMenu from '@/components/SidebarMenu.vue'
 
 const router = useRouter()
 const menuAbierto = ref(false)
-
-const cerrarSesion = async () => {
-  try {
-    await apiLogout()
-  } catch (err) {
-    console.error('Error al cerrar sesión:', err)
-  } finally {
-    router.push({ name: 'login' })
-  }
-}
 </script>
 
 <style scoped>
 .dashboard {
   min-height: 100vh;
   background-color: #f5f5f5;
-}
-
-.navbar {
-  background-color: #2c4666;
-  padding: 0.75rem 1.5rem;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-}
-
-.btn-menu {
-  background: none;
-  border: none;
-  padding: 0.5rem;
-  cursor: pointer;
-}
-
-.btn-light {
-  background-color: white;
-  border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 4px;
-  display: flex;
-  align-items: center;
-  font-weight: 500;
 }
 
 .main-logo {
