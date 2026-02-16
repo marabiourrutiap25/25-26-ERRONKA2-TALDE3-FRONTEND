@@ -7,14 +7,20 @@ export const useMainStore = defineStore('main', () => {
   const cargando = ref(false)
   const error = ref(null)
   const items = ref([])
+  const token = ref(null)
 
   // GETTERS: Propiedades calculadas
   const usuarioNombre = computed(() => usuario.value?.nombre || 'Anónimo')
   const tieneItems = computed(() => items.value.length > 0)
 
   // ACTIONS: Métodos/funciones
-  const setUsuario = (nuevoUsuario) => {
+  const setUsuario = (nuevoUsuario,token) => {
     usuario.value = nuevoUsuario
+    token.value = token // Asegura que el token se mantenga actualizado en el usuario
+  }
+
+  const setToken = (nuevoToken) => {
+    token.value = nuevoToken
   }
 
   const agregarItem = (item) => {
@@ -25,6 +31,7 @@ export const useMainStore = defineStore('main', () => {
     usuario.value = null
     items.value = []
     error.value = null
+    token.value = null
   }
 
   return {
@@ -36,6 +43,7 @@ export const useMainStore = defineStore('main', () => {
     // Getters
     usuarioNombre,
     tieneItems,
+    token,
     // Actions
     setUsuario,
     agregarItem,
