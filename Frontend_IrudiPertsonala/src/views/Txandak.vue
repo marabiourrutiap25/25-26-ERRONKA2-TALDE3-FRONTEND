@@ -21,7 +21,7 @@
         <thead class="table-light">
           <tr>
             <th v-for="header in headersVisibles" :key="header">
-              {{ header === 'student_name' ? 'ALUMNO' : header.toUpperCase() }}
+              {{ header === 'student_name' ? 'IKASLEA' : header.toUpperCase() }}
             </th>
             <th class="text-end">Acciones</th>
           </tr>
