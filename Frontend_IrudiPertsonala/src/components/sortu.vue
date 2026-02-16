@@ -4,6 +4,7 @@
       <div class="modal-header border-bottom-0 pt-4 px-4 pb-2 d-flex justify-content-between align-items-center">
         <h4 class="modal-title fw-bold text-dark d-flex align-items-center">
           {{ title }}
+          <span class="ms-3 badge-dot"></span>
         </h4>
         <button type="button" class="btn-close-custom" @click="onCancel">✕</button>
       </div>
@@ -91,6 +92,8 @@ defineExpose({ open, close, setFormData })
   background: rgba(0, 0, 0, 0.4);
   backdrop-filter: blur(4px);
 }
+
+
 
 .custom-label {
   display: block;

@@ -11,6 +11,7 @@
       </button>
     </div>
 
+    <!-- TABLA -->
     <div v-if="filas.length" class="table-responsive">
       <table class="table table-hover border rounded mb-0">
         <tbody class="bg-light">
@@ -24,14 +25,19 @@
         </tbody>
         <thead class="table-light">
           <tr>
-            <th v-for="header in headers" :key="header">{{ header }}</th>
+            <th v-for="header in headersFiltrados" :key="header">{{ header }}</th>
             <th>Acciones</th>
           </tr>
         </thead>
         <tbody class="bg-white">
           <tr v-for="(fila, index) in filas" :key="index">
-            <td v-for="header in headers" :key="header">
-              {{ fila[header] }}
+            <td 
+              v-for="header in headersFiltrados" 
+              :key="header" 
+              style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"
+              :title="fila[header]"
+            >
+              {{ truncar(fila[header]) }}
             </td>
             <td>
               <div class="d-flex justify-content-end">
@@ -67,7 +73,7 @@
     <EditatuDialog
       ref="editDialogRef"
       :title="`Editar ${Titulo}`"
-      :headers="headers"
+      :headers="headersFiltrados"
       @submit="handleEditSubmit"
     />
 
@@ -75,7 +81,7 @@
     <CrearDialog
       ref="crearDialogRef"
       :title="`Crear ${Titulo}`"
-      :headers="headers"
+      :headers="headersFiltrados"
       @submit="handleCreateSubmit"
     />
 
@@ -103,33 +109,39 @@ const props = defineProps({
   }
 })
 
+// 🔹 Computed headers, filtrando "id"
 const headers = computed(() => {
   if (!props.filas.length) return []
   return Object.keys(props.filas[0])
 })
 
+const headersFiltrados = computed(() => headers.value.filter(h => h !== 'id'))
+
 const currentEditRow = ref(null)
 
+// 🔹 Truncar texto a 20 caracteres
+const truncar = (texto, limite = 20) => {
+  if (!texto) return ''
+  return texto.length > limite ? texto.slice(0, limite) + '…' : texto
+}
 
 // 🔵 ABRIR CREAR
 const abrirCrear = () => {
   crearDialogRef.value?.open()
 }
 
-
 // 🔵 EDITAR
 const editar = (fila) => {
   currentEditRow.value = fila
   if (editDialogRef.value) {
     const formData = {}
-    headers.value.forEach(header => {
+    headersFiltrados.value.forEach(header => {
       formData[header] = fila[header] || ""
     })
     editDialogRef.value.setFormData?.(formData)
     editDialogRef.value.open()
   }
 }
-
 
 // 🔵 BORRAR
 const borrarFila = (id) => {
@@ -138,7 +150,6 @@ const borrarFila = (id) => {
   }
 }
 
-
 // 🔵 SUBMIT EDITAR
 const handleEditSubmit = (formData) => {
   emit('editar', {
@@ -146,7 +157,6 @@ const handleEditSubmit = (formData) => {
     ...formData
   })
 }
-
 
 // 🟢 SUBMIT CREAR
 const handleCreateSubmit = (formData) => {
