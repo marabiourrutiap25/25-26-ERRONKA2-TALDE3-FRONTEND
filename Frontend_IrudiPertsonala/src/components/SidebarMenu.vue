@@ -43,10 +43,10 @@
           <span>Biltegia</span>
         </div>
         <ul class="sidebar-menu">
-          <li><a href="#">Ekipamendua</a></li>
-          <li><a href="#">Kategoriak</a></li>
-          <li><a href="#">Inbentarioa</a></li>
-          <li><a href="#">Gelak</a></li>
+          <li><a @click="router.push('/hitzorduak')">Hitzorduak</a></li>
+          <li><a @click="router.push('/txandak')">Txandak</a></li>
+          <li><a @click="router.push('/hitzorduak')">Inbentarioa</a></li>
+          <li><a @click="router.push('/hitzorduak')">Gelak</a></li>
         </ul>
       </div>
 
