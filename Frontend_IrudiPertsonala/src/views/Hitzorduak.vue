@@ -10,7 +10,11 @@
     <div class="mb-3 row align-items-center">
       <label for="week" class="col-auto col-form-label">Aukeratu astea:</label>
       <div class="col-auto">
-        <input type="week" class="form-control" :value="selectedWeek" @change="onWeekChange" id="week"/>
+        <select class="form-select" v-model="selectedWeek">
+          <option v-for="semana in todasLasSemanas" :key="semana.value" :value="semana.value">
+            {{ semana.label }}
+          </option>
+        </select>
       </div>
     </div>
 
@@ -23,18 +27,12 @@
     />
 
     <!-- Modal Crear / Editar Hitzordua -->
-    <Sortu
-      ref="crearDialogRef"
+    <SortuHitzordua
+      ref="sortuHitzorduaRef"
       :headers="headers"
+      :clients="clients"
+      :students="students"
       title="Crear / Editar Hitzordua"
-      @submit="guardarHitzordua"
-    />
-
-    <!-- Modal Editar -->
-    <Editatu
-      ref="editatuDialogRef"
-      :headers="headers"
-      title="Editar Hitzordua"
       @submit="guardarHitzordua"
     />
   </div>
@@ -42,50 +40,51 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import { startOfWeek } from 'date-fns'
+import { startOfWeek, addDays, format, getWeek } from 'date-fns'
 import HitzorduakComponent from '../components/HitzorduakComponent.vue'
-import Sortu from '../components/sortu.vue'
-import Editatu from '../components/editatu.vue'
+import SortuHitzordua from '../components/sortuHitzordua.vue'
 import Api from '../composables/Api.js'
 
 const tableName = 'appointments'
 const selectedWeek = ref(getCurrentWeek())
 const Egutegia = ref([])
+const clients = ref([])
+const students = ref([])
 
-// Referencias a los modales
-const crearDialogRef = ref(null)
-const editatuDialogRef = ref(null)
+// Referencia al modal
+const sortuHitzorduaRef = ref(null)
 
 // Headers (solo keys)
-const headers = ['seat', 'date', 'start_time', 'end_time']
+const headers = ['seat', 'date', 'start_time', 'end_time','comments']
 
+// ---------- FUNCIONES DE SEMANA ----------
 function getCurrentWeek() {
   const now = new Date()
-  const weekNumber = getWeekNumber(now)
-  return `${now.getFullYear()}-W${weekNumber.toString().padStart(2,'0')}`
+  const weekNumber = getWeek(now, { weekStartsOn: 1 })
+  return `${now.getFullYear()}-W${String(weekNumber).padStart(2,'0')}`
 }
 
-function getWeekNumber(d) {
-  d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()))
-  const dayNum = d.getUTCDay() || 7
-  d.setUTCDate(d.getUTCDate() + 4 - dayNum)
-  const yearStart = new Date(Date.UTC(d.getUTCFullYear(),0,1))
-  return Math.ceil((((d - yearStart)/86400000)+1)/7)
-}
+// Genera todas las semanas del año actual
+const todasLasSemanas = computed(() => {
+  const semanas = []
+  const now = new Date()
+  const year = now.getFullYear()
+  const firstDay = startOfWeek(new Date(year, 0, 1), { weekStartsOn: 1 })
+  for (let i = 0; i < 52; i++) {
+    const start = addDays(firstDay, i * 7)
+    const weekNum = getWeek(start, { weekStartsOn: 1 })
+    const value = `${year}-W${String(weekNum).padStart(2,'0')}`
+    const label = `Semana ${weekNum} (${format(start,'dd/MM')})`
+    semanas.push({ value, label })
+  }
+  return semanas
+})
 
-function onWeekChange(e) {
-  selectedWeek.value = e.target.value
-}
-
+// ---------- FILTRADO DE CITAS ----------
 const egutegiaFiltrada = computed(() => {
   if (!Egutegia.value?.length || !selectedWeek.value) return []
 
-  const parts = selectedWeek.value.split('-W')
-  if (parts.length !== 2) return []
-
-  const year = Number(parts[0])
-  const week = Number(parts[1])
-
+  const [year, week] = selectedWeek.value.split('-W').map(Number)
   const firstDay = startOfWeek(new Date(year,0,1 + (week-1)*7), {weekStartsOn:1})
   const lastDay = new Date(firstDay)
   lastDay.setDate(firstDay.getDate()+6)
@@ -97,45 +96,67 @@ const egutegiaFiltrada = computed(() => {
   })
 })
 
-// Cargar citas
+// ---------- CARGA DE DATOS ----------
 const cargarDatos = async () => {
-  try { Egutegia.value = await Api.cargarObjetos(tableName) } 
-  catch (e) { console.error(e); Egutegia.value = [] }
-}
+  try { 
+    Egutegia.value = await Api.cargarObjetos(tableName) 
+  } catch (e) { 
+    console.error(e); 
+    Egutegia.value = [] 
+  }
 
-// Abrir modal Crear
-const abrirCrear = () => {
-  crearDialogRef.value?.setFormData({})
-  crearDialogRef.value?.open()
-}
-
-// Abrir modal Editar (desde HitzorduakComponent)
-const editarHitzordua = (data) => {
-  editatuDialogRef.value?.setFormData(data)
-  editatuDialogRef.value?.open()
-}
-
-// Guardar cita (crear o editar)
-const guardarHitzordua = async (data) => {
   try {
-    // Convertir a JSON y pasar string con nombre de tabla
-    const endpoint = 'appointments' // siempre string
-    const payload = JSON.parse(JSON.stringify(data)) // asegura que sea objeto plano
-    if (data.id) {
-      await Api.aldatuObjeto(payload, endpoint)
-    } else {
-      await Api.crearObjektua(endpoint, payload)
-    }
-    await cargarDatos()
-  } catch(e) {
-    console.error('Error guardando cita:', e)
+    clients.value = await Api.cargarObjetos('clients')
+  } catch (e) {
+    console.error(e)
+    clients.value = []
+  }
+
+  try {
+    students.value = await Api.cargarObjetos('students')
+  } catch (e) {
+    console.error(e)
+    students.value = []
   }
 }
 
-// Borrar cita
+// ---------- MODALES ----------
+const abrirCrear = () => {
+  sortuHitzorduaRef.value?.setFormData({})
+  sortuHitzorduaRef.value?.open()
+}
+
+const editarHitzordua = (data) => {
+  sortuHitzorduaRef.value?.setFormData(data)
+  sortuHitzorduaRef.value?.open()
+}
+
+// ---------- GUARDAR CITAS ----------
+const guardarHitzordua = async (data) => {
+  try {
+    console.log("Payload que llega a Api.js:", data) // 🔹 Aquí vemos lo que se envía
+
+    const payload = JSON.parse(JSON.stringify(data))
+    if (data.id) {
+      await Api.aldatuObjeto(payload, tableName)
+    } else {
+      await Api.crearObjektua(payload, tableName)
+    }
+    await cargarDatos()
+  } catch(e) {
+    console.error('Error guardando Hitzordua:', e)
+  }
+}
+
+
+// ---------- BORRAR CITAS ----------
 const borrarHitzordua = async (id) => {
-  try { await Api.ezabatuObjektua({id}, tableName); await cargarDatos() }
-  catch(e){console.error(e)}
+  try { 
+    await Api.ezabatuObjektua({id}, tableName)
+    await cargarDatos() 
+  } catch(e){
+    console.error(e)
+  }
 }
 
 onMounted(cargarDatos)

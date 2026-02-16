@@ -6,7 +6,7 @@
           <h5 class="modal-title">{{ title }}</h5>
           <button type="button" class="btn-close" @click="onCancel"></button>
         </div>
-        
+
         <div class="modal-body">
           <form @submit.prevent="handleSubmit">
             <div v-for="header in normalizedHeaders" :key="header.key" class="mb-3">
@@ -16,7 +16,7 @@
                 v-model="form[header.key]"
                 type="text"
                 class="form-control"
-                :readonly="header.key === 'id'"
+                :readonly="header.key === 'id' || header.key.endsWith('_at')"
               />
             </div>
 
@@ -48,7 +48,6 @@ const emit = defineEmits(["submit", "cancel"])
 const dialogRef = ref(null)
 const form = reactive({})
 
-// 🔹 Normaliza los headers para que siempre sean objetos {key,label}
 const normalizedHeaders = computed(() => {
   return props.headers.map(h => {
     if (typeof h === "string") return { key: h, label: capitalize(h) }
@@ -57,7 +56,6 @@ const normalizedHeaders = computed(() => {
   })
 })
 
-// Inicializar formulario con campos vacíos
 watch(
   normalizedHeaders,
   (newHeaders) => {
@@ -68,21 +66,18 @@ watch(
   { immediate: true }
 )
 
-// Configurar datos de la fila a editar
 const setFormData = (data) => {
   Object.keys(form).forEach(key => {
     form[key] = data[key] ?? ""
   })
 }
 
-// Abrir / cerrar diálogo
 const open = () => dialogRef.value?.showModal()
 const close = () => {
   dialogRef.value?.close()
   Object.keys(form).forEach(key => form[key] = "")
 }
 
-// Emitir solo los datos, nunca SubmitEvent
 const handleSubmit = () => {
   emit("submit", { ...form })
   close()
@@ -93,12 +88,10 @@ const onCancel = () => {
   close()
 }
 
-// Función para capitalizar labels
 function capitalize(str) {
   if (!str) return ""
   return str.charAt(0).toUpperCase() + str.slice(1).replace(/_/g, ' ')
 }
 
-// Exponer métodos al padre
 defineExpose({ open, close, setFormData })
 </script>

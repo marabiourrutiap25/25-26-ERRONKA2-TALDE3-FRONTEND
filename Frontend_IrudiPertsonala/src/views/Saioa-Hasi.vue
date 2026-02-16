@@ -1,120 +1,143 @@
 <template>
-  <div class="login-container">
-    <!-- Div con imagen -->
-    <div class="imagen-section">
-      <img src="@/assets/editatu.png" alt="Login" class="login-image" />
-    </div>
+  <div class="container-fluid vh-100 bg-primary d-flex justify-content-center align-items-center">
+    <div class="card shadow-lg p-4 rounded-4 w-100" style="max-width: 420px;">
+      
+      <!-- Logo -->
+      <div class="text-center mb-4">
+        <img 
+          src="@/assets/editatu.png" 
+          alt="Irudi Pertsonala Logo" 
+          class="img-fluid mb-3" 
+          style="max-width: 120px;"
+        />
+        <h1 class="h4 fw-bold mb-0">Irudi Pertsonala</h1>
+        <p class="text-muted mb-0">Peluquería & Estética</p>
+      </div>
 
-    <!-- Div con formulario -->
-    <div class="form-section">
-      <form @submit.prevent="handleLogin" class="login-form">
-        <h2 class="mb-4 text-center">Saioa Hasi</h2>
+      <!-- Formulario -->
+      <form @submit.prevent="iniciarSesion">
         
+        <!-- Email -->
         <div class="mb-3">
-          <label for="usuario" class="form-label">Erabiltzailea</label>
-          <input
-            type="text"
-            class="form-control"
-            id="usuario"
-            v-model="usuario"
-            placeholder="Sartu erabiltzailea"
-            required
-          />
+          <label for="email" class="form-label fw-medium">Correo electrónico</label>
+          <div class="input-group">
+            <span class="input-group-text">📧</span>
+            <input
+              id="email"
+              type="email"
+              class="form-control"
+              v-model="email"
+              required
+              placeholder="tucorreo@ejemplo.com"
+            />
+          </div>
         </div>
 
+        <!-- Password -->
         <div class="mb-3">
-          <label for="pasahitza" class="form-label">Pasahitza</label>
-          <input
-            type="password"
-            class="form-control"
-            id="pasahitza"
-            v-model="pasahitza"
-            placeholder="Sartu pasahitza"
-            required
-          />
+          <label for="password" class="form-label fw-medium">Contraseña</label>
+          <div class="input-group">
+            <span class="input-group-text">🔒</span>
+            <input
+              id="password"
+              :type="mostrarPassword ? 'text' : 'password'"
+              class="form-control"
+              v-model="password"
+              required
+              minlength="4"
+              placeholder="••••••••"
+            />
+            <button 
+              type="button" 
+              class="btn btn-outline-secondary"
+              @click="mostrarPassword = !mostrarPassword"
+            >
+              {{ mostrarPassword ? '🙈' : '👁️' }}
+            </button>
+          </div>
         </div>
 
-        <button type="submit" class="btn btn-light w-100">Sartu</button>
+        <!-- Recordar -->
+        <div class="mb-3 form-check">
+          <input 
+            type="checkbox" 
+            class="form-check-input" 
+            id="recordar" 
+            v-model="recordar"
+          >
+          <label class="form-check-label" for="recordar">
+            Recordarme
+          </label>
+        </div>
+
+        <!-- Error -->
+        <div v-if="error" class="alert alert-danger py-2" role="alert">
+          {{ error }}
+        </div>
+
+        <!-- Botón -->
+        <button 
+          type="submit" 
+          class="btn btn-primary w-100 py-2 fw-semibold"
+          :disabled="cargando"
+        >
+          <span 
+            v-if="cargando" 
+            class="spinner-border spinner-border-sm me-2"
+          ></span>
+          {{ cargando ? 'Entrando...' : 'Iniciar Sesión' }}
+        </button>
+
       </form>
+
+      <!-- Olvidaste contraseña -->
+      <div class="text-center mt-4">
+        <a href="#" class="text-decoration-none text-muted small">
+          ¿Olvidaste tu contraseña?
+        </a>
+      </div>
+
     </div>
   </div>
 </template>
 
 <script setup>
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+import { login } from '@/composables/Api.js'
 
-const usuario = ref('')
-const pasahitza = ref('')
+const router = useRouter()
 
-function handleLogin() {
-  console.log('Login con:', { usuario: usuario.value, pasahitza: pasahitza.value })
-  // Aquí va la lógica de autenticación
+// Variables del formulario
+const email = ref('')
+const password = ref('')
+const error = ref('')
+const cargando = ref(false)
+const mostrarPassword = ref(false)
+const recordar = ref(false)
+
+// Método de login
+const iniciarSesion = async () => {
+  error.value = ''
+  cargando.value = true
+
+  try {
+    // Llamada a tu API de login
+    await login(email.value, password.value, recordar.value)
+
+    // Redirige a la página principal después del login
+    router.push('/egutegiak') // <- Cambia a la ruta que quieras
+  } catch (err) {
+    if (err.status === 422) {
+      error.value = 'Credenciales incorrectas.'
+    } else if (err.status === 401) {
+      error.value = 'No autorizado.'
+    } else {
+      error.value = 'Error de conexión. Intenta de nuevo más tarde.'
+    }
+    console.error('Error login:', err)
+  } finally {
+    cargando.value = false
+  }
 }
 </script>
-
-<style scoped>
-.login-container {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-  background: linear-gradient(135deg, #0066cc 0%, #0052a3 100%);
-  padding: 20px;
-  gap: 30px;
-}
-
-.imagen-section {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.login-image {
-  width: 120px;
-  height: 120px;
-  object-fit: cover;
-  border-radius: 10px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-}
-
-.form-section {
-  background: white;
-  padding: 40px;
-  border-radius: 10px;
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-  width: 100%;
-  max-width: 400px;
-}
-
-.login-form h2 {
-  color: #0066cc;
-  font-weight: bold;
-}
-
-.form-control {
-  border: 2px solid #0066cc;
-  border-radius: 5px;
-  padding: 10px;
-}
-
-.form-control:focus {
-  border-color: #0052a3;
-  box-shadow: 0 0 0 0.2rem rgba(0, 102, 204, 0.25);
-}
-
-.btn-light {
-  background-color: #0066cc;
-  color: white;
-  border: none;
-  font-weight: bold;
-  padding: 10px;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background-color 0.3s;
-}
-
-.btn-light:hover {
-  background-color: #0052a3;
-}
-</style>

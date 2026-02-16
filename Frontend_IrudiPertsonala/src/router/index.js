@@ -22,7 +22,7 @@ const routes = [
   { path: "/bezeroak", component: Bezeroak },
   { path: "/hitzorduak", component: Hitzorduak },
   { path: "/mugimenduak", component: Mugimenduak },
-  { path: "/saioa-hasi", component: Saioa },
+  { path: "/", component: Saioa },
   { path: "/txandak", component: Txandak },
 ];
 

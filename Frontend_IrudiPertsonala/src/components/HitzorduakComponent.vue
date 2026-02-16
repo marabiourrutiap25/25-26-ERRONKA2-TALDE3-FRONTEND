@@ -13,13 +13,12 @@
         <tr v-for="hour in hours" :key="hour">
           <th>{{ hour }}:00</th>
           <td v-for="day in days" :key="day.toDateString() + '-' + hour">
-            <!-- Mostrar solo las citas que empiezan en esta celda -->
             <div
               v-for="item in citasInicioCelda(day, hour)"
               :key="item.id"
               class="bg-secondary text-white p-1 mb-1 rounded"
               :style="{ height: calcularAltura(item), cursor: 'pointer' }"
-              @click="$emit('editar', item)"  <!-- Abrir modal Editatu.vue -->
+              @click="$emit('editar', item)"
             >
               Seat {{ item.seat }} <br>
               {{ item.start_time }} - {{ item.end_time }}
@@ -37,7 +36,7 @@ import { startOfWeek, addDays, format } from 'date-fns'
 
 const props = defineProps({
   week: { type: String, required: true },
-  datos: { type: Array, default: () => [] } // array de citas
+  datos: { type: Array, default: () => [] }
 })
 
 // Horas del calendario (8 a 20)
@@ -60,7 +59,13 @@ function formatDate(date) {
 function citasInicioCelda(day, hour) {
   return props.datos.filter(item => {
     if (!item.id || !item.date || !item.start_time) return false
-    const start = new Date(`${item.date}T${item.start_time}`)
+
+    // Crear fecha local robusta, incluyendo segundos
+    const [year, month, date] = item.date.split('-').map(Number)
+    const [h, m, s] = item.start_time.split(':').map(Number)
+    const start = new Date(year, month - 1, date, h, m, s)
+
+    // Comparar solo la hora (entera) para colocar en la celda
     return (
       start.getFullYear() === day.getFullYear() &&
       start.getMonth() === day.getMonth() &&
@@ -70,15 +75,20 @@ function citasInicioCelda(day, hour) {
   })
 }
 
-
 // Calcular altura proporcional según duración de la cita
 function calcularAltura(item) {
   if (!item.start_time || !item.end_time) return '60px'
-  const start = new Date(`${item.date}T${item.start_time}`)
-  const end = new Date(`${item.date}T${item.end_time}`)
-  const diffMs = end - start
-  const diffHoras = diffMs / (1000 * 60 * 60)
-  const altura = Math.max(diffHoras * 60, 30) // mínimo 30px
+
+  const [year, month, date] = item.date.split('-').map(Number)
+
+  const [sh, sm, ss] = item.start_time.split(':').map(Number)
+  const [eh, em, es] = item.end_time.split(':').map(Number)
+
+  const start = new Date(year, month - 1, date, sh, sm, ss)
+  const end = new Date(year, month - 1, date, eh, em, es)
+
+  const diffHoras = (end - start) / (1000 * 60 * 60)
+  const altura = Math.max(diffHoras * 60, 30)
   return `${altura}px`
 }
 </script>
