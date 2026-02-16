@@ -1,7 +1,7 @@
 // src/composables/Api.js
 
 const API_URL = 'http://127.0.0.1:8000/api';
-const tokenFijo = "tPtNggGY0QmiL7a7FE9YFxcG2dAzLHvOsVTQd7zb99d535d8";
+const tokenFijo = "egOGVWfm7BIWJT6I1U1gtzvQ7r3y5iTO5IHAm7bu99ea31ea";
 
 // =======================
 // FUNCION GENÉRICA PARA LLAMAR API
