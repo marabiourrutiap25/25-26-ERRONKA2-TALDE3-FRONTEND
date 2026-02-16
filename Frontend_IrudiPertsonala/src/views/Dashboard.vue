@@ -13,7 +13,7 @@
         </button>
         <button 
           class="btn btn-light btn-sm" 
-          @click="$emit('cerrar-sesion')"
+          @click="cerrarSesion"
         >
           Saioa Itxi
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" style="margin-left: 4px;">
@@ -33,28 +33,28 @@
 
       <!-- Botones superiores -->
       <div class="d-flex justify-content-center gap-3 mb-4 flex-wrap">
-        <button class="menu-btn-white">
+        <button class="menu-btn-white" @click="router.push('/hitzorduak')">
           <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" viewBox="0 0 16 16">
             <path d="M11 6.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1z"/>
             <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1z"/>
           </svg>
           <div>Hitzorduak</div>
         </button>
-        <button class="menu-btn-white">
+        <button class="menu-btn-white" @click="router.push('/txandak')">
           <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" viewBox="0 0 16 16">
             <path d="M8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71V3.5z"/>
             <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm7-8A7 7 0 1 1 1 8a7 7 0 0 1 14 0z"/>
           </svg>
           <div>Txandak</div>
         </button>
-        <button class="menu-btn-white">
+        <button class="menu-btn-white" @click="router.push('/mugimenduak')">
           <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" viewBox="0 0 16 16">
             <path d="M2.5 8a5.5 5.5 0 0 1 8.25-4.764.5.5 0 0 0 .5-.866A6.5 6.5 0 1 0 14.5 8a.5.5 0 0 0-1 0 5.5 5.5 0 1 1-11 0z"/>
             <path d="M15.354 3.354a.5.5 0 0 0-.708-.708L8 9.293 5.354 6.646a.5.5 0 1 0-.708.708l3 3a.5.5 0 0 0 .708 0l7-7z"/>
           </svg>
           <div>Mugimenduak</div>
         </button>
-        <button class="menu-btn-white">
+        <button class="menu-btn-white" @click="router.push('/bezeroak')">
           <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" viewBox="0 0 16 16">
             <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6Zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0Zm4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4Zm-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10Z"/>
           </svg>
@@ -73,13 +73,13 @@
             <span>Inbentarioa</span>
           </div>
           <div class="section-content">
-            <button class="card-btn">
+            <button class="card-btn" @click="router.push('/materialak')">
               <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="currentColor" viewBox="0 0 16 16">
                 <path d="M3.5 3.5c-.614-.884-.074-1.962.858-2.5L8 7.226 11.642 1c.932.538 1.472 1.616.858 2.5L8.81 8.61l1.556 2.661a2.5 2.5 0 1 1-.794.637L8 9.73l-1.572 2.177a2.5 2.5 0 1 1-.794-.637L7.19 8.61 3.5 3.5zm2.5 10a1.5 1.5 0 1 0-3 0 1.5 1.5 0 0 0 3 0zm7 0a1.5 1.5 0 1 0-3 0 1.5 1.5 0 0 0 3 0z"/>
               </svg>
               <div>Materialak</div>
             </button>
-            <button class="card-btn">
+            <button class="card-btn" @click="router.push('/produktuak')">
               <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="currentColor" viewBox="0 0 16 16">
                 <path d="M8 1a2.5 2.5 0 0 1 2.5 2.5V4h-5v-.5A2.5 2.5 0 0 1 8 1zm3.5 3v-.5a3.5 3.5 0 1 0-7 0V4H1v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V4h-3.5zM2 5h12v9a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V5z"/>
               </svg>
@@ -119,11 +119,22 @@
 
 <script setup>
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+import { logout as apiLogout } from '@/composables/Api.js'
 import SidebarMenu from '@/components/SidebarMenu.vue'
 
-defineEmits(['cerrar-sesion'])
-
+const router = useRouter()
 const menuAbierto = ref(false)
+
+const cerrarSesion = async () => {
+  try {
+    await apiLogout()
+  } catch (err) {
+    console.error('Error al cerrar sesión:', err)
+  } finally {
+    router.push({ name: 'login' })
+  }
+}
 </script>
 
 <style scoped>

@@ -1,5 +1,108 @@
 const API_URL = 'http://localhost:8000/api'
 
+async function llamarAPI(metodo, endpoint, datos = {}) {
+  let url = `${API_URL}/${endpoint}`;  
+  const token = localStorage.getItem('token') 
+  const headers = { 
+    'Content-Type': 'application/json', 
+    'Authorization': `Bearer ${token}` 
+  };
+  const options = { method: metodo, headers };
+
+  let bodyDatos = { ...datos };
+  if (datos.id) {
+    url += `/${datos.id}`;
+    delete bodyDatos.id;
+  }
+
+  if (metodo !== "GET" && metodo !== "HEAD") {
+    options.body = JSON.stringify(bodyDatos);
+  } else if (Object.keys(bodyDatos).length > 0) {
+    const query = new URLSearchParams(bodyDatos).toString();
+    url += `?${query}`;
+  }
+
+  const response = await fetch(url, options);
+  const text = await response.text();
+  let resultado = null;
+
+  try {
+    resultado = text ? JSON.parse(text) : null;
+  } catch (err) {
+    console.error('Respuesta no es JSON:', { status: response.status, text });
+    throw new Error(`API devolvió no JSON. Estado: ${response.status}`);
+  }
+
+  if (!response.ok) {
+    const mensaje = resultado?.error || `HTTP error ${response.status}`;
+    throw new Error(mensaje);
+  }
+
+  return resultado;
+}
+
+
+// =======================
+// FUNCIONES CRUD
+// =======================
+export async function cargarObjetos(endpoint) {
+  try {
+    const resultado = await llamarAPI('GET', endpoint);
+    if (Array.isArray(resultado)) return resultado;
+    if (resultado && typeof resultado === 'object') {
+      return resultado.data || resultado.results || resultado.items || resultado;
+    }
+    return [];
+  } catch (err) {
+    console.error('Error al cargar datos:', err);
+    return [];
+  }
+}
+
+export async function cargarObjeto(filtros, endpoint) {
+  try {
+    return await llamarAPI('GET', endpoint, filtros);
+  } catch (err) {
+    console.error('Error al cargar objeto:', err);
+    return null;
+  }
+}
+
+export async function aldatuObjeto(datos, endpoint) {
+  try {
+    return await llamarAPI('PUT', endpoint, datos);
+  } catch (err) {
+    console.error('Error al actualizar objeto:', err);
+    return null;
+  }
+}
+
+export async function ezabatuObjektua(datos, endpoint) {
+  try {
+    return await llamarAPI('DELETE', endpoint, datos);
+  } catch (err) {
+    console.error('Error al eliminar objeto:', err);
+    alert('Error al eliminar: ' + err.message);
+    return null;
+  }
+}
+
+export async function crearObjektua(datos, endpoint) {
+  try {
+    return await llamarAPI('POST', endpoint, datos);
+  } catch (err) {
+    console.error('Error al crear objeto:', err);
+    return null;
+  }
+}
+
+
+
+
+
+
+
+
 // LOGIN
 export async function login(email, password, recordar = false) {
   const response = await fetch(API_URL + '/login', {
@@ -64,4 +167,18 @@ export const getCurrentUser = () => {
 // OBTENER TOKEN
 export const getToken = () => {
   return localStorage.getItem('token') || sessionStorage.getItem('token')
+}
+
+export default{
+  login,
+  logout,
+  isAuthenticated,
+  getCurrentUser,
+  getToken,
+  cargarObjetos,
+  cargarObjeto,
+  aldatuObjeto,
+  ezabatuObjektua,
+  crearObjektua
+
 }

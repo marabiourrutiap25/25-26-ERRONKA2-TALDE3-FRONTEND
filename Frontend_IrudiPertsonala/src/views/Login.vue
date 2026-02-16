@@ -78,9 +78,10 @@
 
 <script setup>
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
 import { login } from '@/composables/Api.js'
 
-const emit = defineEmits(['login-exitoso'])
+const router = useRouter()
 
 const email = ref('')
 const password = ref('')
@@ -94,9 +95,9 @@ const iniciarSesion = async () => {
   cargando.value = true
 
   try {
-    const response = await login(email.value, password.value, recordar.value)
+    await login(email.value, password.value, recordar.value)
     
-    emit('login-exitoso', response.user)
+    router.push({ name: 'dashboard' })
   } catch (err) {
     if (err.status === 422) {
       error.value = 'Credenciales incorrectas. Verifica tu email y contraseña.'

@@ -1,12 +1,12 @@
 <template>
   <div class="container">
     <div class="d-flex justify-content-between align-items-center my-4">
-      <h2 class="mb-0">Gestión de Zerbitzuak</h2>
+      <h2 class="mb-0">Gestión de Bezeroak</h2>
     </div>
 
     <!-- Tabla con acciones crear, editar y borrar -->
     <Tabla
-      :filas="Zerbitzua"
+      :filas="Bezeroa"
       @crear="crear"
       @editar="editar"
       @borrar="borrar"
@@ -19,17 +19,17 @@ import { ref, onMounted } from 'vue'
 import Tabla from '../components/tabla.vue'
 import Api from '../composables/Api.js'
 
-const Zerbitzua = ref([])
-const tableName = "services" // Nombre de la tabla en la API
+const Bezeroa = ref([])
+const tableName = "clients" // Nombre de la tabla en la API
 
 // 🔹 Cargar datos iniciales
 const cargarDatos = async () => {
   try {
-    Zerbitzua.value = await Api.cargarObjetos(tableName)
-    console.log("Datos cargados:", Zerbitzua.value)
+    Bezeroa.value = await Api.cargarObjetos(tableName)
+    console.log("Datos cargados:", Bezeroa.value)
   } catch (error) {
     console.error("Error cargando datos:", error)
-    Zerbitzua.value = []
+    Bezeroa.value = []
   }
 }
 
