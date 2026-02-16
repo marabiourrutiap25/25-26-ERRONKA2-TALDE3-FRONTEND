@@ -105,8 +105,10 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { login } from '@/composables/Api.js'
+import { useMainStore } from '@/stores/UserStore.js'
 
 const router = useRouter()
+const store = useMainStore()
 
 // Variables del formulario
 const email = ref('')
@@ -123,10 +125,13 @@ const iniciarSesion = async () => {
 
   try {
     // Llamada a tu API de login
-    await login(email.value, password.value, recordar.value)
+    const data = await login(email.value, password.value, recordar.value)
+
+    // Guardar usuario y token en el store
+    store.setUsuario(data.user, data.token)
 
     // Redirige a la página principal después del login
-    router.push('/egutegiak') // <- Cambia a la ruta que quieras
+    router.push('/egutegiak') 
   } catch (err) {
     if (err.status === 422) {
       error.value = 'Credenciales incorrectas.'
