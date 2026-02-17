@@ -1,67 +1,30 @@
 <template>
-  <SidebarMenu v-model="menuAbierto" />
-  <div class="container my-4">
+  <div class="container">
+    <Container_De_Mierda_Toast />
+
     <div class="d-flex justify-content-between align-items-center my-4">
       <h2 class="mb-0">Kudeaketa - Txandak</h2>
-      <button class="btn btn-success" @click="abrirCrear">
-        Crear Txanda
-      </button>
     </div>
 
-    <div v-if="Txandak.length" class="table-responsive">
-      <table class="table table-hover border rounded mb-0">
-        <tbody class="bg-light">
-          <tr>
-            <td colspan="100%">
-              <div class="d-flex justify-content-between align-items-center">
-                <span class="fw-bold">Txanda</span>
-              </div>
-            </td>
-          </tr>
-        </tbody>
-        <thead class="table-light">
-          <tr>
-            <th v-for="header in headersVisibles" :key="header">
-              {{ header === 'student_name' ? 'IKASLEA' : header.toUpperCase() }}
-            </th>
-            <th class="text-end">Acciones</th>
-          </tr>
-        </thead>
-        <tbody class="bg-white">
-          <tr v-for="(fila, index) in Txandak" :key="index">
-            <td v-for="header in headersVisibles" :key="header"
-              style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"
-              :title="fila[header]">
-              {{ truncar(fila[header]) }}
-            </td>
-            <td>
-              <div class="d-flex justify-content-end">
-                <button type="button" class="btn p-0 me-2" @click="prepararEdicion(fila)">
-                  <img src="@/assets/editatu.png" alt="Editar" style="max-width: 24px;" />
-                </button>
-                <button type="button" class="btn p-0 me-2" @click="borrar(fila.id)">
-                  <img src="@/assets/ezabatu.png" alt="Borrar" style="max-width: 24px;" />
-                </button>
-              </div>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+    <Huevada_De_Tabla :filas="Txandak" titulo="Txandak" etiqueta-tabla="Txandak"
+      texto-btn-crear="Txanda sortu" :mapa-headers="{ student_name: 'IKASLEA' }"
+      :columnas-excluidas="['id', 'student_id', 'created_at', 'updated_at', 'deleted_at']"
+      @crear="abrirCrear" @editar="prepararEdicion" @borrar="borrar" />
 
     <dialog ref="modalRef" class="custom-dialog p-0 border-0 shadow-lg rounded-4">
       <div class="modal-content border-0">
         <div class="modal-header border-bottom-0 pt-4 px-4 pb-2 d-flex justify-content-between align-items-center">
           <h4 class="modal-title fw-bold text-dark">
-            {{ modoEdicion ? 'Editar Txanda' : 'Crear Txanda' }}
+            {{ modoEdicion ? 'Editar' : 'Crear' }} Txanda
           </h4>
           <button type="button" class="btn-close-custom" @click="cerrarModal">✕</button>
         </div>
 
         <div class="modal-body px-4 pb-4">
           <form @submit.prevent="guardar">
+
             <div class="mb-4">
-              <label class="custom-label">ALUMNO</label>
+              <label class="custom-label">IKASLEA</label>
               <select v-model="form.student_id" class="form-control custom-input" required>
                 <option value="" disabled>Selecciona un alumno</option>
                 <option v-for="alumno in alumnosLista" :key="alumno.id" :value="alumno.id">
@@ -70,12 +33,11 @@
               </select>
             </div>
 
-            <div v-for="header in headersOriginales" :key="header" class="mb-4">
-              <div
-                v-if="!['id', 'student_id', 'student_name', 'created_at', 'updated_at', 'deleted_at'].includes(header.toLowerCase())">
-                <label :for="header" class="custom-label">{{ header.toUpperCase() }}</label>
-                <input :id="header" v-model="form[header]" type="text" class="form-control custom-input"
-                  :placeholder="'Introduce ' + header" />
+            <div v-for="key in Object.keys(form)" :key="key">
+              <div v-if="esCampoEditable(key)" class="mb-4">
+                <label :for="key" class="custom-label">{{ key.toUpperCase().replace(/_/g, ' ') }}</label>
+                <input :id="key" v-model="form[key]" type="text" class="form-control custom-input"
+                  :placeholder="'Introduce ' + key" />
               </div>
             </div>
 
@@ -91,35 +53,25 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, computed } from 'vue'
+import { ref, reactive, onMounted } from 'vue'
 import Api from '../composables/Api.js'
-import SidebarMenu from '@/components/SidebarMenu.vue'
+import { useToast } from '../composables/Movida_Necesarria_Use_Toast.js'
+import Huevada_De_Tabla from '../components/Huevada_De_Tabla.vue'
+import Container_De_Mierda_Toast from '../components/Container_De_Mierda_Toast.vue'
 
-const menuAbierto = ref(false)
+const { ok, err } = useToast()
 
 const Txandak = ref([])
 const alumnosLista = ref([])
 const tableName = "shifts"
+
 const modalRef = ref(null)
 const modoEdicion = ref(false)
-const currentId = ref(null)
 const form = reactive({})
 
-const headersOriginales = computed(() => {
-  if (!Txandak.value.length) return []
-  return Object.keys(Txandak.value[0])
-})
-
-// Filtrado de columnas para la tabla
-const headersVisibles = computed(() => {
-  const excluidos = ['id', 'student_id', 'created_at', 'updated_at', 'deleted_at']
-  return headersOriginales.value.filter(h => !excluidos.includes(h.toLowerCase()))
-})
-
-const truncar = (texto, limite = 20) => {
-  if (!texto) return ''
-  let t = texto.toString()
-  return t.length > limite ? t.slice(0, limite) + '…' : t
+const esCampoEditable = (key) => {
+  const excluidos = ['id', 'student_id', 'student_name', 'created_at', 'updated_at', 'deleted_at']
+  return !excluidos.includes(key.toLowerCase())
 }
 
 const cargarDatos = async () => {
@@ -130,31 +82,30 @@ const cargarDatos = async () => {
     ])
     alumnosLista.value = resStudents?.data || resStudents || []
     const listaRaw = resShifts?.data || resShifts || []
-
-    if (Array.isArray(listaRaw)) {
-      Txandak.value = listaRaw.map(turno => {
-        const alumno = alumnosLista.value.find(a => a.id === turno.student_id)
-        return {
-          ...turno,
-          student_name: alumno ? `${alumno.name} ${alumno.surnames}` : `ID: ${turno.student_id}`
-        }
-      })
-    }
-  } catch (e) { console.error(e) }
+    Txandak.value = listaRaw.map(turno => {
+      const alumno = alumnosLista.value.find(a => a.id === turno.student_id)
+      return { ...turno, student_name: alumno ? `${alumno.name} ${alumno.surnames}` : `ID: ${turno.student_id}` }
+    })
+  } catch (e) {
+    console.error("Error cargando datos:", e)
+    Txandak.value = []
+  }
 }
 
 const abrirCrear = () => {
   modoEdicion.value = false
-  currentId.value = null
-  Object.keys(form).forEach(k => form[k] = "")
+  for (let k in form) delete form[k]
+  if (Txandak.value.length > 0) {
+    Object.keys(Txandak.value[0]).forEach(key => { if (esCampoEditable(key)) form[key] = "" })
+  }
   form.student_id = ""
   modalRef.value?.showModal()
 }
 
 const prepararEdicion = (fila) => {
   modoEdicion.value = true
-  currentId.value = fila.id
-  headersOriginales.value.forEach(h => { form[h] = fila[h] || "" })
+  for (let k in form) delete form[k]
+  Object.assign(form, fila)
   modalRef.value?.showModal()
 }
 
@@ -162,22 +113,30 @@ const cerrarModal = () => modalRef.value?.close()
 
 const guardar = async () => {
   try {
-    // Extraemos solo lo necesario para el payload, evitando campos de solo lectura
-    const { student_name, id, created_at, updated_at, deleted_at, ...payload } = form
+    const { id, student_name, created_at, updated_at, deleted_at, ...payload } = form
     let res
-    if (modoEdicion.value) {
-      res = await Api.aldatuObjeto({ id: currentId.value, ...payload }, tableName)
-    } else {
-      res = await Api.crearObjektua(payload, tableName)
+    if (modoEdicion.value) res = await Api.aldatuObjeto({ id, ...payload }, tableName)
+    else res = await Api.crearObjektua(payload, tableName)
+    if (res) {
+      cerrarModal()
+      await cargarDatos()
+      ok(res.message || (modoEdicion.value ? 'Txanda actualizada correctamente' : 'Txanda creada correctamente'))
     }
-    if (res) { cerrarModal(); await cargarDatos() }
-  } catch (e) { alert(e.message) }
+  } catch (e) {
+    err(e.message || 'Error al guardar')
+  }
 }
 
 const borrar = async (id) => {
-  if (confirm('¿Borrar registro?')) {
+  if (!confirm('Ziur zaude ezabatu nahi duzulaz?')) return
+  try {
     const res = await Api.ezabatuObjektua({ id }, tableName)
-    if (res) await cargarDatos()
+    if (res) {
+      await cargarDatos()
+      ok(res.message || 'Txanda eliminada correctamente')
+    }
+  } catch (e) {
+    err(e.message || 'Error al eliminar')
   }
 }
 

@@ -30,7 +30,7 @@
               Cancelar
             </button>
             <button type="submit" class="btn btn-save px-4">
-              Guardar Cambios
+              Aldaketak gorde
             </button>
           </div>
         </form>
