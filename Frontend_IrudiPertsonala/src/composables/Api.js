@@ -34,7 +34,7 @@ async function llamarAPI(metodo, endpoint, datos = {}) {
   }
 
   if (!response.ok) {
-    const mensaje = resultado?.error || `HTTP error ${response.status}`;
+    const mensaje = resultado?.errors || `HTTP error ${response.status}`;
     throw new Error(mensaje);
   }
 
@@ -73,7 +73,7 @@ export async function aldatuObjeto(datos, endpoint) {
     return await llamarAPI('PUT', endpoint, datos);
   } catch (err) {
     console.error('Error al actualizar objeto:', err);
-    return null;
+    throw err; // antes: return null
   }
 }
 
@@ -83,7 +83,7 @@ export async function ezabatuObjektua(datos, endpoint) {
   } catch (err) {
     console.error('Error al eliminar objeto:', err);
     alert('Error al eliminar: ' + err.message);
-    return null;
+    throw err; // antes: alert(...) + return null
   }
 }
 
@@ -92,6 +92,7 @@ export async function crearObjektua(datos, endpoint) {
     return await llamarAPI('POST', endpoint, datos);
   } catch (err) {
     console.error('Error al crear objeto:', err);
+    alert('Error al crear: ' + err.message);
     return null;
   }
 }

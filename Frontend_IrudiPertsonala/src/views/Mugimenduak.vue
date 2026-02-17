@@ -7,11 +7,11 @@
     </div>
 
     <DataTable :filas="Consumables" titulo="Kontsumible - Ikasle" etiqueta-tabla="Consumable"
-      texto-btn-crear="Crear Consumable" @crear="abrirCrear('consumable')"
+      texto-btn-crear="Kontsumiblea sortu" @crear="abrirCrear('consumable')"
       @editar="(fila) => prepararEdicion(fila, 'consumable')" @borrar="(id) => borrar(id, 'consumable')" />
 
     <DataTable :filas="Equipments" titulo="Ekipamentu - Ikasle" etiqueta-tabla="Equipment"
-      texto-btn-crear="Crear Equipment" @crear="abrirCrear('equipment')"
+      texto-btn-crear="Ekipamentua sortu" @crear="abrirCrear('equipment')"
       @editar="(fila) => prepararEdicion(fila, 'equipment')" @borrar="(id) => borrar(id, 'equipment')" />
 
     <dialog ref="modalRef" class="custom-dialog p-0 border-0 shadow-lg rounded-4">

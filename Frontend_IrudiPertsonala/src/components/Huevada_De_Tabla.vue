@@ -70,7 +70,7 @@ const props = defineProps({
     // Columnas que nunca deben mostrarse en la tabla
     columnasExcluidas: {
         type: Array,
-        default: () => ['id', 'student_id', 'consumable_id', 'equipment_id', 'created_at', 'updated_at', 'deleted_at']
+        default: () => ['id', 'student_id', 'consumable_id', 'equipment_id', 'created_at', 'updated_at', 'deleted_at', 'consumable_category_id']
     },
     // Mapa de cabeceras personalizadas { clave: 'Texto visible' }
     mapaHeaders: {

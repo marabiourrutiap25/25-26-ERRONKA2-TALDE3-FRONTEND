@@ -6,7 +6,7 @@
       <h2 class="mb-0">Kudeaketa - Materialak</h2>
     </div>
 
-    <DataTable :filas="Materiala" titulo="Materialak" etiqueta-tabla="Equipment" texto-btn-crear="Crear Equipment"
+    <DataTable :filas="Materiala" titulo="Materialak" etiqueta-tabla="Equipment" texto-btn-crear="Materiala sortu"
       :mapa-headers="{ category_name: 'KATEGORIA' }" @crear="abrirCrear" @editar="prepararEdicion" @borrar="borrar" />
 
     <dialog ref="modalRef" class="custom-dialog p-0 border-0 shadow-lg rounded-4">
