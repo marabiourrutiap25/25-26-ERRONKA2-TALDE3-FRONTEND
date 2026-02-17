@@ -1,5 +1,11 @@
 const API_URL = 'http://localhost:8000/api'
 
+// Extrae el mensaje más relevante de cualquier respuesta de la API
+function extraerMensaje(resultado) {
+  if (!resultado) return null
+  return resultado.message || resultado.errors || resultado.data || null
+}
+
 async function llamarAPI(metodo, endpoint, datos = {}) {
   let url = `${API_URL}/${endpoint}`;  
   const token = localStorage.getItem('token') 
@@ -34,8 +40,13 @@ async function llamarAPI(metodo, endpoint, datos = {}) {
   }
 
   if (!response.ok) {
-    const mensaje = resultado?.errors || `HTTP error ${response.status}`;
-    throw new Error(mensaje);
+    // Lanzar el mensaje que venga de la API, sea en errors, message o data
+    throw new Error(extraerMensaje(resultado) || `HTTP error ${response.status}`);
+  }
+
+  // Adjuntar siempre un .message normalizado al resultado
+  if (resultado && typeof resultado === 'object') {
+    resultado.message = extraerMensaje(resultado)
   }
 
   return resultado;
@@ -73,7 +84,7 @@ export async function aldatuObjeto(datos, endpoint) {
     return await llamarAPI('PUT', endpoint, datos);
   } catch (err) {
     console.error('Error al actualizar objeto:', err);
-    throw err; // antes: return null
+    throw err;
   }
 }
 
@@ -82,8 +93,7 @@ export async function ezabatuObjektua(datos, endpoint) {
     return await llamarAPI('DELETE', endpoint, datos);
   } catch (err) {
     console.error('Error al eliminar objeto:', err);
-    alert('Error al eliminar: ' + err.message);
-    throw err; // antes: alert(...) + return null
+    throw err;
   }
 }
 
@@ -92,16 +102,9 @@ export async function crearObjektua(datos, endpoint) {
     return await llamarAPI('POST', endpoint, datos);
   } catch (err) {
     console.error('Error al crear objeto:', err);
-    alert('Error al crear: ' + err.message);
-    return null;
+    throw err;
   }
 }
-
-
-
-
-
-
 
 
 // LOGIN
@@ -123,8 +126,6 @@ export async function login(email, password, recordar = false) {
   console.log('Respuesta del servidor:', data)
 
   if (response.ok) {
-    // Si el usuario marca "Recordarme", usar localStorage (persistente)
-    // Si no, usar sessionStorage (se borra al cerrar la ventana)
     const storage = recordar ? localStorage : sessionStorage
     storage.setItem('token', data.token)
     storage.setItem('usuario', JSON.stringify(data.user))
@@ -147,7 +148,6 @@ export async function logout() {
     }
   })
 
-  // Limpiar ambos storages
   localStorage.removeItem('token')
   localStorage.removeItem('usuario')
   sessionStorage.removeItem('token')
@@ -170,7 +170,7 @@ export const getToken = () => {
   return localStorage.getItem('token') || sessionStorage.getItem('token')
 }
 
-export default{
+export default {
   login,
   logout,
   isAuthenticated,
@@ -181,5 +181,4 @@ export default{
   aldatuObjeto,
   ezabatuObjektua,
   crearObjektua
-
 }

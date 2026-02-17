@@ -1,14 +1,15 @@
 <template>
-  <SidebarMenu v-model="menuAbierto" />
   <div class="container">
-    <ToastContainer />
+    <Container_De_Mierda_Toast />
 
     <div class="d-flex justify-content-between align-items-center my-4">
       <h2 class="mb-0">Kudeaketa - Materialak</h2>
     </div>
 
-    <DataTable :filas="Materiala" titulo="Materialak" etiqueta-tabla="Equipment" texto-btn-crear="Materiala sortu"
-      :mapa-headers="{ category_name: 'KATEGORIA' }" @crear="abrirCrear" @editar="prepararEdicion" @borrar="borrar" />
+    <Huevada_De_Tabla :filas="Materiala" titulo="Materialak" etiqueta-tabla="Equipment"
+      texto-btn-crear="Crear Equipment" :mapa-headers="{ category_name: 'KATEGORIA' }"
+      :columnas-excluidas="['id', 'equipment_category_id', 'created_at', 'updated_at', 'deleted_at']"
+      @crear="abrirCrear" @editar="prepararEdicion" @borrar="borrar" />
 
     <dialog ref="modalRef" class="custom-dialog p-0 border-0 shadow-lg rounded-4">
       <div class="modal-content border-0">
@@ -55,12 +56,10 @@
 import { ref, reactive, onMounted } from 'vue'
 import Api from '../composables/Api.js'
 import { useToast } from '../composables/Movida_Necesarria_Use_Toast.js'
-import SidebarMenu from '@/components/SidebarMenu.vue'
-import DataTable from '../components/Huevada_De_Tabla.vue'
-import ToastContainer from '../components/Container_De_Mierda_Toast.vue'
-const { ok, err } = useToast()
+import Huevada_De_Tabla from '../components/Huevada_De_Tabla.vue'
+import Container_De_Mierda_Toast from '../components/Container_De_Mierda_Toast.vue'
 
-const menuAbierto = ref(false)
+const { ok, err } = useToast()
 
 const Materiala = ref([])
 const listaCategorias = ref([])
@@ -70,30 +69,22 @@ const modalRef = ref(null)
 const modoEdicion = ref(false)
 const form = reactive({})
 
-// --- HELPERS ---
 const esCampoEditable = (key) => {
   const excluidos = ['id', 'equipment_category_id', 'category_name', 'created_at', 'updated_at', 'deleted_at']
   return !excluidos.includes(key.toLowerCase())
 }
 
-// --- CARGA ---
 const cargarDatos = async () => {
   try {
     const [resEquipment, resCat] = await Promise.all([
       Api.cargarObjetos(tableName),
       Api.cargarObjetos("equipment-categories")
     ])
-
     listaCategorias.value = resCat?.data || resCat || []
     const equipmentRaw = resEquipment?.data || resEquipment || []
-
-    // Mapear equipment_category_id → category_name
     Materiala.value = equipmentRaw.map(item => {
       const cat = listaCategorias.value.find(c => c.id === item.equipment_category_id)
-      return {
-        ...item,
-        category_name: cat ? cat.name : `ID: ${item.equipment_category_id}`
-      }
+      return { ...item, category_name: cat ? cat.name : `ID: ${item.equipment_category_id}` }
     })
   } catch (e) {
     console.error("Error cargando datos:", e)
@@ -104,14 +95,10 @@ const cargarDatos = async () => {
 const abrirCrear = () => {
   modoEdicion.value = false
   for (let k in form) delete form[k]
-
   if (Materiala.value.length > 0) {
-    Object.keys(Materiala.value[0]).forEach(key => {
-      if (esCampoEditable(key)) form[key] = ""
-    })
+    Object.keys(Materiala.value[0]).forEach(key => { if (esCampoEditable(key)) form[key] = "" })
   }
   form.equipment_category_id = ""
-
   modalRef.value?.showModal()
 }
 
@@ -124,34 +111,32 @@ const prepararEdicion = (fila) => {
 
 const cerrarModal = () => modalRef.value?.close()
 
-// --- CRUD ---
 const guardar = async () => {
   try {
     const { id, category_name, created_at, updated_at, deleted_at, ...payload } = form
-
     let res
     if (modoEdicion.value) res = await Api.aldatuObjeto({ id, ...payload }, tableName)
     else res = await Api.crearObjektua(payload, tableName)
-
     if (res) {
       cerrarModal()
       await cargarDatos()
-      ok(modoEdicion.value ? 'Equipment actualizado correctamente' : 'Equipment creado correctamente')
+      ok(res.message || (modoEdicion.value ? 'Equipment actualizado correctamente' : 'Equipment creado correctamente'))
     }
   } catch (e) {
-    err(`Error al guardar: ${e.message}`)
+    err(e.message || 'Error al guardar')
   }
 }
 
 const borrar = async (id) => {
   if (!confirm('Ziur zaude ezabatu nahi duzulaz?')) return
   try {
-    if (await Api.ezabatuObjektua({ id }, tableName)) {
+    const res = await Api.ezabatuObjektua({ id }, tableName)
+    if (res) {
       await cargarDatos()
-      ok('Equipment eliminado correctamente')
+      ok(res.message || 'Equipment eliminado correctamente')
     }
   } catch (e) {
-    err(`Error al eliminar: ${e.message}`)
+    err(e.message || 'Error al eliminar')
   }
 }
 

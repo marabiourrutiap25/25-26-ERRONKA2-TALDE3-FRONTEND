@@ -8,17 +8,10 @@
       <h2 class="mb-0">Kudeaketa - Ikasleak</h2>
     </div>
 
-    <Huevada_De_Tabla
-      :filas="ikasleak"
-      titulo="Ikasleak"
-      etiqueta-tabla="Students"
-      texto-btn-crear="Crear Student"
+    <Huevada_De_Tabla :filas="ikasleak" titulo="Ikasleak" etiqueta-tabla="Students" texto-btn-crear="Iakslea sortu"
       :mapa-headers="{ group_name: 'TALDEA' }"
-      :columnas-excluidas="['id', 'group_id', 'created_at', 'updated_at', 'deleted_at']"
-      @crear="abrirCrear"
-      @editar="prepararEdicion"
-      @borrar="borrar"
-    />
+      :columnas-excluidas="['id', 'group_id', 'created_at', 'updated_at', 'deleted_at']" @crear="abrirCrear"
+      @editar="prepararEdicion" @borrar="borrar" />
 
     <dialog ref="modalRef" class="custom-dialog p-0 border-0 shadow-lg rounded-4">
       <div class="modal-content border-0">
@@ -32,7 +25,6 @@
         <div class="modal-body px-4 pb-4">
           <form @submit.prevent="guardar">
 
-            <!-- Grupo: siempre como select -->
             <div class="mb-4">
               <label class="custom-label">TALDEA</label>
               <select v-model="form.group_id" class="form-control custom-input" required>
@@ -43,17 +35,11 @@
               </select>
             </div>
 
-            <!-- Resto de campos editables dinámicos (excluye group_id) -->
             <div v-for="key in Object.keys(form)" :key="key">
               <div v-if="esCampoEditable(key)" class="mb-4">
                 <label :for="key" class="custom-label">{{ key.toUpperCase().replace(/_/g, ' ') }}</label>
-                <input
-                  :id="key"
-                  v-model="form[key]"
-                  type="text"
-                  class="form-control custom-input"
-                  :placeholder="'Introduce ' + key"
-                />
+                <input :id="key" v-model="form[key]" type="text" class="form-control custom-input"
+                  :placeholder="'Introduce ' + key" />
               </div>
             </div>
 
@@ -87,30 +73,22 @@ const modalRef = ref(null)
 const modoEdicion = ref(false)
 const form = reactive({})
 
-// --- HELPERS ---
 const esCampoEditable = (key) => {
   const excluidos = ['id', 'group_id', 'group_name', 'created_at', 'updated_at', 'deleted_at']
   return !excluidos.includes(key.toLowerCase())
 }
 
-// --- CARGA ---
 const cargarDatos = async () => {
   try {
     const [resStudents, resGroups] = await Promise.all([
       Api.cargarObjetos(tableName),
       Api.cargarObjetos("groups")
     ])
-
     listaGrupos.value = resGroups?.data || resGroups || []
     const studentsRaw = resStudents?.data || resStudents || []
-
-    // Mapear group_id → group_name para mostrarlo en la tabla
     ikasleak.value = studentsRaw.map(item => {
       const g = listaGrupos.value.find(gr => gr.id === item.group_id)
-      return {
-        ...item,
-        group_name: g ? g.name : `ID: ${item.group_id}`
-      }
+      return { ...item, group_name: g ? g.name : `ID: ${item.group_id}` }
     })
   } catch (e) {
     console.error("Error cargando datos:", e)
@@ -118,18 +96,13 @@ const cargarDatos = async () => {
   }
 }
 
-// --- MODAL ---
 const abrirCrear = () => {
   modoEdicion.value = false
   for (let k in form) delete form[k]
-
   if (ikasleak.value.length > 0) {
-    Object.keys(ikasleak.value[0]).forEach(key => {
-      if (esCampoEditable(key)) form[key] = ""
-    })
+    Object.keys(ikasleak.value[0]).forEach(key => { if (esCampoEditable(key)) form[key] = "" })
   }
   form.group_id = ""
-
   modalRef.value?.showModal()
 }
 
@@ -142,34 +115,32 @@ const prepararEdicion = (fila) => {
 
 const cerrarModal = () => modalRef.value?.close()
 
-// --- CRUD ---
 const guardar = async () => {
   try {
     const { id, group_name, created_at, updated_at, deleted_at, ...payload } = form
-
     let res
     if (modoEdicion.value) res = await Api.aldatuObjeto({ id, ...payload }, tableName)
     else res = await Api.crearObjektua(payload, tableName)
-
     if (res) {
       cerrarModal()
       await cargarDatos()
-      ok(modoEdicion.value ? 'Student actualizado correctamente' : 'Student creado correctamente')
+      ok(res.message || (modoEdicion.value ? 'Student actualizado correctamente' : 'Student creado correctamente'))
     }
   } catch (e) {
-    err(`Error al guardar: ${e.message}`)
+    err(e.message || 'Error al guardar')
   }
 }
 
 const borrar = async (id) => {
   if (!confirm('Ziur zaude ezabatu nahi duzulaz?')) return
   try {
-    if (await Api.ezabatuObjektua({ id }, tableName)) {
+    const res = await Api.ezabatuObjektua({ id }, tableName)
+    if (res) {
       await cargarDatos()
-      ok('Student eliminado correctamente')
+      ok(res.message || 'Student eliminado correctamente')
     }
   } catch (e) {
-    err(`Error al eliminar: ${e.message}`)
+    err(e.message || 'Error al eliminar')
   }
 }
 
@@ -177,12 +148,59 @@ onMounted(cargarDatos)
 </script>
 
 <style scoped>
-.custom-dialog { width: 100%; max-width: 450px; background: white; }
-.custom-dialog::backdrop { background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(4px); }
-.custom-label { display: block; font-weight: 600; font-size: 0.85rem; color: #333; margin-bottom: 8px; }
-.custom-input { background-color: #f0f0f0; border: none; border-radius: 50px; padding: 12px 20px; font-size: 0.95rem; }
-.custom-input:focus { background-color: #f0f0f0; box-shadow: 0 0 0 2px #3b82f6; outline: none; }
-.btn-close-custom { background: none; border: none; font-size: 1.5rem; cursor: pointer; }
-.btn-cancel { background-color: #e9ecef; border-radius: 50px; color: #333; font-weight: 600; border: none; }
-.btn-save { background-color: #1d7eda; border-radius: 50px; color: white; font-weight: 500; border: none; }
+.custom-dialog {
+  width: 100%;
+  max-width: 450px;
+  background: white;
+}
+
+.custom-dialog::backdrop {
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(4px);
+}
+
+.custom-label {
+  display: block;
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: #333;
+  margin-bottom: 8px;
+}
+
+.custom-input {
+  background-color: #f0f0f0;
+  border: none;
+  border-radius: 50px;
+  padding: 12px 20px;
+  font-size: 0.95rem;
+}
+
+.custom-input:focus {
+  background-color: #f0f0f0;
+  box-shadow: 0 0 0 2px #3b82f6;
+  outline: none;
+}
+
+.btn-close-custom {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+.btn-cancel {
+  background-color: #e9ecef;
+  border-radius: 50px;
+  color: #333;
+  font-weight: 600;
+  border: none;
+}
+
+.btn-save {
+  background-color: #1d7eda;
+  border-radius: 50px;
+  color: white;
+  font-weight: 500;
+  border: none;
+}
 </style>

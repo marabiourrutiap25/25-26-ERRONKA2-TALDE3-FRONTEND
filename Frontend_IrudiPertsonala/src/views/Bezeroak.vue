@@ -1,5 +1,4 @@
 <template>
-  <SidebarMenu v-model="menuAbierto" />
   <div class="container">
     <Container_De_Mierda_Toast />
 
@@ -7,7 +6,7 @@
       <h2 class="mb-0">Kudeaketa - Bezeroak</h2>
     </div>
 
-    <Huevada_De_Tabla :filas="Bezeroa" titulo="Bezeroak" etiqueta-tabla="Clients" texto-btn-crear="Bezeroa sortu"
+    <Huevada_De_Tabla :filas="Bezeroa" titulo="Bezeroak" etiqueta-tabla="Clients" texto-btn-crear="Crear Client"
       @crear="abrirCrear" @editar="prepararEdicion" @borrar="borrar" />
 
     <dialog ref="modalRef" class="custom-dialog p-0 border-0 shadow-lg rounded-4">
@@ -56,13 +55,11 @@ const modalRef = ref(null)
 const modoEdicion = ref(false)
 const form = reactive({})
 
-// --- HELPERS ---
 const esCampoEditable = (key) => {
   const excluidos = ['id', 'created_at', 'updated_at', 'deleted_at']
   return !excluidos.includes(key.toLowerCase())
 }
 
-// --- CARGA ---
 const cargarDatos = async () => {
   try {
     const res = await Api.cargarObjetos(tableName)
@@ -73,17 +70,12 @@ const cargarDatos = async () => {
   }
 }
 
-// --- MODAL ---
 const abrirCrear = () => {
   modoEdicion.value = false
   for (let k in form) delete form[k]
-
   if (Bezeroa.value.length > 0) {
-    Object.keys(Bezeroa.value[0]).forEach(key => {
-      if (esCampoEditable(key)) form[key] = ""
-    })
+    Object.keys(Bezeroa.value[0]).forEach(key => { if (esCampoEditable(key)) form[key] = "" })
   }
-
   modalRef.value?.showModal()
 }
 
@@ -96,34 +88,32 @@ const prepararEdicion = (fila) => {
 
 const cerrarModal = () => modalRef.value?.close()
 
-// --- CRUD ---
 const guardar = async () => {
   try {
     const { id, created_at, updated_at, deleted_at, ...payload } = form
-
     let res
     if (modoEdicion.value) res = await Api.aldatuObjeto({ id, ...payload }, tableName)
     else res = await Api.crearObjektua(payload, tableName)
-
     if (res) {
       cerrarModal()
       await cargarDatos()
-      ok(modoEdicion.value ? 'Client actualizado correctamente' : 'Client creado correctamente')
+      ok(res.message || (modoEdicion.value ? 'Client actualizado correctamente' : 'Client creado correctamente'))
     }
   } catch (e) {
-    err(`Error al guardar: ${e.message}`)
+    err(e.message || 'Error al guardar')
   }
 }
 
 const borrar = async (id) => {
   if (!confirm('Ziur zaude ezabatu nahi duzulaz?')) return
   try {
-    if (await Api.ezabatuObjektua({ id }, tableName)) {
+    const res = await Api.ezabatuObjektua({ id }, tableName)
+    if (res) {
       await cargarDatos()
-      ok('Client eliminado correctamente')
+      ok(res.message || 'Client eliminado correctamente')
     }
   } catch (e) {
-    err(`Error al eliminar: ${e.message}`)
+    err(e.message || 'Error al eliminar')
   }
 }
 

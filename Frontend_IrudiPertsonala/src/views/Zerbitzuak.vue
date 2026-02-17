@@ -32,7 +32,6 @@
         <div class="modal-body px-4 pb-4">
           <form @submit.prevent="guardar">
 
-            <!-- Categoría: siempre como select -->
             <div class="mb-4">
               <label class="custom-label">KATEGORIA</label>
               <select v-model="form.service_category_id" class="form-control custom-input" required>
@@ -43,7 +42,6 @@
               </select>
             </div>
 
-            <!-- Resto de campos editables dinámicos -->
             <div v-for="key in Object.keys(form)" :key="key">
               <div v-if="esCampoEditable(key)" class="mb-4">
                 <label :for="key" class="custom-label">{{ key.toUpperCase().replace(/_/g, ' ') }}</label>
@@ -153,22 +151,23 @@ const guardar = async () => {
     if (res) {
       cerrarModal()
       await cargarDatos()
-      ok(modoEdicion.value ? 'Service actualizado correctamente' : 'Service creado correctamente')
+      ok(res.message || (modoEdicion.value ? 'Service actualizado correctamente' : 'Service creado correctamente'))
     }
   } catch (e) {
-    err(`Error al guardar: ${e.message}`)
+    err(e.message || 'Error al guardar')
   }
 }
 
 const borrar = async (id) => {
   if (!confirm('Ziur zaude ezabatu nahi duzulaz?')) return
   try {
-    if (await Api.ezabatuObjektua({ id }, tableName)) {
+    const res = await Api.ezabatuObjektua({ id }, tableName)
+    if (res) {
       await cargarDatos()
-      ok('Service eliminado correctamente')
+      ok(res.message || 'Service eliminado correctamente')
     }
   } catch (e) {
-    err(`Error al eliminar: ${e.message}`)
+    err(e.message || 'Error al eliminar')
   }
 }
 
