@@ -1,7 +1,8 @@
 <template>
+  <SidebarMenu v-model="menuAbierto" />
   <div class="container">
     <div class="d-flex justify-content-between align-items-center my-4">
-      <h2 class="mb-0">Gestión de Ikasleak</h2>
+      <h2 class="mb-0">Kudeaketa - kasleak</h2>
     </div>
 
     <!-- Tabla con acciones crear, editar y borrar -->
@@ -17,8 +18,10 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import Tabla from '../components/tabla.vue'
+import SidebarMenu from '@/components/SidebarMenu.vue'
 import Api from '../composables/Api.js'
 
+const menuAbierto = ref(false)
 const ikasleak = ref([])
 const tableName = "students" // Nombre de la tabla en la API
 

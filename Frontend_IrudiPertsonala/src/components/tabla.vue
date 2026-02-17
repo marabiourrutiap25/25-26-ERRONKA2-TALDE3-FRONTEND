@@ -1,7 +1,6 @@
 <template>
   <div class="container my-5">
 
-    <!-- 🔵 BOTÓN CREAR -->
     <div class="mb-3 d-flex justify-content-end">
       <button 
         class="btn btn-success"
@@ -11,7 +10,6 @@
       </button>
     </div>
 
-    <!-- TABLA -->
     <div v-if="filas.length" class="table-responsive">
       <table class="table table-hover border rounded mb-0">
         <tbody class="bg-light">
@@ -25,8 +23,10 @@
         </tbody>
         <thead class="table-light">
           <tr>
-            <th v-for="header in headersFiltrados" :key="header">{{ header }}</th>
-            <th>Acciones</th>
+            <th v-for="header in headersFiltrados" :key="header">
+              {{ formatHeader(header) }}
+            </th>
+            <th class="text-end">Acciones</th>
           </tr>
         </thead>
         <tbody class="bg-white">
@@ -66,10 +66,9 @@
     </div>
 
     <div v-else class="text-center text-muted">
-      No hay datos para mostrar
+      Ez daude erakusteko daturik.
     </div>
 
-    <!-- 🔵 DIALOGO EDITAR -->
     <EditatuDialog
       ref="editDialogRef"
       :title="`Editar ${Titulo}`"
@@ -77,7 +76,6 @@
       @submit="handleEditSubmit"
     />
 
-    <!-- 🟢 DIALOGO CREAR -->
     <CrearDialog
       ref="crearDialogRef"
       :title="`Crear ${Titulo}`"
@@ -91,7 +89,7 @@
 <script setup>
 import { computed, ref } from "vue"
 import EditatuDialog from "./editatu.vue"
-import CrearDialog from "./sortu.vue" // 👈 nuevo
+import CrearDialog from "./sortu.vue"
 
 const emit = defineEmits(['editar', 'borrar', 'crear'])
 
@@ -109,32 +107,39 @@ const props = defineProps({
   }
 })
 
-// 🔹 Computed headers, filtrando "id"
+// 🔹 Headers originales
 const headers = computed(() => {
   if (!props.filas.length) return []
   return Object.keys(props.filas[0])
 })
 
-const headersFiltrados = computed(() => headers.value.filter(h => h !== 'id'))
+// 🔹 FILTRO DINÁMICO: Aquí es donde ocurre la magia
+const headersFiltrados = computed(() => {
+  const excluidos = ['id', 'created_at', 'updated_at', 'deleted_at']
+  return headers.value.filter(h => !excluidos.includes(h.toLowerCase()))
+})
+
+// 🔹 Formatear texto de cabecera (opcional, para que se vea bonito)
+const formatHeader = (h) => {
+  return h.toUpperCase().replace('_', ' ')
+}
 
 const currentEditRow = ref(null)
 
-// 🔹 Truncar texto a 20 caracteres
 const truncar = (texto, limite = 20) => {
   if (!texto) return ''
   return texto.length > limite ? texto.slice(0, limite) + '…' : texto
 }
 
-// 🔵 ABRIR CREAR
 const abrirCrear = () => {
   crearDialogRef.value?.open()
 }
 
-// 🔵 EDITAR
 const editar = (fila) => {
   currentEditRow.value = fila
   if (editDialogRef.value) {
     const formData = {}
+    // Solo pasamos al formulario los campos que no están excluidos
     headersFiltrados.value.forEach(header => {
       formData[header] = fila[header] || ""
     })
@@ -143,14 +148,12 @@ const editar = (fila) => {
   }
 }
 
-// 🔵 BORRAR
 const borrarFila = (id) => {
   if (confirm('¿Estás seguro de que quieres borrar este registro?')) {
     emit('borrar', id)
   }
 }
 
-// 🔵 SUBMIT EDITAR
 const handleEditSubmit = (formData) => {
   emit('editar', {
     id: currentEditRow.value?.id,
@@ -158,7 +161,6 @@ const handleEditSubmit = (formData) => {
   })
 }
 
-// 🟢 SUBMIT CREAR
 const handleCreateSubmit = (formData) => {
   emit('crear', formData)
 }

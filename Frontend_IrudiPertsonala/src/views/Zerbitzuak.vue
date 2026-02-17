@@ -1,7 +1,8 @@
 <template>
+  <SidebarMenu v-model="menuAbierto" />
   <div class="container">
     <div class="d-flex justify-content-between align-items-center my-4">
-      <h2 class="mb-0">Gestión de Zerbitzuak</h2>
+      <h2 class="mb-0">Kudeaketa - Zerbitzuak</h2>
     </div>
 
     <!-- Tabla con acciones crear, editar y borrar -->
@@ -18,7 +19,9 @@
 import { ref, onMounted } from 'vue'
 import Tabla from '../components/tabla.vue'
 import Api from '../composables/Api.js'
+import SidebarMenu from '@/components/SidebarMenu.vue'
 
+const menuAbierto = ref(false)
 const Zerbitzua = ref([])
 const tableName = "services" // Nombre de la tabla en la API
 
