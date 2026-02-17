@@ -5,7 +5,7 @@
     <ToastComponent />
 
     <TaulaComponent :filas="Materiala" titulo="Materialak" etiqueta-tabla="Equipment"
-      texto-btn-crear="Crear Equipment" :mapa-headers="{ category_name: 'KATEGORIA' }"
+      texto-btn-crear="Materiala Sortu" :mapa-headers="{ category_name: 'KATEGORIA' }"
       :columnas-excluidas="['id', 'equipment_category_id', 'created_at', 'updated_at', 'deleted_at']"
       @crear="abrirCrear" @editar="prepararEdicion" @borrar="borrar" />
 
@@ -13,7 +13,7 @@
       <div class="modal-content border-0">
         <div class="modal-header border-bottom-0 pt-4 px-4 pb-2 d-flex justify-content-between align-items-center">
           <h4 class="modal-title fw-bold text-dark">
-            {{ modoEdicion ? 'Editar' : 'Crear' }} Equipment
+            Materiala {{ modoEdicion ? 'editatu' : 'sortu' }}
           </h4>
           <button type="button" class="btn-close-custom" @click="cerrarModal">✕</button>
         </div>
@@ -24,7 +24,7 @@
             <div class="mb-4">
               <label class="custom-label">KATEGORIA</label>
               <select v-model="form.equipment_category_id" class="form-control custom-input" required>
-                <option value="" disabled>Selecciona una categoría</option>
+                <option value="" disabled>Kategoria hautatu</option>
                 <option v-for="cat in listaCategorias" :key="cat.id" :value="cat.id">
                   {{ cat.name }}
                 </option>

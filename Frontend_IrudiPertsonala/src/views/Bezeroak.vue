@@ -3,7 +3,7 @@
 
   <div class="container">
     <ToastComponent />
-    <TaulaComponent :filas="Bezeroa" titulo="Bezeroak" etiqueta-tabla="Clients" texto-btn-crear="Bezeroa sortu"
+    <TaulaComponent :filas="Bezeroa" titulo="Bezeroak" etiqueta-tabla="Clients" texto-btn-crear="Bezeroa Sortu"
       @crear="abrirCrear" @editar="prepararEdicion" @borrar="borrar" />
 
     <dialog ref="modalRef" class="custom-dialog p-0 border-0 shadow-lg rounded-4">

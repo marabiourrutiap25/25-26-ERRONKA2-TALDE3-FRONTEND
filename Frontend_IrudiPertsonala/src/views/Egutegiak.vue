@@ -6,7 +6,7 @@
     <TaulaComponent
       titulo="Egutegiak"
       :filas="Egutegia"
-      texto-btn-crear="Sortu Egutegia"
+      texto-btn-crear="Egutegia Sortu"
       @crear="crear"
       @editar="editar"
       @borrar="borrar"

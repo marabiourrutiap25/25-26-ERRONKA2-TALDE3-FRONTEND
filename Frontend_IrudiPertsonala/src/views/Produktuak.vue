@@ -5,7 +5,7 @@
     <ToastComponent />
 
     <TaulaComponent :filas="Produktuak" titulo="Produktuak" etiqueta-tabla="Consumables"
-      texto-btn-crear="Crear Consumable" :mapa-headers="{ category_name: 'KATEGORIA' }"
+      texto-btn-crear="Produktua Sortu" :mapa-headers="{ category_name: 'KATEGORIA' }"
       :columnas-excluidas="['id', 'consumable_category_id', 'created_at', 'updated_at', 'deleted_at']"
       @crear="abrirCrear" @editar="prepararEdicion" @borrar="borrar" />
 

@@ -11,8 +11,9 @@
       </div>
 
       <!-- Botones superiores -->
-      <div class="d-flex justify-content-center gap-3 mb-4 flex-wrap">
-        <button class="menu-btn-white" @click="router.push('/hitzorduak')">
+      <div class="buttons-wrapper">
+        <div class="d-flex justify-content-center gap-4 mb-4 flex-wrap">
+          <button class="menu-btn-white" @click="router.push('/hitzorduak')">
           <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" viewBox="0 0 16 16">
             <path d="M11 6.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1z"/>
             <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1z"/>
@@ -39,6 +40,7 @@
           </svg>
           <div>Bezeroak</div>
         </button>
+        </div>
       </div>
 
       <!-- Contenedor de secciones -->
@@ -126,14 +128,15 @@ const menuAbierto = ref(false)
   background-color: white;
   border: 1px solid #ddd;
   border-radius: 12px;
-  padding: 1.5rem 1.75rem;
+  padding: 2rem 2.5rem;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 0.75rem;
   cursor: pointer;
   transition: all 0.2s;
-  min-width: 140px;
+  flex: 1;
+  min-width: 160px;
   box-shadow: 0 2px 4px rgba(0,0,0,0.08);
 }
 
@@ -159,6 +162,15 @@ const menuAbierto = ref(false)
   flex-wrap: wrap;
   max-width: 1200px;
   margin: 0 auto;
+}
+
+.buttons-wrapper {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.buttons-wrapper .d-flex {
+  width: 100%;
 }
 
 .section-container {

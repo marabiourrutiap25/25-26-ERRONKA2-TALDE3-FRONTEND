@@ -1,35 +1,35 @@
 <template>
-  <SidebarMenu v-model="menuAbierto" />
+  <SidebarMenu :titulo="'Mugimenduak'" v-model="menuAbierto" />
+
+  <div class="d-flex justify-content-center mb-4 my-5">
+    <div class="btn-group" role="group">
+      <button type="button" class="btn" :class="tablaActiva === 'consumables' ? 'btn-dark' : 'btn-outline-dark'"
+        @click="tablaActiva = 'consumables'">
+        Kontsumibleak
+      </button>
+      <button type="button" class="btn" :class="tablaActiva === 'equipments' ? 'btn-dark' : 'btn-outline-dark'"
+        @click="tablaActiva = 'equipments'">
+        Materialak
+      </button>
+    </div>
+  </div>
+
   <div class="container my-4">
     <ToastContainer />
 
-    <div class="d-flex justify-content-between align-items-center my-4">
-      <h2 class="mb-0">Mugimenduak</h2>
-    </div>
-
-    <TaulaComponent
-      :filas="Consumables"
-      titulo="Kontsumible - Ikasle"
-      etiqueta-tabla="Consumable"
-      texto-btn-crear="Kontsumiblea sortu"
+    <TaulaComponent v-if="tablaActiva === 'consumables'" :filas="Consumables" titulo="Mugimenduak"
+      etiqueta-tabla="Consumable" texto-btn-crear="Kontsumible Mugimendua Sortu"
       :mapa-headers="{ student_name: 'IKASLEA', item_name: 'KONTSUMIBLEA' }"
       :columnas-excluidas="['id', 'student_id', 'consumable_id', 'created_at', 'updated_at', 'deleted_at']"
-      @crear="abrirCrear('consumable')"
-      @editar="(fila) => prepararEdicion(fila, 'consumable')"
-      @borrar="(id) => borrar(id, 'consumable')"
-    />
+      @crear="abrirCrear('consumable')" @editar="(fila) => prepararEdicion(fila, 'consumable')"
+      @borrar="(id) => borrar(id, 'consumable')" />
 
-    <TaulaComponent
-      :filas="Equipments"
-      titulo="Ekipamentu - Ikasle"
-      etiqueta-tabla="Equipment"
-      texto-btn-crear="Ekipamentua sortu"
-      :mapa-headers="{ student_name: 'IKASLEA', item_name: 'EKIPAMENTUA' }"
+    <TaulaComponent v-if="tablaActiva === 'equipments'" :filas="Equipments" titulo="Mugimenduak"
+      etiqueta-tabla="Equipment" texto-btn-crear="Ekipamendu Mugimendua Sortu"
+      :mapa-headers="{ student_name: 'IKASLEA', item_name: 'EKIPAMENDUA' }"
       :columnas-excluidas="['id', 'student_id', 'equipment_id', 'created_at', 'updated_at', 'deleted_at']"
-      @crear="abrirCrear('equipment')"
-      @editar="(fila) => prepararEdicion(fila, 'equipment')"
-      @borrar="(id) => borrar(id, 'equipment')"
-    />
+      @crear="abrirCrear('equipment')" @editar="(fila) => prepararEdicion(fila, 'equipment')"
+      @borrar="(id) => borrar(id, 'equipment')" />
 
     <dialog ref="modalRef" class="custom-dialog p-0 border-0 shadow-lg rounded-4">
       <div class="modal-content border-0">
@@ -54,8 +54,9 @@
             </div>
 
             <div class="mb-4">
-              <label class="custom-label">{{ tipoActual === 'consumable' ? 'KONTSUMIBLEA' : 'EKIPAMENTUA' }}</label>
-              <select v-if="tipoActual === 'consumable'" v-model="form.consumable_id" class="form-control custom-input" required>
+              <label class="custom-label">{{ tipoActual === 'consumable' ? 'PRODUKTUA' : 'EKIPAMENTUA' }}</label>
+              <select v-if="tipoActual === 'consumable'" v-model="form.consumable_id" class="form-control custom-input"
+                required>
                 <option value="" disabled>Selecciona un consumible</option>
                 <option v-for="c in listaMaestraConsumables" :key="c.id" :value="c.id">{{ c.name }}</option>
               </select>
@@ -70,13 +71,8 @@
             <div v-for="key in Object.keys(form)" :key="key">
               <div v-if="esCampoEditable(key)" class="mb-4">
                 <label :for="key" class="custom-label">{{ key.toUpperCase().replace(/_/g, ' ') }}</label>
-                <input
-                  :id="key"
-                  v-model="form[key]"
-                  type="text"
-                  class="form-control custom-input"
-                  :placeholder="'Introduce ' + key"
-                />
+                <input :id="key" v-model="form[key]" type="text" class="form-control custom-input"
+                  :placeholder="'Introduce ' + key" />
               </div>
             </div>
 
@@ -111,6 +107,7 @@ const menuAbierto = ref(false)
 const modalRef = ref(null)
 const modoEdicion = ref(false)
 const tipoActual = ref('')
+const tablaActiva = ref('consumables')
 const form = reactive({})
 
 const endpointPivotC = "student-consumables"
@@ -230,10 +227,12 @@ onMounted(cargarTodo)
   max-width: 450px;
   background: white;
 }
+
 .custom-dialog::backdrop {
   background: rgba(0, 0, 0, 0.4);
   backdrop-filter: blur(4px);
 }
+
 .custom-label {
   display: block;
   font-weight: 600;
@@ -241,6 +240,7 @@ onMounted(cargarTodo)
   color: #333;
   margin-bottom: 8px;
 }
+
 .custom-input {
   background-color: #f0f0f0;
   border: none;
@@ -248,17 +248,20 @@ onMounted(cargarTodo)
   padding: 12px 20px;
   font-size: 0.95rem;
 }
+
 .custom-input:focus {
   background-color: #f0f0f0;
   box-shadow: 0 0 0 2px #3b82f6;
   outline: none;
 }
+
 .btn-close-custom {
   background: none;
   border: none;
   font-size: 1.5rem;
   cursor: pointer;
 }
+
 .btn-cancel {
   background-color: #e9ecef;
   border-radius: 50px;
@@ -266,6 +269,7 @@ onMounted(cargarTodo)
   font-weight: 600;
   border: none;
 }
+
 .btn-save {
   background-color: #1d7eda;
   border-radius: 50px;

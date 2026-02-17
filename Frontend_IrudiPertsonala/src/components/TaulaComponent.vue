@@ -1,8 +1,8 @@
 <template>
     <div>
-        <div class="d-flex justify-content-between align-items-center mt-5 mb-3">
-            <h3 class="mb-0">{{ titulo }} kudeatu</h3>
-            <button class="btn btn-info text-white" @click="$emit('crear')">+ {{ textoBtnCrear }}</button>
+        <div class="d-flex justify-content-between align-items-center mt-5 mb-4">
+            <h3 class="mb-0 table-title fw-bold">{{ titulo }} kudeatu</h3>
+            <button class="btn btn-primary text-white fw-bold" @click="$emit('crear')">+ {{ textoBtnCrear }}</button>
         </div>
 
         <div v-if="filas.length" class="table-responsive mb-5">
@@ -12,7 +12,7 @@
                         <th v-for="header in headersVisibles" :key="header">
                             {{ formatHeader(header) }}
                         </th>
-                        <th class="text-end">AKZIOAK</th>
+                        <th class="text-center">AKZIOAK</th>
                     </tr>
                 </thead>
                 <tbody class="bg-white">
@@ -20,11 +20,11 @@
                         <td v-for="header in headersVisibles" :key="header" class="align-middle">
                             {{ truncar(fila[header]) }}
                         </td>
-                        <td class="text-end">
-                            <button class="btn p-0 me-2" @click="$emit('editar', fila)">
+                        <td class="text-center">
+                            <button class="btn btn-primary p-2 me-3" @click="$emit('editar', fila)">
                                 <img src="@/assets/editatu.png" alt="Editar" style="max-width: 24px;" />
                             </button>
-                            <button class="btn p-0 me-2" @click="$emit('borrar', fila.id)">
+                            <button class="btn btn-danger p-2 me-2" @click="$emit('borrar', fila.id)">
                                 <img src="@/assets/ezabatu.png" alt="Borrar" style="max-width: 24px;" />
                             </button>
                         </td>
@@ -99,3 +99,10 @@ const truncar = (t) => {
     return str.length > props.maxLongitud ? str.slice(0, props.maxLongitud) + '…' : str
 }
 </script>
+
+<style scoped>
+.btn-primary img,
+.btn-danger img {
+    filter: brightness(0) invert(1);
+}
+</style>

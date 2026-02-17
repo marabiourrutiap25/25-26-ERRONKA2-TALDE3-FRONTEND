@@ -11,7 +11,7 @@
           </option>
         </select>
       </div>
-      <button class="btn btn-info text-white" @click="abrirCrear">+ Hitzordua sortu</button>
+      <button class="btn btn-primary text-white fw-bold" @click="abrirCrear">+ Hitzordua Sortu</button>
     </div>
 
     <!-- Calendario -->

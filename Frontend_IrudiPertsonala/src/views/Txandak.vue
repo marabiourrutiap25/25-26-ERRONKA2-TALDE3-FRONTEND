@@ -5,7 +5,7 @@
     <ToastComponent />
 
     <TaulaComponent :filas="Txandak" titulo="Txandak" etiqueta-tabla="Txandak"
-      texto-btn-crear="Txanda sortu" :mapa-headers="{ student_name: 'IKASLEA' }"
+      texto-btn-crear="Txanda Sortu" :mapa-headers="{ student_name: 'IKASLEA' }"
       :columnas-excluidas="['id', 'student_id', 'created_at', 'updated_at', 'deleted_at']"
       @crear="abrirCrear" @editar="prepararEdicion" @borrar="borrar" />
 

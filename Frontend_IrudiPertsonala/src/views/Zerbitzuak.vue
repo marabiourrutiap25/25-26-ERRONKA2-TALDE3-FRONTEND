@@ -8,7 +8,7 @@
       :filas="Zerbitzua"
       titulo="Zerbitzuak"
       etiqueta-tabla="Services"
-      texto-btn-crear="Crear Service"
+      texto-btn-crear="Zerbitzua Sortu"
       :mapa-headers="{ category_name: 'KATEGORIA' }"
       :columnas-excluidas="['id', 'service_category_id', 'created_at', 'updated_at', 'deleted_at']"
       @crear="abrirCrear"

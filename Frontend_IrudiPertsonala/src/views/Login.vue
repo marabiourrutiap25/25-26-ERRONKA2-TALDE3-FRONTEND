@@ -5,32 +5,28 @@
       <div class="text-center mb-4">
         <img src="@/assets/IMP_Logotipoa.png" alt="Irudi Pertsonala Logo" class="logo-image mb-3" />
         <h1 class="brand-name">Irudi Pertsonala</h1>
-        <p class="brand-subtitle">Peluquería & Estética</p>
+        <p class="brand-subtitle">Ile-apainketa & Estetika</p>
       </div>
 
       <!-- Formulario de login -->
       <form @submit.prevent="iniciarSesion">
         <div class="mb-3">
-          <label for="email" class="form-label">Correo electrónico</label>
+          <label for="email" class="form-label">Email</label>
           <div class="input-group">
-            <span class="input-group-text">
-              <i class="bi bi-envelope"></i>📧
-            </span>
             <input
               id="email"
               type="email"
               class="form-control"
               v-model="email"
               required
-              placeholder="tucorreo@ejemplo.com"
+              placeholder="niremail@adibide.com"
             />
           </div>
         </div>
 
         <div class="mb-3">
-          <label for="password" class="form-label">Contraseña</label>
+          <label for="password" class="form-label">Pasahitza</label>
           <div class="input-group">
-            <span class="input-group-text">🔒</span>
             <input
               id="password"
               :type="mostrarPassword ? 'text' : 'password'"
@@ -40,19 +36,20 @@
               minlength="4"
               placeholder="••••••••"
             />
-            <button 
-              type="button" 
-              class="btn btn-outline-secondary"
+            <button
+              type="button"
+              class="btn btn-outline-secondary btn-eye"
               @click="mostrarPassword = !mostrarPassword"
+              :aria-label="mostrarPassword ? 'Ez ikusi' : 'Ikusi'"
             >
-              {{ mostrarPassword ? '🙈' : '👁️' }}
+              <img :src="mostrarPassword ? ezIkusi : ikusi" :alt="mostrarPassword ? 'Ez ikusi' : 'Ikusi'" class="eye-icon" />
             </button>
           </div>
         </div>
 
         <div class="mb-3 form-check">
           <input type="checkbox" class="form-check-input" id="recordar" v-model="recordar">
-          <label class="form-check-label" for="recordar">Recordarme</label>
+          <label class="form-check-label" for="recordar">Gogoratu nire datuak</label>
         </div>
 
         <div v-if="error" class="alert alert-danger py-2" role="alert">
@@ -65,13 +62,9 @@
           :disabled="cargando"
         >
           <span v-if="cargando" class="spinner-border spinner-border-sm me-2"></span>
-          {{ cargando ? 'Entrando...' : 'Iniciar Sesión' }}
+          {{ cargando ? 'Sartzen...' : 'Saioa hasi' }}
         </button>
       </form>
-
-      <div class="text-center mt-4">
-        <a href="#" class="text-muted small">¿Olvidaste tu contraseña?</a>
-      </div>
     </div>
   </div>
 </template>
@@ -80,6 +73,8 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { login } from '@/composables/Api.js'
+import ikusi from '@/assets/ikusi.png'
+import ezIkusi from '@/assets/ez_ikusi.png'
 
 const router = useRouter()
 const email = ref('')
@@ -183,6 +178,19 @@ const iniciarSesion = async () => {
 
 .input-group-text {
   background-color: #f8f9fa;
+}
+
+.btn-eye {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.25rem 0.5rem;
+}
+
+.eye-icon {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
 }
 
 a {
