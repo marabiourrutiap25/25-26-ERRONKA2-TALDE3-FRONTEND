@@ -2,7 +2,7 @@
   <div class="container mt-4">
     <!-- Encabezado y botón Crear -->
     <div class="d-flex justify-content-between align-items-center mb-3">
-      <h2 class="mb-0">Gestión de Hitzorduak</h2>
+      <h2 class="mb-0">Kudeaketa - Hitzorduak</h2>
       <button class="btn btn-success" @click="abrirCrear">Crear Hitzordua</button>
     </div>
 
@@ -74,7 +74,7 @@ const todasLasSemanas = computed(() => {
     const start = addDays(firstDay, i * 7)
     const weekNum = getWeek(start, { weekStartsOn: 1 })
     const value = `${year}-W${String(weekNum).padStart(2,'0')}`
-    const label = `Semana ${weekNum} (${format(start,'dd/MM')})`
+    const label = `Astea ${weekNum} (${format(start,'dd/MM')})`
     semanas.push({ value, label })
   }
   return semanas

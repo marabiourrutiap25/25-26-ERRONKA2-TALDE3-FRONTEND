@@ -66,7 +66,7 @@
     </div>
 
     <div v-else class="text-center text-muted">
-      No hay datos para mostrar
+      Ez daude erakusteko daturik.
     </div>
 
     <EditatuDialog

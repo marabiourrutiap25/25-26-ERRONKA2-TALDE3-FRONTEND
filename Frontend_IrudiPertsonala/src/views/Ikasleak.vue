@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <div class="d-flex justify-content-between align-items-center my-4">
-      <h2 class="mb-0">Gestión de Ikasleak</h2>
+      <h2 class="mb-0">Kudeaketa - kasleak</h2>
     </div>
 
     <!-- Tabla con acciones crear, editar y borrar -->
