@@ -1,11 +1,8 @@
 <template>
+  <SidebarMenu titulo="Bezeroak" v-model="menuAbierto" />
+
   <div class="container">
     <ToastComponent />
-
-    <div class="d-flex justify-content-between align-items-center my-4">
-      <h2 class="mb-0">Kudeaketa - Bezeroak</h2>
-    </div>
-
     <TaulaComponent :filas="Bezeroa" titulo="Bezeroak" etiqueta-tabla="Clients" texto-btn-crear="Crear Client"
       @crear="abrirCrear" @editar="prepararEdicion" @borrar="borrar" />
 
@@ -45,8 +42,11 @@ import Api from '../composables/Api.js'
 import { useToast } from '../composables/UseToast.js'
 import ToastComponent from '../components/ToastComponent.vue'
 import TaulaComponent from '@/components/TaulaComponent.vue'
+import SidebarMenu from '@/components/SidebarMenu.vue'
 
 const { ok, err } = useToast()
+
+const menuAbierto = ref(false)
 
 const Bezeroa = ref([])
 const tableName = "clients"

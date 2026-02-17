@@ -174,6 +174,7 @@ const menuAbierto = ref(false)
 .section-header {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 0.75rem;
   background-color: rgba(255,255,255,0.1);
   padding: 0.75rem 1.25rem;

@@ -1,10 +1,8 @@
 <template>
+  <SidebarMenu titulo="Txandak" v-model="menuAbierto" />
+
   <div class="container">
     <ToastComponent />
-
-    <div class="d-flex justify-content-between align-items-center my-4">
-      <h2 class="mb-0">Kudeaketa - Txandak</h2>
-    </div>
 
     <TaulaComponent :filas="Txandak" titulo="Txandak" etiqueta-tabla="Txandak"
       texto-btn-crear="Txanda sortu" :mapa-headers="{ student_name: 'IKASLEA' }"
@@ -58,8 +56,11 @@ import Api from '../composables/Api.js'
 import { useToast } from '../composables/UseToast.js'
 import ToastComponent from '../components/ToastComponent.vue'
 import TaulaComponent from '@/components/TaulaComponent.vue'
+import SidebarMenu from '@/components/SidebarMenu.vue'
 
 const { ok, err } = useToast()
+
+const menuAbierto = ref(false)
 
 const Txandak = ref([])
 const alumnosLista = ref([])

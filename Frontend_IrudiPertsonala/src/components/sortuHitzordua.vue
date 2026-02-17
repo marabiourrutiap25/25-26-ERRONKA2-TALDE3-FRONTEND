@@ -1,53 +1,54 @@
 <template>
-  <dialog ref="dialogRef" class="p-0 border-0">
-    <div class="modal-dialog modal-dialog-centered m-0">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">{{ title }}</h5>
-          <button type="button" class="btn-close" @click="onCancel"></button>
+  <dialog ref="dialogRef" class="custom-dialog p-0 border-0 shadow-lg rounded-4">
+    <div class="modal-content border-0">
+        <div class="modal-header border-bottom-0 pt-4 px-4 pb-2 d-flex justify-content-between align-items-center">
+          <h4 class="modal-title fw-bold text-dark">{{ title }}</h4>
+          <button type="button" class="btn-close-custom" @click="onCancel">✕</button>
         </div>
 
-        <div class="modal-body">
+        <div class="modal-body px-4 pb-4">
           <form @submit.prevent="handleSubmit">
             <!-- Campos normales -->
-            <div v-for="header in normalizedHeaders" :key="header.key" class="mb-3">
-              <label :for="header.key" class="form-label">{{ header.label }}</label>
+            <div v-for="header in normalizedHeaders" :key="header.key" class="mb-4">
+              <label :for="header.key" class="custom-label">{{ header.label }}</label>
               <input
                 v-if="header.key !== 'comments'"
                 :id="header.key"
                 v-model="form[header.key]"
                 type="text"
-                class="form-control"
+                class="form-control custom-input"
                 :readonly="header.key === 'id'"
+                :placeholder="'Introduce ' + header.key"
               />
               <textarea
                 v-else
                 :id="header.key"
                 v-model="form[header.key]"
-                class="form-control"
+                class="form-control custom-input"
                 rows="3"
+                :placeholder="'Introduce ' + header.key"
               ></textarea>
             </div>
 
             <!-- Select Cliente -->
-            <div class="mb-3">
-              <label for="client_id" class="form-label">Cliente</label>
-              <select id="client_id" v-model.number="form.client_id" class="form-select">
+            <div class="mb-4">
+              <label for="client_id" class="custom-label">Cliente</label>
+              <select id="client_id" v-model.number="form.client_id" class="form-select custom-input">
                 <option value="" disabled>Seleccione Cliente</option>
                 <option v-for="c in clients" :key="c.id" :value="c.id">{{ c.name }}</option>
               </select>
             </div>
 
             <!-- Select Alumno -->
-            <div class="mb-3">
-              <label for="student_id" class="form-label">Alumno</label>
-              <select id="student_id" v-model.number="form.student_id" class="form-select">
+            <div class="mb-4">
+              <label for="student_id" class="custom-label">Alumno</label>
+              <select id="student_id" v-model.number="form.student_id" class="form-select custom-input">
                 <option value="" disabled>Seleccione Alumno</option>
                 <option v-for="s in students" :key="s.id" :value="s.id">{{ s.name }}</option>
               </select>
             </div>
 
-            <div class="modal-footer px-0 pt-3 d-flex justify-content-between">
+            <div class="d-flex justify-content-end gap-3 pt-3">
               <!-- Botón borrar -->
               <!-- Botón de borrar -->
               <button
@@ -61,20 +62,15 @@
 
 
               <div class="ms-auto">
-                <button type="button" class="btn btn-secondary" @click="onCancel">
-                  Cancelar
-                </button>
-                <button type="submit" class="btn btn-primary">
-                  Guardar
-                </button>
+                <button type="button" class="btn btn-cancel px-4" @click="onCancel">Cancelar</button>
+                <button type="submit" class="btn btn-save px-4">Guardar</button>
               </div>
             </div>
 
           </form>
         </div>
       </div>
-    </div>
-  </dialog>
+    </dialog>
 </template>
 
 <script setup>
@@ -164,3 +160,61 @@ function capitalize(str) {
 // Exponer métodos
 defineExpose({ open, close, setFormData })
 </script>
+
+<style scoped>
+.custom-dialog {
+  width: 100%;
+  max-width: 450px;
+  background: white;
+}
+
+.custom-dialog::backdrop {
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(4px);
+}
+
+.custom-label {
+  display: block;
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: #333;
+  margin-bottom: 8px;
+}
+
+.custom-input {
+  background-color: #f0f0f0;
+  border: none;
+  border-radius: 50px;
+  padding: 12px 20px;
+  font-size: 0.95rem;
+}
+
+.custom-input:focus {
+  background-color: #f0f0f0;
+  box-shadow: 0 0 0 2px #3b82f6;
+  outline: none;
+}
+
+.btn-close-custom {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+.btn-cancel {
+  background-color: #e9ecef;
+  border-radius: 50px;
+  color: #333;
+  font-weight: 600;
+  border: none;
+}
+
+.btn-save {
+  background-color: #1d7eda;
+  border-radius: 50px;
+  color: white;
+  font-weight: 500;
+  border: none;
+}
+</style>

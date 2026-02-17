@@ -3,20 +3,15 @@
   <div class="container mt-4">
     <!-- Encabezado y botón Crear -->
     <div class="d-flex justify-content-between align-items-center mb-3">
-      <h2 class="mb-0">Kudeaketa - Hitzorduak</h2>
-      <button class="btn btn-success" @click="abrirCrear">Crear Hitzordua</button>
-    </div>
-
-    <!-- Selector de semana -->
-    <div class="mb-3 row align-items-center">
-      <label for="week" class="col-auto col-form-label">Aukeratu astea:</label>
-      <div class="col-auto">
+      <div class="d-flex align-items-center">
+        <label for="week" class="me-2 text-nowrap fw-bold">Aukeratu astea:</label>
         <select class="form-select" v-model="selectedWeek">
           <option v-for="semana in todasLasSemanas" :key="semana.value" :value="semana.value">
             {{ semana.label }}
           </option>
         </select>
       </div>
+      <button class="btn btn-info text-white" @click="abrirCrear">+ Hitzordua sortu</button>
     </div>
 
     <!-- Calendario -->

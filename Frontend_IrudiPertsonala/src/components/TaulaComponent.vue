@@ -1,7 +1,7 @@
 <template>
     <div>
         <div class="d-flex justify-content-between align-items-center mt-5 mb-3">
-            <h3 class="mb-0">{{ titulo }}</h3>
+            <h3 class="mb-0">{{ titulo }} kudeatu</h3>
             <button class="btn btn-info text-white" @click="$emit('crear')">+ {{ textoBtnCrear }}</button>
         </div>
 

@@ -49,10 +49,13 @@
           <span>Orokorra</span>
         </div>
         <ul class="sidebar-menu">
-          <li><a class="sidebar-link" @click="router.push('/hitzorduak')">Hitzorduak</a></li>
-          <li><a class="sidebar-link" @click="router.push('/txandak')">Txandak</a></li>
-          <li><a class="sidebar-link" @click="router.push('/mugimenduak')">Mugimenduak</a></li>
-          <li><a class="sidebar-link" @click="router.push('/bezeroak')">Bezeroak</a></li>
+          <li> <router-link to="/hitzorduak" class="sidebar-link" active-class="active-link">
+              Hitzorduak
+            </router-link></li>
+          <li><router-link to="/txandak" class="sidebar-link" active-class="active-link">Txandak</router-link></li>
+          <li><router-link to="/mugimenduak" class="sidebar-link" active-class="active-link">Mugimenduak</router-link>
+          </li>
+          <li><router-link to="/bezeroak" class="sidebar-link" active-class="active-link">Bezeroak</router-link></li>
         </ul>
       </div>
 
@@ -66,8 +69,10 @@
           <span>Inbentarioa</span>
         </div>
         <ul class="sidebar-menu">
-          <li><a class="sidebar-link" @click="router.push('/materialak')">Materialak</a></li>
-          <li><a class="sidebar-link" @click="router.push('/produktuak')">Produktuak</a></li>
+          <li><router-link to="/materialak" class="sidebar-link" active-class="active-link">Materialak</router-link>
+          </li>
+          <li><router-link to="/produktuak" class="sidebar-link" active-class="active-link">Produktuak</router-link>
+          </li>
         </ul>
       </div>
 
@@ -81,8 +86,9 @@
           <span>Kudeaketak</span>
         </div>
         <ul class="sidebar-menu">
-          <li><a class="sidebar-link" @click="router.push('/ikasleak')">Ikasleak</a></li>
-          <li><a class="sidebar-link" @click="router.push('/zerbitzuak')">Zerbitzuak</a></li>
+          <li><router-link to="/ikasleak" class="sidebar-link" active-class="active-link">Ikasleak</router-link></li>
+          <li><router-link to="/zerbitzuak" class="sidebar-link" active-class="active-link">Zerbitzuak</router-link>
+          </li>
         </ul>
       </div>
     </nav>
@@ -205,14 +211,6 @@ const cerrarSesion = async () => {
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.sidebar-title {
-  color: #3b82f6;
-  font-size: 0.9rem;
-  font-weight: 500;
-  display: block;
-  margin-bottom: 0.75rem;
-}
-
 .btn-menu-sidebar {
   background: none;
   border: none;
@@ -278,5 +276,10 @@ const cerrarSesion = async () => {
   height: auto;
   filter: brightness(0) invert(1);
   cursor: pointer;
+}
+
+.active-link {
+  color: white;
+  font-weight: bold;
 }
 </style>
