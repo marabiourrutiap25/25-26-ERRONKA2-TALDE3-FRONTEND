@@ -1,14 +1,12 @@
 <template>
-  <SidebarMenu v-model="menuAbierto" />
-  <div class="container">
-    <div class="d-flex justify-content-between align-items-center my-4">
-      <h2 class="mb-0">Kudeaketa - Egutegiak</h2>
-    </div>
+  <SidebarMenu titulo="Egutegiak" v-model="menuAbierto" />
 
+  <div class="container">
     <!-- Tabla con acciones crear, editar y borrar -->
     <TaulaComponent
       titulo="Egutegiak"
       :filas="Egutegia"
+      texto-btn-crear="Sortu Egutegia"
       @crear="crear"
       @editar="editar"
       @borrar="borrar"
@@ -25,7 +23,7 @@ const menuAbierto = ref(false)
 const Egutegia = ref([])
 const tableName = "schedules" // Nombre de la tabla en la API
 
-// 🔹 Cargar datos iniciales
+//   Cargar datos iniciales
 const cargarDatos = async () => {
   try {
     Egutegia.value = await Api.cargarObjetos(tableName)
@@ -41,7 +39,7 @@ onMounted(() => {
   cargarDatos()
 })
 
-// 🔹 Crear un registro
+//   Crear un registro
 const crear = async (data) => {
   try {
     console.log("Datos a crear:", data)
@@ -60,7 +58,7 @@ const crear = async (data) => {
   }
 }
 
-// 🔹 Editar un registro
+//   Editar un registro
 const editar = async ({ id, ...data }) => {
   console.log("ID:", id)
   console.log("Datos:", data)
@@ -81,7 +79,7 @@ const editar = async ({ id, ...data }) => {
   }
 }
 
-// 🔹 Borrar un registro
+//   Borrar un registro
 const borrar = async (id) => {
   try {
     const resultado = await Api.ezabatuObjektua({ id }, tableName)

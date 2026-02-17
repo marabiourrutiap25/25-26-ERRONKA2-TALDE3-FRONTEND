@@ -28,7 +28,7 @@
       :headers="headers"
       :clients="clients"
       :students="students"
-      title="Crear / Editar Hitzordua"
+      title="Hitzordua sortu / editatu"
       @submit="guardarHitzordua"
     />
   </div>
@@ -132,7 +132,7 @@ const editarHitzordua = (data) => {
 // ---------- GUARDAR CITAS ----------
 const guardarHitzordua = async (data) => {
   try {
-    console.log("Payload que llega a Api.js:", data) // 🔹 Aquí vemos lo que se envía
+    console.log("Payload que llega a Api.js:", data) //   Aquí vemos lo que se envía
 
     const payload = JSON.parse(JSON.stringify(data))
     if (data.id) {

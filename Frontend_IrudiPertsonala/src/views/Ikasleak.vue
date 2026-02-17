@@ -3,7 +3,7 @@
 
   <div class="container">
     <ToastComponent />
-
+    <button class="btn btn-success text-white mt-4"  @click="router.push('/egutegiak')">Egutegiak Ikusi</button>
     <TaulaComponent :filas="ikasleak" titulo="Ikasleak" etiqueta-tabla="Students" texto-btn-crear="Ikaslea sortu"
       :mapa-headers="{ group_name: 'TALDEA' }"
       :columnas-excluidas="['id', 'group_id', 'created_at', 'updated_at', 'deleted_at']" @crear="abrirCrear"
@@ -41,7 +41,7 @@
 
             <div class="d-flex justify-content-end gap-3 pt-3">
               <button type="button" class="btn btn-cancel px-4" @click="cerrarModal">Cancelar</button>
-              <button type="submit" class="btn btn-save px-4">Guardar Cambios</button>
+              <button type="submit" class="btn btn-save px-4">Aldaketak Gorde</button>
             </div>
           </form>
         </div>
@@ -52,13 +52,16 @@
 
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import Api from '../composables/Api.js'
 import { useToast } from '../composables/UseToast.js'
 import ToastComponent from '../components/ToastComponent.vue'
 import SidebarMenu from '@/components/SidebarMenu.vue'
 import TaulaComponent from '@/components/TaulaComponent.vue'
+import Egutegiak from './Egutegiak.vue'
 
 const { ok, err } = useToast()
+const router = useRouter()
 
 const menuAbierto = ref(false)
 const ikasleak = ref([])

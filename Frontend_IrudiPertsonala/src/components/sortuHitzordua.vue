@@ -57,7 +57,7 @@
                 class="btn btn-danger"
                 @click="borrarHitzordua"
                 >
-                Borrar
+                Ezabatu
               </button>
 
 
@@ -78,7 +78,7 @@ import { ref, reactive, computed, defineExpose, watch } from 'vue'
 import Api from '../composables/Api.js'
 
 const props = defineProps({
-  title: { type: String, default: "Crear / Editar Hitzordua" },
+  title: { type: String, default: "Hitzordua sortu/editatu" },
   headers: { type: Array, required: true },
   clients: { type: Array, default: () => [] },
   students: { type: Array, default: () => [] }

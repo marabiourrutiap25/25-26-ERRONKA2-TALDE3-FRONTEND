@@ -1,10 +1,8 @@
 <template>
+  <SidebarMenu titulo="Produktuak" v-model="menuAbierto" />
+
   <div class="container">
     <ToastComponent />
-
-    <div class="d-flex justify-content-between align-items-center my-4">
-      <h2 class="mb-0">Kudeaketa - Produktuak</h2>
-    </div>
 
     <TaulaComponent :filas="Produktuak" titulo="Produktuak" etiqueta-tabla="Consumables"
       texto-btn-crear="Crear Consumable" :mapa-headers="{ category_name: 'KATEGORIA' }"
@@ -15,7 +13,7 @@
       <div class="modal-content border-0">
         <div class="modal-header border-bottom-0 pt-4 px-4 pb-2 d-flex justify-content-between align-items-center">
           <h4 class="modal-title fw-bold text-dark">
-            {{ modoEdicion ? 'Editar' : 'Crear' }} Consumable
+            Produktua {{ modoEdicion ? 'editatu' : 'sortu' }}
           </h4>
           <button type="button" class="btn-close-custom" @click="cerrarModal">✕</button>
         </div>
@@ -43,7 +41,7 @@
 
             <div class="d-flex justify-content-end gap-3 pt-3">
               <button type="button" class="btn btn-cancel px-4" @click="cerrarModal">Cancelar</button>
-              <button type="submit" class="btn btn-save px-4">Guardar Cambios</button>
+              <button type="submit" class="btn btn-save px-4">Aldaketak Gorde</button>
             </div>
           </form>
         </div>
@@ -58,8 +56,11 @@ import Api from '../composables/Api.js'
 import { useToast } from '../composables/UseToast.js'
 import ToastComponent from '../components/ToastComponent.vue'
 import TaulaComponent from '@/components/TaulaComponent.vue'
+import SidebarMenu from '@/components/SidebarMenu.vue'
 
 const { ok, err } = useToast()
+
+const menuAbierto = ref(false)
 
 const Produktuak = ref([])
 const listaCategorias = ref([])

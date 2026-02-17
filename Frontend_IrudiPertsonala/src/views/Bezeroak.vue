@@ -3,14 +3,14 @@
 
   <div class="container">
     <ToastComponent />
-    <TaulaComponent :filas="Bezeroa" titulo="Bezeroak" etiqueta-tabla="Clients" texto-btn-crear="Crear Client"
+    <TaulaComponent :filas="Bezeroa" titulo="Bezeroak" etiqueta-tabla="Clients" texto-btn-crear="Bezeroa sortu"
       @crear="abrirCrear" @editar="prepararEdicion" @borrar="borrar" />
 
     <dialog ref="modalRef" class="custom-dialog p-0 border-0 shadow-lg rounded-4">
       <div class="modal-content border-0">
         <div class="modal-header border-bottom-0 pt-4 px-4 pb-2 d-flex justify-content-between align-items-center">
           <h4 class="modal-title fw-bold text-dark">
-            {{ modoEdicion ? 'Editar' : 'Crear' }} Client
+            Bezeroa {{ modoEdicion ? 'editatu' : 'sortu' }}
           </h4>
           <button type="button" class="btn-close-custom" @click="cerrarModal">✕</button>
         </div>
@@ -27,7 +27,7 @@
 
             <div class="d-flex justify-content-end gap-3 pt-3">
               <button type="button" class="btn btn-cancel px-4" @click="cerrarModal">Cancelar</button>
-              <button type="submit" class="btn btn-save px-4">Guardar Cambios</button>
+              <button type="submit" class="btn btn-save px-4">Aldaketak Gorde</button>
             </div>
           </form>
         </div>

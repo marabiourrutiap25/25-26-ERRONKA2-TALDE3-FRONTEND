@@ -1,10 +1,8 @@
 <template>
+  <SidebarMenu titulo="Materialak" v-model="menuAbierto" />
+
   <div class="container">
     <ToastComponent />
-
-    <div class="d-flex justify-content-between align-items-center my-4">
-      <h2 class="mb-0">Kudeaketa - Materialak</h2>
-    </div>
 
     <TaulaComponent :filas="Materiala" titulo="Materialak" etiqueta-tabla="Equipment"
       texto-btn-crear="Crear Equipment" :mapa-headers="{ category_name: 'KATEGORIA' }"
@@ -43,7 +41,7 @@
 
             <div class="d-flex justify-content-end gap-3 pt-3">
               <button type="button" class="btn btn-cancel px-4" @click="cerrarModal">Cancelar</button>
-              <button type="submit" class="btn btn-save px-4">Guardar Cambios</button>
+              <button type="submit" class="btn btn-save px-4">Aldaketak Gorde</button>
             </div>
           </form>
         </div>
@@ -58,8 +56,11 @@ import Api from '../composables/Api.js'
 import { useToast } from '../composables/UseToast.js'
 import ToastComponent from '../components/ToastComponent.vue'
 import TaulaComponent from '@/components/TaulaComponent.vue'
+import SidebarMenu from '@/components/SidebarMenu.vue'
 
 const { ok, err } = useToast()
+
+const menuAbierto = ref(false)
 
 const Materiala = ref([])
 const listaCategorias = ref([])

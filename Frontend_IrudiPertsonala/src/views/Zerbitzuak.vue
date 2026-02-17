@@ -53,7 +53,7 @@
 
             <div class="d-flex justify-content-end gap-3 pt-3">
               <button type="button" class="btn btn-cancel px-4" @click="cerrarModal">Cancelar</button>
-              <button type="submit" class="btn btn-save px-4">Guardar Cambios</button>
+              <button type="submit" class="btn btn-save px-4">Aldaketak Gorde</button>
             </div>
           </form>
         </div>
