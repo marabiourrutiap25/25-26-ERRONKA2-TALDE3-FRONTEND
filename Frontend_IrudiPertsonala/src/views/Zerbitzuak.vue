@@ -1,12 +1,8 @@
 <template>
-  <SidebarMenu v-model="menuAbierto" />
+  <SidebarMenu titulo="Zerbitzuak" v-model="menuAbierto" />
 
   <div class="container">
     <ToastComponent />
-
-    <div class="d-flex justify-content-between align-items-center my-4">
-      <h2 class="mb-0">Kudeaketa - Zerbitzuak</h2>
-    </div>
 
     <TaulaComponent
       :filas="Zerbitzua"

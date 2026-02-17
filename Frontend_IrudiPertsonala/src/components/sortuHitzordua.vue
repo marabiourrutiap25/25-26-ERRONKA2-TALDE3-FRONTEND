@@ -32,18 +32,18 @@
 
             <!-- Select Cliente -->
             <div class="mb-4">
-              <label for="client_id" class="custom-label">Cliente</label>
+              <label for="client_id" class="custom-label">Bezeroa</label>
               <select id="client_id" v-model.number="form.client_id" class="form-select custom-input">
-                <option value="" disabled>Seleccione Cliente</option>
+                <option value="" disabled>Bezeroa aukeratu</option>
                 <option v-for="c in clients" :key="c.id" :value="c.id">{{ c.name }}</option>
               </select>
             </div>
 
             <!-- Select Alumno -->
             <div class="mb-4">
-              <label for="student_id" class="custom-label">Alumno</label>
+              <label for="student_id" class="custom-label">Ikaslea</label>
               <select id="student_id" v-model.number="form.student_id" class="form-select custom-input">
-                <option value="" disabled>Seleccione Alumno</option>
+                <option value="" disabled>Ikaslea aukeratu</option>
                 <option v-for="s in students" :key="s.id" :value="s.id">{{ s.name }}</option>
               </select>
             </div>

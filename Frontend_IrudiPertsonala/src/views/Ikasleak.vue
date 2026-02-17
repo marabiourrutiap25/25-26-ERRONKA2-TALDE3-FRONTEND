@@ -1,14 +1,10 @@
 <template>
-  <SidebarMenu v-model="menuAbierto" />
+  <SidebarMenu titulo="Ikasleak" v-model="menuAbierto" />
 
   <div class="container">
     <ToastComponent />
 
-    <div class="d-flex justify-content-between align-items-center my-4">
-      <h2 class="mb-0">Kudeaketa - Ikasleak</h2>
-    </div>
-
-    <TaulaComponent :filas="ikasleak" titulo="Ikasleak" etiqueta-tabla="Students" texto-btn-crear="Iakslea sortu"
+    <TaulaComponent :filas="ikasleak" titulo="Ikasleak" etiqueta-tabla="Students" texto-btn-crear="Ikaslea sortu"
       :mapa-headers="{ group_name: 'TALDEA' }"
       :columnas-excluidas="['id', 'group_id', 'created_at', 'updated_at', 'deleted_at']" @crear="abrirCrear"
       @editar="prepararEdicion" @borrar="borrar" />

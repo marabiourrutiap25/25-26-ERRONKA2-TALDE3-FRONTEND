@@ -1,6 +1,6 @@
 <template>
-  <SidebarMenu v-model="menuAbierto" />
-  <div class="container mt-4">
+  <SidebarMenu titulo="Hitzorduak" v-model="menuAbierto" />
+  <div class="container mt-5">
     <!-- Encabezado y botón Crear -->
     <div class="d-flex justify-content-between align-items-center mb-3">
       <div class="d-flex align-items-center">
