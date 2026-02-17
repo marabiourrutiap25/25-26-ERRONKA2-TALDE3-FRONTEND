@@ -82,7 +82,6 @@ import { useRouter } from 'vue-router'
 import { login } from '@/composables/Api.js'
 
 const router = useRouter()
-
 const email = ref('')
 const password = ref('')
 const error = ref('')

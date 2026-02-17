@@ -1,4 +1,5 @@
 <template>
+  <SidebarMenu v-model="menuAbierto" />
   <div class="container my-4">
     <div class="d-flex justify-content-between align-items-center my-4">
       <h2 class="mb-0">Kudeaketa - Txandak</h2>
@@ -92,6 +93,9 @@
 <script setup>
 import { ref, reactive, onMounted, computed } from 'vue'
 import Api from '../composables/Api.js'
+import SidebarMenu from '@/components/SidebarMenu.vue'
+
+const menuAbierto = ref(false)
 
 const Txandak = ref([])
 const alumnosLista = ref([])
