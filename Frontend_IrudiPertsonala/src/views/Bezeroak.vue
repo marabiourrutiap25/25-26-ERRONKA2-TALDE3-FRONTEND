@@ -1,4 +1,5 @@
 <template>
+  <SidebarMenu v-model="menuAbierto" />
   <div class="container">
     <Container_De_Mierda_Toast />
 

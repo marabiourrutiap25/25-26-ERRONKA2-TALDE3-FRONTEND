@@ -1,4 +1,5 @@
 <template>
+  <SidebarMenu v-model="menuAbierto" />
   <div class="container">
     <div class="d-flex justify-content-between align-items-center my-4">
       <h2 class="mb-0">Kudeaketa - Egutegiak</h2>
@@ -17,8 +18,9 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import Tabla from '../components/tabla.vue'
+import SidebarMenu from '@/components/SidebarMenu.vue'
 import Api from '../composables/Api.js'
-
+const menuAbierto = ref(false)
 const Egutegia = ref([])
 const tableName = "schedules" // Nombre de la tabla en la API
 

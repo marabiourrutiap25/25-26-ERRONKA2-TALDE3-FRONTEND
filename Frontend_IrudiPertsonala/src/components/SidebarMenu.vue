@@ -43,10 +43,26 @@
           <span>Biltegia</span>
         </div>
         <ul class="sidebar-menu">
-          <li><a @click="router.push('/hitzorduak')">Hitzorduak</a></li>
-          <li><a @click="router.push('/txandak')">Txandak</a></li>
-          <li><a @click="router.push('/hitzorduak')">Inbentarioa</a></li>
-          <li><a @click="router.push('/hitzorduak')">Gelak</a></li>
+          <li>
+            <a href="#" @click.prevent="router.push('/hitzorduak')">
+              Hitzorduak
+            </a>
+          </li>
+          <li>
+            <a href="#" @click.prevent="router.push('/txandak')">
+              Txandak
+            </a>
+          </li>
+          <li>
+            <a href="#" @click.prevent="router.push('/inbentarioa')">
+              Inbentarioa
+            </a>
+          </li>
+          <li>
+            <a href="#" @click.prevent="router.push('/gelak')">
+              Gelak
+            </a>
+          </li>
         </ul>
       </div>
 
@@ -217,14 +233,15 @@ const cerrarSesion = async () => {
 }
 
 .sidebar-menu a {
-  color: rgba(255, 255, 255, 0.7);
+  color: white;
   text-decoration: none;
   font-size: 0.95rem;
-  transition: color 0.2s;
+  transition: opacity 0.2s ease;
+  cursor: pointer;
 }
 
 .sidebar-menu a:hover {
-  color: white;
+  opacity: 0.8;
 }
 
 .sidebar-footer {
@@ -240,4 +257,5 @@ const cerrarSesion = async () => {
   height: auto;
   filter: brightness(0) invert(1);
 }
+
 </style>

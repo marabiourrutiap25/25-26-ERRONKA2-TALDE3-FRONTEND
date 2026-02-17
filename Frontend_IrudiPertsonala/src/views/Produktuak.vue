@@ -1,4 +1,5 @@
 <template>
+  <SidebarMenu v-model="menuAbierto" />
   <div class="container">
     <Container_De_Mierda_Toast />
 
@@ -66,7 +67,11 @@
 </template>
 
 <script setup>
+
 import { ref, reactive, onMounted } from 'vue'
+
+import { ref, onMounted } from 'vue'
+import SidebarMenu from '@/components/SidebarMenu.vue'
 import Api from '../composables/Api.js'
 import { useToast } from '../composables/Movida_Necesarria_Use_Toast.js'
 import Huevada_De_Tabla from '../components/Huevada_De_Tabla.vue'
@@ -74,6 +79,7 @@ import Container_De_Mierda_Toast from '../components/Container_De_Mierda_Toast.v
 
 const { ok, err } = useToast()
 
+const menuAbierto = ref(false)
 const Produktuak = ref([])
 const listaCategorias = ref([])
 const tableName = "consumables"

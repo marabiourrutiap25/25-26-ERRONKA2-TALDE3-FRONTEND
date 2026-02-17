@@ -1,4 +1,5 @@
 <template>
+  <SidebarMenu v-model="menuAbierto" />
   <div class="container mt-4">
     <!-- Encabezado y botón Crear -->
     <div class="d-flex justify-content-between align-items-center mb-3">
@@ -42,9 +43,11 @@
 import { ref, computed, onMounted } from 'vue'
 import { startOfWeek, addDays, format, getWeek } from 'date-fns'
 import HitzorduakComponent from '../components/HitzorduakComponent.vue'
+import SidebarMenu from '@/components/SidebarMenu.vue'
 import SortuHitzordua from '../components/sortuHitzordua.vue'
 import Api from '../composables/Api.js'
 
+const menuAbierto = ref(false)
 const tableName = 'appointments'
 const selectedWeek = ref(getCurrentWeek())
 const Egutegia = ref([])
