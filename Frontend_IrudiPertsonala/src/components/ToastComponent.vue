@@ -12,7 +12,7 @@
 </template>
 
 <script setup>
-import { useToast } from '../composables/Movida_Necesarria_Use_Toast'
+import { useToast } from '../composables/UseToast'
 const { toasts } = useToast()
 </script>
 

@@ -2,13 +2,13 @@
   <SidebarMenu v-model="menuAbierto" />
 
   <div class="container">
-    <Container_De_Mierda_Toast />
+    <ToastComponent />
 
     <div class="d-flex justify-content-between align-items-center my-4">
       <h2 class="mb-0">Kudeaketa - Ikasleak</h2>
     </div>
 
-    <Huevada_De_Tabla :filas="ikasleak" titulo="Ikasleak" etiqueta-tabla="Students" texto-btn-crear="Iakslea sortu"
+    <TaulaComponent :filas="ikasleak" titulo="Ikasleak" etiqueta-tabla="Students" texto-btn-crear="Iakslea sortu"
       :mapa-headers="{ group_name: 'TALDEA' }"
       :columnas-excluidas="['id', 'group_id', 'created_at', 'updated_at', 'deleted_at']" @crear="abrirCrear"
       @editar="prepararEdicion" @borrar="borrar" />
@@ -17,7 +17,7 @@
       <div class="modal-content border-0">
         <div class="modal-header border-bottom-0 pt-4 px-4 pb-2 d-flex justify-content-between align-items-center">
           <h4 class="modal-title fw-bold text-dark">
-            {{ modoEdicion ? 'Editar' : 'Crear' }} Student
+            Ikaslea {{ modoEdicion ? 'editatu' : 'sortu' }}
           </h4>
           <button type="button" class="btn-close-custom" @click="cerrarModal">✕</button>
         </div>
@@ -57,10 +57,10 @@
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
 import Api from '../composables/Api.js'
-import { useToast } from '../composables/Movida_Necesarria_Use_Toast.js'
-import Huevada_De_Tabla from '../components/Huevada_De_Tabla.vue'
-import Container_De_Mierda_Toast from '../components/Container_De_Mierda_Toast.vue'
+import { useToast } from '../composables/UseToast.js'
+import ToastComponent from '../components/ToastComponent.vue'
 import SidebarMenu from '@/components/SidebarMenu.vue'
+import TaulaComponent from '@/components/TaulaComponent.vue'
 
 const { ok, err } = useToast()
 

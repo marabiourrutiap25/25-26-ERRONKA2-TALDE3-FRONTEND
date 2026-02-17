@@ -2,13 +2,13 @@
   <SidebarMenu v-model="menuAbierto" />
 
   <div class="container">
-    <Container_De_Mierda_Toast />
+    <ToastComponent />
 
     <div class="d-flex justify-content-between align-items-center my-4">
       <h2 class="mb-0">Kudeaketa - Zerbitzuak</h2>
     </div>
 
-    <Huevada_De_Tabla
+    <TaulaComponent
       :filas="Zerbitzua"
       titulo="Zerbitzuak"
       etiqueta-tabla="Services"
@@ -69,10 +69,10 @@
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
 import Api from '../composables/Api.js'
-import { useToast } from '../composables/Movida_Necesarria_Use_Toast.js'
-import Huevada_De_Tabla from '../components/Huevada_De_Tabla.vue'
-import Container_De_Mierda_Toast from '../components/Container_De_Mierda_Toast.vue'
+import { useToast } from '../composables/UseToast.js'
+import ToastComponent from '../components/ToastComponent.vue'
 import SidebarMenu from '@/components/SidebarMenu.vue'
+import TaulaComponent from '@/components/TaulaComponent.vue'
 
 const { ok, err } = useToast()
 

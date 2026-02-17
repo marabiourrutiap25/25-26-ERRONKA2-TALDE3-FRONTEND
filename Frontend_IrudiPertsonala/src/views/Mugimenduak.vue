@@ -7,7 +7,7 @@
       <h2 class="mb-0">Mugimenduak</h2>
     </div>
 
-    <DataTable
+    <TaulaComponent
       :filas="Consumables"
       titulo="Kontsumible - Ikasle"
       etiqueta-tabla="Consumable"
@@ -19,7 +19,7 @@
       @borrar="(id) => borrar(id, 'consumable')"
     />
 
-    <DataTable
+    <TaulaComponent
       :filas="Equipments"
       titulo="Ekipamentu - Ikasle"
       etiqueta-tabla="Equipment"
@@ -94,10 +94,10 @@
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
 import Api from '../composables/Api.js'
-import { useToast } from '../composables/Movida_Necesarria_Use_Toast.js'
+import { useToast } from '../composables/UseToast.js'
 import SidebarMenu from '@/components/SidebarMenu.vue'
-import DataTable from '../components/Huevada_De_Tabla.vue'
-import ToastContainer from '../components/Container_De_Mierda_Toast.vue'
+import ToastContainer from '../components/ToastComponent.vue'
+import TaulaComponent from '@/components/TaulaComponent.vue'
 
 const { ok, err } = useToast()
 

@@ -6,7 +6,8 @@
     </div>
 
     <!-- Tabla con acciones crear, editar y borrar -->
-    <Tabla
+    <TaulaComponent
+      titulo="Egutegiak"
       :filas="Egutegia"
       @crear="crear"
       @editar="editar"
@@ -17,9 +18,9 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import Tabla from '../components/tabla.vue'
 import SidebarMenu from '@/components/SidebarMenu.vue'
 import Api from '../composables/Api.js'
+import TaulaComponent from '@/components/TaulaComponent.vue'
 const menuAbierto = ref(false)
 const Egutegia = ref([])
 const tableName = "schedules" // Nombre de la tabla en la API
