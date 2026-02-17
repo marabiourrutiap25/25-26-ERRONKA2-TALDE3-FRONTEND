@@ -5,7 +5,7 @@
       <div class="text-center mb-4">
         <img src="@/assets/IMP_Logotipoa.png" alt="Irudi Pertsonala Logo" class="logo-image mb-3" />
         <h1 class="brand-name">Irudi Pertsonala</h1>
-        <p class="brand-subtitle">Peluquería & Estética</p>
+        <p class="brand-subtitle">Ileapainketa  & Estetika</p>
       </div>
 
       <!-- Formulario de login -->
@@ -68,10 +68,6 @@
           {{ cargando ? 'Entrando...' : 'Iniciar Sesión' }}
         </button>
       </form>
-
-      <div class="text-center mt-4">
-        <a href="#" class="text-muted small">¿Olvidaste tu contraseña?</a>
-      </div>
     </div>
   </div>
 </template>

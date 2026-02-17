@@ -40,7 +40,7 @@ const props = defineProps({
 })
 
 // Horas del calendario (8 a 20)
-const hours = Array.from({ length: 13 }, (_, i) => i + 8)
+const hours = Array.from({ length: 8 }, (_, i) => i + 8)
 
 // Días de la semana
 const days = computed(() => {

@@ -1,23 +1,19 @@
 <template>
-  <div class="container">
-    <div class="d-flex justify-content-between align-items-center my-4">
-      <h2 class="mb-0">Gestión de Bezeroak</h2>
-    </div>
-
-    <!-- Tabla con acciones crear, editar y borrar -->
-    <Tabla
-      :filas="Bezeroa"
-      @crear="crear"
-      @editar="editar"
-      @borrar="borrar"
-    />
-  </div>
+  <SidebarMenu :titulo="'Bezeroak'" v-model="menuAbierto" />
+  <!-- Tabla con acciones crear, editar y borrar -->
+  <Taula :filas="Bezeroa" :titulo="'Bezeroa'" , :labels="{
+    name: 'IZENA',
+    surnames: 'ABIZENA',
+    telephone: 'TELEFONOA',
+    home_client: 'ETXEKOA'
+  }" @crear="crear" @editar="editar" @borrar="borrar" />
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import Tabla from '../components/tabla.vue'
 import Api from '../composables/Api.js'
+import SidebarMenu from '@/components/SidebarMenu.vue'
+import Taula from '@/components/Taula.vue'
 
 const Bezeroa = ref([])
 const tableName = "clients" // Nombre de la tabla en la API
@@ -43,7 +39,7 @@ const crear = async (data) => {
   try {
     console.log("Datos a crear:", data)
 
-    const resultado = await Api.crearObjektua(data,tableName)
+    const resultado = await Api.crearObjektua(data, tableName)
 
     if (resultado) {
       alert("Registro creado correctamente")
@@ -61,11 +57,11 @@ const crear = async (data) => {
 const editar = async ({ id, ...data }) => {
   console.log("ID:", id)
   console.log("Datos:", data)
-  
+
   try {
     const datosParaAPI = { id, ...data }
     const resultado = await Api.aldatuObjeto(datosParaAPI, tableName)
-    
+
     if (resultado) {
       alert("Registro actualizado correctamente")
       await cargarDatos()
@@ -82,7 +78,7 @@ const editar = async ({ id, ...data }) => {
 const borrar = async (id) => {
   try {
     const resultado = await Api.ezabatuObjektua({ id }, tableName)
-    
+
     if (resultado) {
       alert("Registro eliminado correctamente")
       await cargarDatos()
@@ -94,4 +90,6 @@ const borrar = async (id) => {
     alert("Error al eliminar: " + error.message)
   }
 }
+
+const menuAbierto = ref(false)
 </script>

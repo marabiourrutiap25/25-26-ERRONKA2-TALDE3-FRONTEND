@@ -1,34 +1,28 @@
 <template>
   <div class="container my-5">
 
-    <!-- 🔵 BOTÓN CREAR -->
+    <!-- BOTÓN CREAR -->
     <div class="mb-3 d-flex justify-content-end">
       <button 
-        class="btn btn-success"
+        class="btn btn-info text-white"
         @click="abrirCrear"
       >
-        Crear {{ Titulo }}
+        + {{ titulo }} sortu
       </button>
     </div>
 
     <!-- TABLA -->
     <div v-if="filas.length" class="table-responsive">
       <table class="table table-hover border rounded mb-0">
-        <tbody class="bg-light">
-          <tr>
-            <td colspan="100%">
-              <div class="d-flex justify-content-between align-items-center">
-                <span class="fw-bold">{{ Titulo }}</span>
-              </div>
-            </td>
-          </tr>
-        </tbody>
         <thead class="table-light">
           <tr>
-            <th v-for="header in headersFiltrados" :key="header">{{ header }}</th>
-            <th>Acciones</th>
+            <th v-for="header in headersFiltrados" :key="header">
+              {{ formatearHeader(header) }}
+            </th>
+            <th class="text-center">KUDEAKETAK</th>
           </tr>
         </thead>
+
         <tbody class="bg-white">
           <tr v-for="(fila, index) in filas" :key="index">
             <td 
@@ -39,11 +33,12 @@
             >
               {{ truncar(fila[header]) }}
             </td>
+
             <td>
-              <div class="d-flex justify-content-end">
+              <div class="d-flex justify-content-center">
                 <button 
                   type="button" 
-                  class="btn p-0 me-2" 
+                  class="btn btn-primary me-2" 
                   @click="editar(fila)" 
                   title="Editar fila"
                 >
@@ -52,7 +47,7 @@
 
                 <button 
                   type="button" 
-                  class="btn p-0 me-2" 
+                  class="btn btn-danger" 
                   @click="borrarFila(fila.id)" 
                   title="Borrar fila"
                 >
@@ -69,18 +64,18 @@
       No hay datos para mostrar
     </div>
 
-    <!-- 🔵 DIALOGO EDITAR -->
+    <!-- DIALOGO EDITAR -->
     <EditatuDialog
       ref="editDialogRef"
-      :title="`Editar ${Titulo}`"
+      :title="`Editar ${titulo}`"
       :headers="headersFiltrados"
       @submit="handleEditSubmit"
     />
 
-    <!-- 🟢 DIALOGO CREAR -->
+    <!-- DIALOGO CREAR -->
     <CrearDialog
       ref="crearDialogRef"
-      :title="`Crear ${Titulo}`"
+      :title="`Crear ${titulo}`"
       :headers="headersFiltrados"
       @submit="handleCreateSubmit"
     />
@@ -91,7 +86,7 @@
 <script setup>
 import { computed, ref } from "vue"
 import EditatuDialog from "./editatu.vue"
-import CrearDialog from "./sortu.vue" // 👈 nuevo
+import CrearDialog from "./sortu.vue"
 
 const emit = defineEmits(['editar', 'borrar', 'crear'])
 
@@ -103,54 +98,92 @@ const props = defineProps({
     type: Array, 
     default: () => [] 
   },
-  Titulo: { 
+  titulo: { 
     type: String, 
     default: "Tabla de datos" 
+  },
+  // Campos que quieres ocultar (editable desde fuera)
+  ocultarCampos: {
+    type: Array,
+    default: () => ['id', 'created_at', 'updated_at', 'deleted_at', 'student_id']
+  },
+    labels: {
+    type: Object,
+    default: () => ({})
   }
 })
 
-// 🔹 Computed headers, filtrando "id"
+/* =========================
+   HEADERS DINÁMICOS
+========================= */
+
 const headers = computed(() => {
   if (!props.filas.length) return []
   return Object.keys(props.filas[0])
 })
 
-const headersFiltrados = computed(() => headers.value.filter(h => h !== 'id'))
+const headersFiltrados = computed(() => {
+  return headers.value.filter(
+    h => !props.ocultarCampos.includes(h.toLowerCase())
+  )
+})
+
+/* =========================
+   UTILIDADES
+========================= */
 
 const currentEditRow = ref(null)
 
-// 🔹 Truncar texto a 20 caracteres
 const truncar = (texto, limite = 20) => {
   if (!texto) return ''
-  return texto.length > limite ? texto.slice(0, limite) + '…' : texto
+  const t = texto.toString()
+  return t.length > limite ? t.slice(0, limite) + '…' : t
 }
 
-// 🔵 ABRIR CREAR
+const formatearHeader = (header) => {
+  // Si existe traducción personalizada, usarla
+  if (props.labels[header]) {
+    return props.labels[header]
+  }
+
+  // Si no, usar formato automático
+  return header.replaceAll('_', ' ').toUpperCase()
+}
+
+
+/* =========================
+   ACCIONES
+========================= */
+
+// ABRIR CREAR
 const abrirCrear = () => {
   crearDialogRef.value?.open()
 }
 
-// 🔵 EDITAR
+// EDITAR
 const editar = (fila) => {
   currentEditRow.value = fila
+
   if (editDialogRef.value) {
     const formData = {}
+
     headersFiltrados.value.forEach(header => {
       formData[header] = fila[header] || ""
     })
+
     editDialogRef.value.setFormData?.(formData)
     editDialogRef.value.open()
   }
 }
 
-// 🔵 BORRAR
+// BORRAR
 const borrarFila = (id) => {
   if (confirm('¿Estás seguro de que quieres borrar este registro?')) {
     emit('borrar', id)
   }
 }
 
-// 🔵 SUBMIT EDITAR
+// SUBMIT EDITAR
 const handleEditSubmit = (formData) => {
   emit('editar', {
     id: currentEditRow.value?.id,
@@ -158,7 +191,7 @@ const handleEditSubmit = (formData) => {
   })
 }
 
-// 🟢 SUBMIT CREAR
+// SUBMIT CREAR
 const handleCreateSubmit = (formData) => {
   emit('crear', formData)
 }

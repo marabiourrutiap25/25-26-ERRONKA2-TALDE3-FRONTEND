@@ -1,40 +1,31 @@
 <template>
+  <SidebarMenu :titulo="'Hitzorduak'" v-model="menuAbierto" />
   <div class="container mt-4">
-    <!-- Encabezado y botón Crear -->
-    <div class="d-flex justify-content-between align-items-center mb-3">
-      <h2 class="mb-0">Gestión de Hitzorduak</h2>
-      <button class="btn btn-success" @click="abrirCrear">Crear Hitzordua</button>
-    </div>
+    <div class="mb-3 d-flex align-items-center justify-content-between flex-wrap">
 
-    <!-- Selector de semana -->
-    <div class="mb-3 row align-items-center">
-      <label for="week" class="col-auto col-form-label">Aukeratu astea:</label>
-      <div class="col-auto">
-        <select class="form-select" v-model="selectedWeek">
+      <!-- Selector de semana -->
+      <div class="d-flex align-items-center">
+        <label for="week" class="me-2 mb-0">Aukeratu astea:</label>
+        <select class="form-select" v-model="selectedWeek" style="width: auto;">
           <option v-for="semana in todasLasSemanas" :key="semana.value" :value="semana.value">
             {{ semana.label }}
           </option>
         </select>
       </div>
+
+      <!-- Botón Crear -->
+      <button class="btn btn-info text-white" @click="abrirCrear">
+        + Hitzordua sortu
+      </button>
     </div>
 
     <!-- Calendario -->
-    <HitzorduakComponent
-      :week="selectedWeek"
-      :datos="egutegiaFiltrada"
-      @editar="editarHitzordua"
-      @borrar="borrarHitzordua"
-    />
+    <HitzorduakComponent :week="selectedWeek" :datos="egutegiaFiltrada" @editar="editarHitzordua"
+      @borrar="borrarHitzordua" />
 
     <!-- Modal Crear / Editar Hitzordua -->
-    <SortuHitzordua
-      ref="sortuHitzorduaRef"
-      :headers="headers"
-      :clients="clients"
-      :students="students"
-      title="Crear / Editar Hitzordua"
-      @submit="guardarHitzordua"
-    />
+    <SortuHitzordua ref="sortuHitzorduaRef" :headers="headers" :clients="clients" :students="students"
+      title="Crear / Editar Hitzordua" @submit="guardarHitzordua" />
   </div>
 </template>
 
@@ -44,6 +35,7 @@ import { startOfWeek, addDays, format, getWeek } from 'date-fns'
 import HitzorduakComponent from '../components/HitzorduakComponent.vue'
 import SortuHitzordua from '../components/sortuHitzordua.vue'
 import Api from '../composables/Api.js'
+import SidebarMenu from '@/components/SidebarMenu.vue'
 
 const tableName = 'appointments'
 const selectedWeek = ref(getCurrentWeek())
@@ -55,13 +47,13 @@ const students = ref([])
 const sortuHitzorduaRef = ref(null)
 
 // Headers (solo keys)
-const headers = ['seat', 'date', 'start_time', 'end_time','comments']
+const headers = ['seat', 'date', 'start_time', 'end_time', 'comments']
 
 // ---------- FUNCIONES DE SEMANA ----------
 function getCurrentWeek() {
   const now = new Date()
   const weekNumber = getWeek(now, { weekStartsOn: 1 })
-  return `${now.getFullYear()}-W${String(weekNumber).padStart(2,'0')}`
+  return `${now.getFullYear()}-W${String(weekNumber).padStart(2, '0')}`
 }
 
 // Genera todas las semanas del año actual
@@ -73,8 +65,8 @@ const todasLasSemanas = computed(() => {
   for (let i = 0; i < 52; i++) {
     const start = addDays(firstDay, i * 7)
     const weekNum = getWeek(start, { weekStartsOn: 1 })
-    const value = `${year}-W${String(weekNum).padStart(2,'0')}`
-    const label = `Semana ${weekNum} (${format(start,'dd/MM')})`
+    const value = `${year}-W${String(weekNum).padStart(2, '0')}`
+    const label = `Semana ${weekNum} (${format(start, 'dd/MM')})`
     semanas.push({ value, label })
   }
   return semanas
@@ -85,9 +77,9 @@ const egutegiaFiltrada = computed(() => {
   if (!Egutegia.value?.length || !selectedWeek.value) return []
 
   const [year, week] = selectedWeek.value.split('-W').map(Number)
-  const firstDay = startOfWeek(new Date(year,0,1 + (week-1)*7), {weekStartsOn:1})
+  const firstDay = startOfWeek(new Date(year, 0, 1 + (week - 1) * 7), { weekStartsOn: 1 })
   const lastDay = new Date(firstDay)
-  lastDay.setDate(firstDay.getDate()+6)
+  lastDay.setDate(firstDay.getDate() + 6)
 
   return Egutegia.value.filter(item => {
     if (!item.date) return false
@@ -98,11 +90,11 @@ const egutegiaFiltrada = computed(() => {
 
 // ---------- CARGA DE DATOS ----------
 const cargarDatos = async () => {
-  try { 
-    Egutegia.value = await Api.cargarObjetos(tableName) 
-  } catch (e) { 
-    console.error(e); 
-    Egutegia.value = [] 
+  try {
+    Egutegia.value = await Api.cargarObjetos(tableName)
+  } catch (e) {
+    console.error(e);
+    Egutegia.value = []
   }
 
   try {
@@ -143,7 +135,7 @@ const guardarHitzordua = async (data) => {
       await Api.crearObjektua(payload, tableName)
     }
     await cargarDatos()
-  } catch(e) {
+  } catch (e) {
     console.error('Error guardando Hitzordua:', e)
   }
 }
@@ -151,13 +143,15 @@ const guardarHitzordua = async (data) => {
 
 // ---------- BORRAR CITAS ----------
 const borrarHitzordua = async (id) => {
-  try { 
-    await Api.ezabatuObjektua({id}, tableName)
-    await cargarDatos() 
-  } catch(e){
+  try {
+    await Api.ezabatuObjektua({ id }, tableName)
+    await cargarDatos()
+  } catch (e) {
     console.error(e)
   }
 }
 
 onMounted(cargarDatos)
+
+const menuAbierto = ref(false)
 </script>

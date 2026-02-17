@@ -1,97 +1,20 @@
 <template>
-  <div class="container my-4">
-    <div class="d-flex justify-content-between align-items-center my-4">
-      <h2 class="mb-0">Gestión de Txandak</h2>
-      <button class="btn btn-success" @click="abrirCrear">
-        Crear Txanda
-      </button>
-    </div>
+  <SidebarMenu :titulo="'Txandak'" v-model="menuAbierto" />
 
-    <div v-if="Txandak.length" class="table-responsive">
-      <table class="table table-hover border rounded mb-0">
-        <tbody class="bg-light">
-          <tr>
-            <td colspan="100%">
-              <div class="d-flex justify-content-between align-items-center">
-                <span class="fw-bold">Txanda</span>
-              </div>
-            </td>
-          </tr>
-        </tbody>
-        <thead class="table-light">
-          <tr>
-            <th v-for="header in headersVisibles" :key="header">
-              {{ header === 'student_name' ? 'IKASLEA' : header.toUpperCase() }}
-            </th>
-            <th class="text-end">Acciones</th>
-          </tr>
-        </thead>
-        <tbody class="bg-white">
-          <tr v-for="(fila, index) in Txandak" :key="index">
-            <td v-for="header in headersVisibles" :key="header"
-              style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"
-              :title="fila[header]">
-              {{ truncar(fila[header]) }}
-            </td>
-            <td>
-              <div class="d-flex justify-content-end">
-                <button type="button" class="btn p-0 me-2" @click="prepararEdicion(fila)">
-                  <img src="@/assets/editatu.png" alt="Editar" style="max-width: 24px;" />
-                </button>
-                <button type="button" class="btn p-0 me-2" @click="borrar(fila.id)">
-                  <img src="@/assets/ezabatu.png" alt="Borrar" style="max-width: 24px;" />
-                </button>
-              </div>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-    <dialog ref="modalRef" class="custom-dialog p-0 border-0 shadow-lg rounded-4">
-      <div class="modal-content border-0">
-        <div class="modal-header border-bottom-0 pt-4 px-4 pb-2 d-flex justify-content-between align-items-center">
-          <h4 class="modal-title fw-bold text-dark">
-            {{ modoEdicion ? 'Editar Txanda' : 'Crear Txanda' }}
-          </h4>
-          <button type="button" class="btn-close-custom" @click="cerrarModal">✕</button>
-        </div>
-
-        <div class="modal-body px-4 pb-4">
-          <form @submit.prevent="guardar">
-            <div class="mb-4">
-              <label class="custom-label">ALUMNO</label>
-              <select v-model="form.student_id" class="form-control custom-input" required>
-                <option value="" disabled>Selecciona un alumno</option>
-                <option v-for="alumno in alumnosLista" :key="alumno.id" :value="alumno.id">
-                  {{ alumno.name }} {{ alumno.surnames }}
-                </option>
-              </select>
-            </div>
-
-            <div v-for="header in headersOriginales" :key="header" class="mb-4">
-              <div
-                v-if="!['id', 'student_id', 'student_name', 'created_at', 'updated_at', 'deleted_at'].includes(header.toLowerCase())">
-                <label :for="header" class="custom-label">{{ header.toUpperCase() }}</label>
-                <input :id="header" v-model="form[header]" type="text" class="form-control custom-input"
-                  :placeholder="'Introduce ' + header" />
-              </div>
-            </div>
-
-            <div class="d-flex justify-content-end gap-3 pt-3">
-              <button type="button" class="btn btn-cancel px-4" @click="cerrarModal">Cancelar</button>
-              <button type="submit" class="btn btn-save px-4">Guardar Cambios</button>
-            </div>
-          </form>
-        </div>
-      </div>
-    </dialog>
-  </div>
+  <!-- Tabla con acciones crear, editar y borrar -->
+  <Taula :filas="Txandak" :titulo="'Txanda'" :labels="{
+    type: 'MOTA',
+    last_name: 'ABIZENA',
+    student_name: 'IKASLE IZENA',
+    birth_date: 'JAIOTZE DATA'
+  }" @crear="abrirCrear" @editar="prepararEdicion" @borrar="borrar" />
 </template>
 
 <script setup>
 import { ref, reactive, onMounted, computed } from 'vue'
 import Api from '../composables/Api.js'
+import Taula from '@/components/Taula.vue'
+import SidebarMenu from '@/components/SidebarMenu.vue'
 
 const Txandak = ref([])
 const alumnosLista = ref([])
@@ -175,9 +98,12 @@ const borrar = async (id) => {
     const res = await Api.ezabatuObjektua({ id }, tableName)
     if (res) await cargarDatos()
   }
+
 }
 
 onMounted(cargarDatos)
+
+const menuAbierto = ref(false)
 </script>
 
 <style scoped>

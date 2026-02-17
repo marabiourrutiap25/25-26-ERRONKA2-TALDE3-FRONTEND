@@ -1,23 +1,21 @@
 <template>
-  <div class="container">
-    <div class="d-flex justify-content-between align-items-center my-4">
-      <h2 class="mb-0">Gestión de Zerbitzuak</h2>
-    </div>
+  <SidebarMenu :titulo="'Zerbitzuak'" v-model="menuAbierto" />
 
     <!-- Tabla con acciones crear, editar y borrar -->
     <Tabla
       :filas="Zerbitzua"
+      :titulo="'Zerbitzua'"
       @crear="crear"
       @editar="editar"
       @borrar="borrar"
     />
-  </div>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import Tabla from '../components/tabla.vue'
+import Tabla from '../components/Taula.vue'
 import Api from '../composables/Api.js'
+import SidebarMenu from '@/components/SidebarMenu.vue'
 
 const Zerbitzua = ref([])
 const tableName = "services" // Nombre de la tabla en la API
@@ -94,4 +92,6 @@ const borrar = async (id) => {
     alert("Error al eliminar: " + error.message)
   }
 }
+
+const menuAbierto = ref(false)
 </script>
