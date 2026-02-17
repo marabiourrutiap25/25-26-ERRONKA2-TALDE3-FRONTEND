@@ -2,24 +2,17 @@
     <div>
         <div class="d-flex justify-content-between align-items-center mt-5 mb-3">
             <h3 class="mb-0">{{ titulo }}</h3>
-            <button class="btn btn-success" @click="$emit('crear')">{{ textoBtnCrear }}</button>
+            <button class="btn btn-info text-white" @click="$emit('crear')">+ {{ textoBtnCrear }}</button>
         </div>
 
         <div v-if="filas.length" class="table-responsive mb-5">
             <table class="table table-hover border rounded mb-0">
-                <tbody class="bg-light">
-                    <tr>
-                        <td colspan="100%">
-                            <span class="fw-bold">{{ etiquetaTabla }}</span>
-                        </td>
-                    </tr>
-                </tbody>
                 <thead class="table-light">
                     <tr>
                         <th v-for="header in headersVisibles" :key="header">
                             {{ formatHeader(header) }}
                         </th>
-                        <th class="text-end">Akzioak</th>
+                        <th class="text-end">AKZIOAK</th>
                     </tr>
                 </thead>
                 <tbody class="bg-white">
@@ -65,7 +58,7 @@ const props = defineProps({
     // Texto del botón de creación
     textoBtnCrear: {
         type: String,
-        default: 'Crear'
+        default: 'Sortu'
     },
     // Columnas que nunca deben mostrarse en la tabla
     columnasExcluidas: {
