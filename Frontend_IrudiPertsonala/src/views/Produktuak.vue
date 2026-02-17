@@ -70,7 +70,6 @@
 
 import { ref, reactive, onMounted } from 'vue'
 
-import { ref, onMounted } from 'vue'
 import SidebarMenu from '@/components/SidebarMenu.vue'
 import Api from '../composables/Api.js'
 import { useToast } from '../composables/Movida_Necesarria_Use_Toast.js'
