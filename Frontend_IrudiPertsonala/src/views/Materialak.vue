@@ -14,12 +14,16 @@
     <TaulaComponent :filas="Materiala" titulo="Materialak" etiqueta-tabla="Equipment"
       texto-btn-crear="Materiala Sortu" :mapa-headers="{ category_name: 'KATEGORIA' }"
       :columnas-excluidas="['id', 'equipment_category_id', 'created_at', 'updated_at', 'deleted_at']"
-      @crear="abrirCrear" @editar="prepararEdicion" @borrar="borrar" />
+      @crear="abrirCrear" @editar="prepararEdicion" @borrar="borrar">
+      <template #default="{ fila }">
+        <button v-if="fila && !fila.end_datetime" class="btn btn-warning btn-sm ms-2" @click="abrirDevolver(fila)">Devolver</button>
+      </template>
+    </TaulaComponent>
 
     <dialog ref="modalSacarRef" class="custom-dialog p-0 border-0 shadow-lg rounded-4">
       <div class="modal-content border-0">
         <div class="modal-header border-bottom-0 pt-4 px-4 pb-2 d-flex justify-content-between align-items-center">
-          <h4 class="modal-title fw-bold text-dark">Materiala Atera</h4>
+          <h4 class="modal-title fw-bold text-dark">Materiala atera</h4>
           <button type="button" class="btn-close-custom" @click="cerrarModalSacar">✕</button>
         </div>
         <div class="modal-body px-4 pb-4">
@@ -34,10 +38,10 @@
               </select>
             </div>
             <div class="mb-4">
-              <label class="custom-label">MATERIALA</label>
+              <label class="custom-label">EKIPAMENDUA</label>
               <select v-model="formSacar.equipment_id" class="form-control custom-input" required>
-                <option value="" disabled>Materiala hautatu</option>
-                <option v-for="e in listaEquipmentsDisponibles" :key="e.id" :value="e.id">
+                <option value="" disabled>Ekipamendu bat hautatu</option>
+                <option v-for="e in listaEquipments" :key="e.id" :value="e.id" :disabled="materialSacado(e.id)">
                   {{ e.name }}
                 </option>
               </select>
@@ -45,6 +49,31 @@
             <div class="d-flex justify-content-end gap-3 pt-3">
               <button type="button" class="btn btn-cancel px-4" @click="cerrarModalSacar">Kantzelatu</button>
               <button type="submit" class="btn btn-save px-4">Atera</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </dialog>
+
+    <dialog ref="modalDevolverRef" class="custom-dialog p-0 border-0 shadow-lg rounded-4">
+      <div class="modal-content border-0">
+        <div class="modal-header border-bottom-0 pt-4 px-4 pb-2 d-flex justify-content-between align-items-center">
+          <h4 class="modal-title fw-bold text-dark">Materiala itzuli</h4>
+          <button type="button" class="btn-close-custom" @click="cerrarModalDevolver">✕</button>
+        </div>
+        <div class="modal-body px-4 pb-4">
+          <form @submit.prevent="guardarDevolver">
+            <div class="mb-4">
+              <label class="custom-label">Ekipamendu izena</label>
+              <input class="form-control custom-input" :value="devolverFila?.equipment_id" disabled />
+            </div>
+            <div class="mb-4">
+              <label class="custom-label">Ikasle izena</label>
+              <input class="form-control custom-input" :value="devolverFila?.student_id" disabled />
+            </div>
+            <div class="d-flex justify-content-end gap-3 pt-3">
+              <button type="button" class="btn btn-cancel px-4" @click="cerrarModalDevolver">Kantzelatu</button>
+              <button type="submit" class="btn btn-save px-4">Itzuli</button>
             </div>
           </form>
         </div>
@@ -93,7 +122,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, computed } from 'vue'
+import { ref, reactive, onMounted } from 'vue'
 import Api from '../composables/Api.js'
 import { useToast } from '../composables/UseToast.js'
 import ToastComponent from '../components/ToastComponent.vue'
@@ -111,6 +140,8 @@ const listaAlumnos = ref([])
 const listaEquipments = ref([])
 const modalSacarRef = ref(null)
 const formSacar = reactive({ student_id: '', equipment_id: '' })
+const modalDevolverRef = ref(null)
+const devolverFila = ref(null)
 
 const modalRef = ref(null)
 const modoEdicion = ref(false)
@@ -144,13 +175,10 @@ const cargarDatos = async () => {
     listaEquipments.value = []
   }
 }
-// Solo materiales que no están actualmente sacados (no hay movimiento abierto)
-const listaEquipmentsDisponibles = computed(() => {
-  // Aquí deberías consultar los movimientos abiertos para filtrar los que no están disponibles
-  // Por simplicidad, se asume que todos están disponibles
-  // Si tienes una lista de movimientos, deberías filtrar aquí
-  return listaEquipments.value
-})
+const materialSacado = (equipment_id) => {
+  // Devuelve true si hay un material con ese equipment_id sin end_datetime
+  return Materiala.value.some(m => m.equipment_id === equipment_id && !m.end_datetime)
+}
 
 const abrirSacar = () => {
   formSacar.student_id = ''
@@ -162,14 +190,14 @@ const cerrarModalSacar = () => modalSacarRef.value?.close()
 
 const guardarSacar = async () => {
   try {
-    // Validar campos
-    const student_id = Number(formSacar.student_id)
-    const equipment_id = Number(formSacar.equipment_id)
-    if (!student_id || !equipment_id) {
-      err('Debes seleccionar alumno y material')
+    if (!formSacar.student_id || !formSacar.equipment_id) {
+      err('Selecciona alumno y equipamiento')
       return
     }
-    // start_datetime automático (YYYY-MM-DD HH:mm:ss)
+    if (materialSacado(formSacar.equipment_id)) {
+      err('Ese material ya está sacado y no se puede volver a sacar hasta que se devuelva')
+      return
+    }
     const now = new Date()
     const yyyy = now.getFullYear()
     const mm = String(now.getMonth() + 1).padStart(2, '0')
@@ -179,19 +207,56 @@ const guardarSacar = async () => {
     const ss = String(now.getSeconds()).padStart(2, '0')
     const start_datetime = `${yyyy}-${mm}-${dd} ${hh}:${min}:${ss}`
     const payload = {
-      student_id,
-      equipment_id,
+      student_id: formSacar.student_id,
+      equipment_id: formSacar.equipment_id,
       start_datetime
     }
-    // endpoint para movimientos
     const res = await Api.crearObjektua(payload, 'student-equipment')
     if (res) {
       cerrarModalSacar()
       await cargarDatos()
-      ok(res.message || 'Materiala aterata')
+      ok(res.message || 'Material sacado correctamente')
     }
   } catch (e) {
-    err(e.message || 'Errorea materiala ateratzerakoan')
+    err(e.message || 'Error al sacar material')
+  }
+}
+
+const abrirDevolver = (fila) => {
+  devolverFila.value = fila
+  modalDevolverRef.value?.showModal()
+}
+
+const cerrarModalDevolver = () => modalDevolverRef.value?.close()
+
+const guardarDevolver = async () => {
+  try {
+    if (!devolverFila.value || devolverFila.value.end_datetime) {
+      err('Este material ya está devuelto')
+      return
+    }
+    const now = new Date()
+    const yyyy = now.getFullYear()
+    const mm = String(now.getMonth() + 1).padStart(2, '0')
+    const dd = String(now.getDate()).padStart(2, '0')
+    const hh = String(now.getHours()).padStart(2, '0')
+    const min = String(now.getMinutes()).padStart(2, '0')
+    const ss = String(now.getSeconds()).padStart(2, '0')
+    const end_datetime = `${yyyy}-${mm}-${dd} ${hh}:${min}:${ss}`
+    const payload = { ...devolverFila.value, end_datetime }
+    // Eliminar campos de solo lectura
+    delete payload.created_at
+    delete payload.updated_at
+    delete payload.deleted_at
+    delete payload.category_name
+    const res = await Api.aldatuObjeto(payload, 'student-equipment')
+    if (res) {
+      cerrarModalDevolver()
+      await cargarDatos()
+      ok(res.message || 'Material devuelto correctamente')
+    }
+  } catch (e) {
+    err(e.message || 'Error al devolver material')
   }
 }
 

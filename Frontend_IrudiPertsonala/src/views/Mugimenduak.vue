@@ -21,7 +21,7 @@
     <!-- Kontsumibleak cards -->
     <div v-if="tablaActiva === 'consumables'">
       <div class="row">
-        <div class="col-md-6 mb-3" v-for="c in Consumables" :key="c.id">
+        <div class="col-md-6 mb-3" v-for="c in ConsumablesSorted" :key="c.id">
           <div class="card h-100">
             <div class="card-header fw-bold">{{ c.item_name }}</div>
             <div class="card-body">
@@ -37,7 +37,7 @@
     <!-- Materialak cards -->
     <div v-if="tablaActiva === 'equipments'">
       <div class="row">
-        <div class="col-md-6 mb-3" v-for="e in Equipments" :key="e.id">
+        <div class="col-md-6 mb-3" v-for="e in EquipmentsSorted" :key="e.id">
           <div class="card h-100">
             <div class="card-header fw-bold">{{ e.item_name }}</div>
             <div class="card-body">
@@ -107,7 +107,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, onMounted, computed } from 'vue'
 import Api from '../composables/Api.js'
 import { useToast } from '../composables/UseToast.js'
 import SidebarMenu from '@/components/SidebarMenu.vue'
@@ -128,6 +128,23 @@ const modoEdicion = ref(false)
 const tipoActual = ref('')
 const tablaActiva = ref('consumables')
 const form = reactive({})
+
+// Computed properties para ordenar por fecha (más nuevos primero)
+const ConsumablesSorted = computed(() => {
+  return [...Consumables.value].sort((a, b) => {
+    const dateA = new Date(a.date)
+    const dateB = new Date(b.date)
+    return dateB - dateA
+  })
+})
+
+const EquipmentsSorted = computed(() => {
+  return [...Equipments.value].sort((a, b) => {
+    const dateA = new Date(a.start_datetime)
+    const dateB = new Date(b.start_datetime)
+    return dateB - dateA
+  })
+})
 
 const endpointPivotC = "student-consumables"
 const endpointPivotE = "student-equipment"

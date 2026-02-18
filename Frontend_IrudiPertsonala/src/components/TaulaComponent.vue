@@ -93,7 +93,7 @@ const isBezeroView = computed(() => {
 })
 
 const verHistorial = (fila) => {
-    const id = fila.id
+    const id = fila && (fila.id || fila.student_id || fila.user_id)
     if (!id) return
     router.push({ name: 'historiala', query: { id } })
 }

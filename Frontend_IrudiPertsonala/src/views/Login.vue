@@ -33,7 +33,7 @@
               class="form-control"
               v-model="password"
               required
-              minlength="4"
+              minlength="1"
               placeholder="••••••••"
             />
             <button
@@ -45,11 +45,6 @@
               <img :src="mostrarPassword ? ezIkusi : ikusi" :alt="mostrarPassword ? 'Ez ikusi' : 'Ikusi'" class="eye-icon" />
             </button>
           </div>
-        </div>
-
-        <div class="mb-3 form-check">
-          <input type="checkbox" class="form-check-input" id="recordar" v-model="recordar">
-          <label class="form-check-label" for="recordar">Gogoratu nire datuak</label>
         </div>
 
         <div v-if="error" class="alert alert-danger py-2" role="alert">
