@@ -14,6 +14,7 @@
       @crear="abrirCrear"
       @editar="prepararEdicion"
       @borrar="borrar"
+      :only-view="!isRoleA"
     />
 
     <dialog ref="modalRef" class="custom-dialog p-0 border-0 shadow-lg rounded-4">
@@ -63,7 +64,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, onMounted, computed } from 'vue'
 import Api from '../composables/Api.js'
 import { useToast } from '../composables/UseToast.js'
 import ToastComponent from '../components/ToastComponent.vue'
@@ -80,6 +81,8 @@ const tableName = "services"
 const modalRef = ref(null)
 const modoEdicion = ref(false)
 const form = reactive({})
+
+const isRoleA = computed(() => Api.isAdmin())
 
 // --- HELPERS ---
 const esCampoEditable = (key) => {

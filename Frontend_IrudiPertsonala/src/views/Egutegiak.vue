@@ -69,6 +69,7 @@
   </div>
 </template>
 
+                      :only-view="!isRoleA"
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
 import SidebarMenu from '@/components/SidebarMenu.vue'
@@ -145,6 +146,7 @@ const guardar = async () => {
   try {
     const { id, group_name, created_at, updated_at, deleted_at, ...payload } = form
     let res
+                const isRoleA = computed(() => Api.isAdmin())
     if (modoEdicion.value) res = await Api.aldatuObjeto({ id, ...payload }, tableName)
     else res = await Api.crearObjektua(payload, tableName)
     if (res) {

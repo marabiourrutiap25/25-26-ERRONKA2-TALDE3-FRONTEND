@@ -130,8 +130,10 @@ export async function login(email, password, recordar = false) {
     const storage = recordar ? localStorage : sessionStorage
     storage.setItem('token', data.token)
     storage.setItem('usuario', JSON.stringify(data.user))
-    // Guardar rol del usuario para control de accesos
-    if (data.user && data.user.role) storage.setItem('role', data.user.role)
+    // Guardar rol del usuario para control de accesos.
+    // Algunas respuestas devuelven role en data.user.role y otras en root `role`.
+    const roleFromResponse = data.role || (data.user && data.user.role)
+    if (roleFromResponse) storage.setItem('role', roleFromResponse)
     return data
   } else {
     throw { status: response.status, data: data }
@@ -175,7 +177,12 @@ export const getRole = () => {
   return localStorage.getItem('role') || sessionStorage.getItem('role') || null
 }
 
-export const isAdmin = () => getRole() === 'A'
+export const isAdmin = () => {
+  const r = getRole()
+  // Normalizar: eliminar comillas y espacios, dejar solo caracteres alfanuméricos
+  const cleaned = String(r || '').replace(/[^a-zA-Z0-9]/g, '').trim().toUpperCase()
+  return cleaned === 'A'
+}
 
 // OBTENER TOKEN
 export const getToken = () => {

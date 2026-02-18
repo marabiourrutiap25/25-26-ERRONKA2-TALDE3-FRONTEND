@@ -3,15 +3,15 @@
 
   <div class="container">
     <ToastComponent />
-    <div class="d-flex justify-content-end">
-      <button class="btn btn-success text-white mt-4 fw-bold" @click="router.push('/egutegiak')">
-        <img src="@/assets/ikusi.png" alt="Egutegiak Ikusi" />
-        Egutegiak Ikusi</button>
-    </div>
+        <div class="d-flex justify-content-end">
+          <button class="btn btn-success text-white mt-4 fw-bold" @click="router.push('/egutegiak')">
+            <img src="@/assets/ikusi.png" alt="Egutegiak Ikusi" />
+            Egutegiak Ikusi</button>
+        </div>
     <TaulaComponent :filas="ikasleak" titulo="Ikasleak" etiqueta-tabla="Students" texto-btn-crear="Ikaslea Sortu"
       :mapa-headers="{ name: 'IZENA', surnames: 'ABIZENAK', group_name: 'TALDEA' }"
       :columnas-excluidas="['id', 'group_id', 'created_at', 'updated_at', 'deleted_at']" @crear="abrirCrear"
-      @editar="prepararEdicion" @borrar="borrar" />
+      @editar="prepararEdicion" @borrar="borrar" :only-view="!isRoleA" />
 
     <dialog ref="modalRef" class="custom-dialog p-0 border-0 shadow-lg rounded-4">
       <div class="modal-content border-0">
@@ -55,7 +55,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import Api from '../composables/Api.js'
 import { useToast } from '../composables/UseToast.js'
@@ -75,6 +75,8 @@ const tableName = "students"
 const modalRef = ref(null)
 const modoEdicion = ref(false)
 const form = reactive({})
+
+const isRoleA = computed(() => Api.isAdmin())
 
 const esCampoEditable = (key) => {
   const excluidos = ['id', 'group_id', 'group_name', 'created_at', 'updated_at', 'deleted_at']
