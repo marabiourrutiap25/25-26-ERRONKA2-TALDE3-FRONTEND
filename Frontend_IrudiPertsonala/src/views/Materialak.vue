@@ -35,12 +35,12 @@
               <div v-if="esCampoEditable(key)" class="mb-4">
                 <label :for="key" class="custom-label">{{ key.toUpperCase().replace(/_/g, ' ') }}</label>
                 <input :id="key" v-model="form[key]" type="text" class="form-control custom-input"
-                  :placeholder="'Introduce ' + key" />
+                  :placeholder="'Sartu ' + key" />
               </div>
             </div>
 
             <div class="d-flex justify-content-end gap-3 pt-3">
-              <button type="button" class="btn btn-cancel px-4" @click="cerrarModal">Cancelar</button>
+              <button type="button" class="btn btn-cancel px-4" @click="cerrarModal">Kantzelatu</button>
               <button type="submit" class="btn btn-save px-4">Aldaketak Gorde</button>
             </div>
           </form>

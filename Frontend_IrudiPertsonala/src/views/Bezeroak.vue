@@ -3,8 +3,9 @@
 
   <div class="container">
     <ToastComponent />
-    <TaulaComponent :filas="Bezeroa" titulo="Bezeroak" etiqueta-tabla="Clients" texto-btn-crear="Bezeroa Sortu"
-      @crear="abrirCrear" @editar="prepararEdicion" @borrar="borrar" />
+
+    <TaulaComponent :filas="BezeroaFormateado" titulo="Bezeroak" etiqueta-tabla="Clients"
+      texto-btn-crear="Bezeroa Sortu" @crear="abrirCrear" @editar="prepararEdicion" @borrar="borrar" />
 
     <dialog ref="modalRef" class="custom-dialog p-0 border-0 shadow-lg rounded-4">
       <div class="modal-content border-0">
@@ -19,15 +20,30 @@
           <form @submit.prevent="guardar">
             <div v-for="key in Object.keys(form)" :key="key">
               <div v-if="esCampoEditable(key)" class="mb-4">
-                <label :for="key" class="custom-label">{{ key.toUpperCase().replace(/_/g, ' ') }}</label>
-                <input :id="key" v-model="form[key]" type="text" class="form-control custom-input"
-                  :placeholder="'Introduce ' + key" />
+                <label :for="key" class="custom-label">
+                  {{ key.toUpperCase().replace(/_/g, ' ') }}
+                </label>
+
+                <!-- SELECT solo para home_client -->
+                <select v-if="key === 'home_client'" :id="key" v-model.number="form[key]"
+                  class="form-control custom-input">
+                  <option :value="0">kanpokoa</option>
+                  <option :value="1">etxekoa</option>
+                </select>
+
+                <!-- INPUT normal -->
+                <input v-else :id="key" v-model="form[key]" type="text" class="form-control custom-input"
+                  :placeholder="'Sartu ' + key" />
               </div>
             </div>
 
             <div class="d-flex justify-content-end gap-3 pt-3">
-              <button type="button" class="btn btn-cancel px-4" @click="cerrarModal">Cancelar</button>
-              <button type="submit" class="btn btn-save px-4">Aldaketak Gorde</button>
+              <button type="button" class="btn btn-cancel px-4" @click="cerrarModal">
+                Kantzelatu
+              </button>
+              <button type="submit" class="btn btn-save px-4">
+                Aldaketak Gorde
+              </button>
             </div>
           </form>
         </div>
@@ -37,7 +53,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, onMounted, computed } from 'vue'
 import Api from '../composables/Api.js'
 import { useToast } from '../composables/UseToast.js'
 import ToastComponent from '../components/ToastComponent.vue'
@@ -47,7 +63,6 @@ import SidebarMenu from '@/components/SidebarMenu.vue'
 const { ok, err } = useToast()
 
 const menuAbierto = ref(false)
-
 const Bezeroa = ref([])
 const tableName = "clients"
 
@@ -70,12 +85,26 @@ const cargarDatos = async () => {
   }
 }
 
+/* 🔥 SOLO para mostrar texto en la tabla */
+const BezeroaFormateado = computed(() =>
+  Bezeroa.value.map(item => ({
+    ...item,
+    home_client: item.home_client == 1 ? 'etxekoa' : 'kanpokoa'
+  }))
+)
+
 const abrirCrear = () => {
   modoEdicion.value = false
   for (let k in form) delete form[k]
+
   if (Bezeroa.value.length > 0) {
-    Object.keys(Bezeroa.value[0]).forEach(key => { if (esCampoEditable(key)) form[key] = "" })
+    Object.keys(Bezeroa.value[0]).forEach(key => {
+      if (esCampoEditable(key)) {
+        form[key] = key === 'home_client' ? 0 : ""
+      }
+    })
   }
+
   modalRef.value?.showModal()
 }
 
@@ -91,13 +120,22 @@ const cerrarModal = () => modalRef.value?.close()
 const guardar = async () => {
   try {
     const { id, created_at, updated_at, deleted_at, ...payload } = form
+
     let res
-    if (modoEdicion.value) res = await Api.aldatuObjeto({ id, ...payload }, tableName)
-    else res = await Api.crearObjektua(payload, tableName)
+    if (modoEdicion.value)
+      res = await Api.aldatuObjeto({ id, ...payload }, tableName)
+    else
+      res = await Api.crearObjektua(payload, tableName)
+
     if (res) {
       cerrarModal()
       await cargarDatos()
-      ok(res.message || (modoEdicion.value ? 'Client actualizado correctamente' : 'Client creado correctamente'))
+      ok(
+        res.message ||
+        (modoEdicion.value
+          ? 'Client actualizado correctamente'
+          : 'Client creado correctamente')
+      )
     }
   } catch (e) {
     err(e.message || 'Error al guardar')
@@ -106,6 +144,7 @@ const guardar = async () => {
 
 const borrar = async (id) => {
   if (!confirm('Ziur zaude ezabatu nahi duzulaz?')) return
+
   try {
     const res = await Api.ezabatuObjektua({ id }, tableName)
     if (res) {

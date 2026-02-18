@@ -20,7 +20,7 @@
       <div class="modal-content border-0">
         <div class="modal-header border-bottom-0 pt-4 px-4 pb-2 d-flex justify-content-between align-items-center">
           <h4 class="modal-title fw-bold text-dark">
-            {{ modoEdicion ? 'Editar' : 'Crear' }} Service
+            {{ modoEdicion ? 'Editatu' : 'Sortu' }} Service
           </h4>
           <button type="button" class="btn-close-custom" @click="cerrarModal">✕</button>
         </div>
@@ -31,7 +31,7 @@
             <div class="mb-4">
               <label class="custom-label">KATEGORIA</label>
               <select v-model="form.service_category_id" class="form-control custom-input" required>
-                <option value="" disabled>Selecciona una categoría</option>
+                <option value="" disabled>Kategoria bat hautatu</option>
                 <option v-for="cat in listaCategorias" :key="cat.id" :value="cat.id">
                   {{ cat.name }}
                 </option>
@@ -46,13 +46,13 @@
                   v-model="form[key]"
                   type="text"
                   class="form-control custom-input"
-                  :placeholder="'Introduce ' + key"
+                  :placeholder="'Sartu ' + key"
                 />
               </div>
             </div>
 
             <div class="d-flex justify-content-end gap-3 pt-3">
-              <button type="button" class="btn btn-cancel px-4" @click="cerrarModal">Cancelar</button>
+              <button type="button" class="btn btn-cancel px-4" @click="cerrarModal">Kantzelatu</button>
               <button type="submit" class="btn btn-save px-4">Aldaketak Gorde</button>
             </div>
           </form>

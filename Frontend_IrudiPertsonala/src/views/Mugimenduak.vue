@@ -35,7 +35,7 @@
       <div class="modal-content border-0">
         <div class="modal-header border-bottom-0 pt-4 px-4 pb-2 d-flex justify-content-between align-items-center">
           <h4 class="modal-title fw-bold text-dark">
-            {{ modoEdicion ? 'Editar' : 'Crear' }} {{ tipoActual === 'consumable' ? 'Consumable' : 'Equipment' }}
+            {{ modoEdicion ? 'Editatu' : 'Sortu' }} {{ tipoActual === 'consumable' ? 'Consumable' : 'Equipment' }}
           </h4>
           <button type="button" class="btn-close-custom" @click="cerrarModal">✕</button>
         </div>
@@ -46,7 +46,7 @@
             <div class="mb-4">
               <label class="custom-label">IKASLEA</label>
               <select v-model="form.student_id" class="form-control custom-input" required>
-                <option value="" disabled>Selecciona un alumno</option>
+                <option value="" disabled>Ikasle bat hautatu</option>
                 <option v-for="a in alumnosLista" :key="a.id" :value="a.id">
                   {{ a.name }} {{ a.surnames }}
                 </option>
@@ -57,11 +57,11 @@
               <label class="custom-label">{{ tipoActual === 'consumable' ? 'PRODUKTUA' : 'EKIPAMENTUA' }}</label>
               <select v-if="tipoActual === 'consumable'" v-model="form.consumable_id" class="form-control custom-input"
                 required>
-                <option value="" disabled>Selecciona un consumible</option>
+                <option value="" disabled>Kontsumible bat hautatu</option>
                 <option v-for="c in listaMaestraConsumables" :key="c.id" :value="c.id">{{ c.name }}</option>
               </select>
               <select v-else v-model="form.equipment_id" class="form-control custom-input" required>
-                <option value="" disabled>Selecciona un equipo</option>
+                <option value="" disabled>Talde bat hautatu</option>
                 <option v-for="e in listaMaestraEquipments" :key="e.id" :value="e.id">
                   {{ e.name }} ({{ e.label }})
                 </option>
@@ -77,7 +77,7 @@
             </div>
 
             <div class="d-flex justify-content-end gap-3 pt-3">
-              <button type="button" class="btn btn-cancel px-4" @click="cerrarModal">Cancelar</button>
+              <button type="button" class="btn btn-cancel px-4" @click="cerrarModal">Kantzelatu</button>
               <button type="submit" class="btn btn-save px-4">Aldaketak Gorde</button>
             </div>
           </form>
