@@ -19,7 +19,7 @@
     <dialog ref="modalSacarRef" class="custom-dialog p-0 border-0 shadow-lg rounded-4">
       <div class="modal-content border-0">
         <div class="modal-header border-bottom-0 pt-4 px-4 pb-2 d-flex justify-content-between align-items-center">
-          <h4 class="modal-title fw-bold text-dark">Produktua atera</h4>
+          <h4 class="modal-title fw-bold text-dark">Produktua Atera</h4>
           <button type="button" class="btn-close-custom" @click="cerrarModalSacar">✕</button>
         </div>
         <div class="modal-body px-4 pb-4">

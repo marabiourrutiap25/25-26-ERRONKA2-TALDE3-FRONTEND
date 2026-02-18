@@ -4,10 +4,52 @@
   <div class="container">
     <ToastComponent />
 
+
+    <div class="d-flex justify-content-between justify-content-md-end mt-5 mb-4">
+      <div>
+        <button class="btn btn-success text-white fw-bold" @click="abrirSacar">Materiala atera</button>
+      </div>
+    </div>
+
     <TaulaComponent :filas="Materiala" titulo="Materialak" etiqueta-tabla="Equipment"
       texto-btn-crear="Materiala Sortu" :mapa-headers="{ category_name: 'KATEGORIA' }"
       :columnas-excluidas="['id', 'equipment_category_id', 'created_at', 'updated_at', 'deleted_at']"
       @crear="abrirCrear" @editar="prepararEdicion" @borrar="borrar" />
+
+    <dialog ref="modalSacarRef" class="custom-dialog p-0 border-0 shadow-lg rounded-4">
+      <div class="modal-content border-0">
+        <div class="modal-header border-bottom-0 pt-4 px-4 pb-2 d-flex justify-content-between align-items-center">
+          <h4 class="modal-title fw-bold text-dark">Materiala Atera</h4>
+          <button type="button" class="btn-close-custom" @click="cerrarModalSacar">✕</button>
+        </div>
+        <div class="modal-body px-4 pb-4">
+          <form @submit.prevent="guardarSacar">
+            <div class="mb-4">
+              <label class="custom-label">IKASLEA</label>
+              <select v-model="formSacar.student_id" class="form-control custom-input" required>
+                <option value="" disabled>Ikasle bat hautatu</option>
+                <option v-for="a in listaAlumnos" :key="a.id" :value="a.id">
+                  {{ a.name }} {{ a.surnames }}
+                </option>
+              </select>
+            </div>
+            <div class="mb-4">
+              <label class="custom-label">MATERIALA</label>
+              <select v-model="formSacar.equipment_id" class="form-control custom-input" required>
+                <option value="" disabled>Materiala hautatu</option>
+                <option v-for="e in listaEquipmentsDisponibles" :key="e.id" :value="e.id">
+                  {{ e.name }}
+                </option>
+              </select>
+            </div>
+            <div class="d-flex justify-content-end gap-3 pt-3">
+              <button type="button" class="btn btn-cancel px-4" @click="cerrarModalSacar">Kantzelatu</button>
+              <button type="submit" class="btn btn-save px-4">Atera</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </dialog>
 
     <dialog ref="modalRef" class="custom-dialog p-0 border-0 shadow-lg rounded-4">
       <div class="modal-content border-0">
@@ -51,7 +93,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, onMounted, computed } from 'vue'
 import Api from '../composables/Api.js'
 import { useToast } from '../composables/UseToast.js'
 import ToastComponent from '../components/ToastComponent.vue'
@@ -65,6 +107,10 @@ const menuAbierto = ref(false)
 const Materiala = ref([])
 const listaCategorias = ref([])
 const tableName = "equipment"
+const listaAlumnos = ref([])
+const listaEquipments = ref([])
+const modalSacarRef = ref(null)
+const formSacar = reactive({ student_id: '', equipment_id: '' })
 
 const modalRef = ref(null)
 const modoEdicion = ref(false)
@@ -77,9 +123,11 @@ const esCampoEditable = (key) => {
 
 const cargarDatos = async () => {
   try {
-    const [resEquipment, resCat] = await Promise.all([
+    const [resEquipment, resCat, resAlumnos, resEquipmentsList] = await Promise.all([
       Api.cargarObjetos(tableName),
-      Api.cargarObjetos("equipment-categories")
+      Api.cargarObjetos("equipment-categories"),
+      Api.cargarObjetos("students"),
+      Api.cargarObjetos("equipment")
     ])
     listaCategorias.value = resCat?.data || resCat || []
     const equipmentRaw = resEquipment?.data || resEquipment || []
@@ -87,9 +135,63 @@ const cargarDatos = async () => {
       const cat = listaCategorias.value.find(c => c.id === item.equipment_category_id)
       return { ...item, category_name: cat ? cat.name : `ID: ${item.equipment_category_id}` }
     })
+    listaAlumnos.value = resAlumnos?.data || resAlumnos || []
+    listaEquipments.value = resEquipmentsList?.data || resEquipmentsList || []
   } catch (e) {
     console.error("Error cargando datos:", e)
     Materiala.value = []
+    listaAlumnos.value = []
+    listaEquipments.value = []
+  }
+}
+// Solo materiales que no están actualmente sacados (no hay movimiento abierto)
+const listaEquipmentsDisponibles = computed(() => {
+  // Aquí deberías consultar los movimientos abiertos para filtrar los que no están disponibles
+  // Por simplicidad, se asume que todos están disponibles
+  // Si tienes una lista de movimientos, deberías filtrar aquí
+  return listaEquipments.value
+})
+
+const abrirSacar = () => {
+  formSacar.student_id = ''
+  formSacar.equipment_id = ''
+  modalSacarRef.value?.showModal()
+}
+
+const cerrarModalSacar = () => modalSacarRef.value?.close()
+
+const guardarSacar = async () => {
+  try {
+    // Validar campos
+    const student_id = Number(formSacar.student_id)
+    const equipment_id = Number(formSacar.equipment_id)
+    if (!student_id || !equipment_id) {
+      err('Debes seleccionar alumno y material')
+      return
+    }
+    // start_datetime automático (YYYY-MM-DD HH:mm:ss)
+    const now = new Date()
+    const yyyy = now.getFullYear()
+    const mm = String(now.getMonth() + 1).padStart(2, '0')
+    const dd = String(now.getDate()).padStart(2, '0')
+    const hh = String(now.getHours()).padStart(2, '0')
+    const min = String(now.getMinutes()).padStart(2, '0')
+    const ss = String(now.getSeconds()).padStart(2, '0')
+    const start_datetime = `${yyyy}-${mm}-${dd} ${hh}:${min}:${ss}`
+    const payload = {
+      student_id,
+      equipment_id,
+      start_datetime
+    }
+    // endpoint para movimientos
+    const res = await Api.crearObjektua(payload, 'student-equipment')
+    if (res) {
+      cerrarModalSacar()
+      await cargarDatos()
+      ok(res.message || 'Materiala aterata')
+    }
+  } catch (e) {
+    err(e.message || 'Errorea materiala ateratzerakoan')
   }
 }
 

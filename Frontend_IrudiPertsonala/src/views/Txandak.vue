@@ -85,7 +85,10 @@ const cargarDatos = async () => {
     const listaRaw = resShifts?.data || resShifts || []
     Txandak.value = listaRaw.map(turno => {
       const alumno = alumnosLista.value.find(a => a.id === turno.student_id)
-      return { ...turno, student_name: alumno ? `${alumno.name} ${alumno.surnames}` : `ID: ${turno.student_id}` }
+      let tipo = turno.type
+      if (tipo === 'M') tipo = 'Mahaia'
+      else if (tipo === 'G') tipo = 'Garbiketa'
+      return { ...turno, student_name: alumno ? `${alumno.name} ${alumno.surnames}` : `ID: ${turno.student_id}`, type: tipo }
     })
   } catch (e) {
     console.error("Error cargando datos:", e)
