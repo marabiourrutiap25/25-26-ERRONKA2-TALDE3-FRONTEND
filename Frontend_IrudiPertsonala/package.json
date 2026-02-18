@@ -12,7 +12,6 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "bootstrap": "^5.3.8",
     "date-fns": "^4.1.0",
     "pinia": "^3.0.4",
     "vue": "^3.5.27",
@@ -20,6 +19,8 @@
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^6.0.3",
+    "bootstrap": "^5.3.8",
+    "sass": "^1.97.3",
     "vite": "^7.3.0",
     "vite-plugin-vue-devtools": "^8.0.5"
   }

@@ -1,0 +1,98 @@
+.custom-dialog {
+  width: 100%;
+  max-width: 450px;
+  background: white;
+
+  &::backdrop {
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(4px);
+  }
+}
+
+.custom-label {
+  display: block;
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: $dark-gray;
+  margin-bottom: 8px;
+}
+
+.custom-input {
+  @include rounded-input;
+  background-color: $light-gray;
+  font-size: 0.95rem;
+
+  &:focus {
+    background-color: $light-gray;
+    box-shadow: $modal-shadow;
+    outline: none;
+  }
+}
+
+.btn-close-custom {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+.btn-cancel {
+  @include button-style($border-gray, $dark-gray);
+}
+
+.btn-save {
+  @include button-style($primary-color, white);
+}
+
+.table-title {
+  color: $dark-gray;
+}
+
+.button-icons img {
+  filter: brightness(0) invert(1);
+  max-width: 24px;
+}
+
+.toast-wrapper {
+  @include toast-position;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+
+  .toast-item {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.75rem 1.25rem;
+    border-radius: $border-radius;
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: white;
+    box-shadow: $small-shadow;
+    min-width: 220px;
+
+    &.success {
+      background-color: $success-color;
+    }
+
+    &.error {
+      background-color: $danger-color;
+    }
+  }
+
+  .toast-icon {
+    font-size: 1rem;
+    font-weight: 700;
+  }
+}
+
+.toast-enter-active,
+.toast-leave-active {
+  transition: all 0.3s ease;
+}
+
+.toast-enter-from,
+.toast-leave-to {
+  opacity: 0;
+  transform: translateY(12px);
+}

@@ -125,5 +125,3 @@ const cargarHistorial = async () => {
 
 onMounted(cargarHistorial)
 </script>
-
-<style scoped></style>
