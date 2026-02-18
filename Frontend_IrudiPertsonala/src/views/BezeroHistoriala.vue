@@ -15,7 +15,6 @@
                   <div class="fw-bold">{{ c.date }}</div>
                   <div class="text-muted small">{{ c.start_time }} - {{ c.end_time }}</div>
                 </div>
-                <div class="text-end small text-muted">ID: {{ c.id }}</div>
               </div>
               <div class="card-body">
                 <div v-if="c._appointment_services && c._appointment_services.length">
@@ -59,7 +58,7 @@ const cargarHistorial = async () => {
     const resultado = await Api.cargarObjeto({ student_id: bezeroId }, 'appointments')
     citas.value = Array.isArray(resultado) ? resultado : (resultado?.data || resultado || [])
 
-    // Para cada cita, cargar appointment_service y enriquecer con nombre de servicio y categoria
+    // Cita bakoitzeko, appointment_service kargatu eta zerbitzuaren izena eta kategoriarekin aberastea
     await Promise.all(
       citas.value.map(async (c) => {
         try {
@@ -98,9 +97,8 @@ const cargarHistorial = async () => {
       })
     )
 
-    // No filtrar: mostrar también citas sin servicios (se renderizarán con mensaje 'Ez da zerbitzu informaziorik.')
-
-    // Cargar nombre del cliente
+    // Ez filtratu: zerbitzurik gabeko citaak ere erakutsi (menaje 'Ez da zerbitzu informaziorik.' batekin errendatuko dira)
+    // Kereak bostalakoa nahi
     try {
       let cliente = await Api.cargarObjeto({ id: bezeroId }, 'clients')
       cliente = Array.isArray(cliente) ? cliente[0] : (cliente?.data || cliente || null)

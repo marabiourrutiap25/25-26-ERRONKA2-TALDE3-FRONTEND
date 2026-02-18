@@ -174,7 +174,7 @@ const guardarSacar = async () => {
       err('No puedes sacar más de lo disponible (stock: ' + stock + ')')
       return
     }
-    // date automático
+    // Automatiko eguna
     const today = new Date()
     const yyyy = today.getFullYear()
     const mm = String(today.getMonth() + 1).padStart(2, '0')
@@ -186,12 +186,12 @@ const guardarSacar = async () => {
       date,
       quantity: qty
     }
-    // endpoint para movimientos
+    // Mugimenduen endpointa
     const res = await Api.crearObjektua(payload, 'student-consumables')
     if (res) {
-      // Actualizar stock del producto (enviando todos los campos)
+      // Produktuaren stock-a eguneratu (eremu guztiak bidaltzea)
       const productoCompleto = { ...selected, stock: stock - qty }
-      // Eliminar campos que no deben enviarse
+      // Irakurri-soilik datuak kendu
       delete productoCompleto.created_at
       delete productoCompleto.updated_at
       delete productoCompleto.deleted_at
@@ -312,5 +312,12 @@ onMounted(cargarDatos)
   color: white;
   font-weight: 500;
   border: none;
+}
+
+/* Image filters for action buttons */
+.btn-primary img,
+.btn-danger img,
+.btn-dark img {
+  filter: brightness(0) invert(1);
 }
 </style>

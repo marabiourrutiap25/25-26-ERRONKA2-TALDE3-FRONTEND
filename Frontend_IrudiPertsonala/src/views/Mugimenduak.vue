@@ -129,7 +129,7 @@ const tipoActual = ref('')
 const tablaActiva = ref('consumables')
 const form = reactive({})
 
-// Computed properties para ordenar por fecha (más nuevos primero)
+// Kalkulatutako jabetzak data-aren arabera ordenatzeko (berriena lehena)
 const ConsumablesSorted = computed(() => {
   return [...Consumables.value].sort((a, b) => {
     const dateA = new Date(a.date)
@@ -297,7 +297,6 @@ onMounted(cargarTodo)
   font-size: 1.5rem;
   cursor: pointer;
 }
-
 .btn-cancel {
   background-color: #e9ecef;
   border-radius: 50px;
@@ -312,5 +311,12 @@ onMounted(cargarTodo)
   color: white;
   font-weight: 500;
   border: none;
+}
+
+/* Image filters for action buttons */
+.btn-primary img,
+.btn-danger img,
+.btn-dark img {
+  filter: brightness(0) invert(1);
 }
 </style>

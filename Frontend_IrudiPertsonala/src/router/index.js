@@ -33,12 +33,12 @@ const router = createRouter({
   routes,
 });
 
-// Guard: si la ruta requiere auth y no hay token, redirige a login
+// Babesa: Ruta-k auth eskatzen badu eta ez dagoen tokena, login-era bideratzen du
 router.beforeEach((to) => {
   if (to.meta.requiresAuth && !Api.isAuthenticated()) {
     return { name: "login" };
   }
-  // Si ya está logeado e intenta ir al login, redirige a dashboard
+  // Logeatu badago eta login-era joaten badira, dashboard-ara bideratzen du
   if (to.name === "login" && Api.isAuthenticated()) {
     return { name: "dashboard" };
   }

@@ -1,11 +1,12 @@
 const API_URL = 'http://localhost:8000/api'
 
-// Extrae el mensaje más relevante de cualquier respuesta de la API
+// APIaren edozein erantzunetik gehien interesatzen den mezua jaso
 function extraerMensaje(resultado) {
   if (!resultado) return null
   return resultado.message || resultado.errors || resultado.data || null
 }
 
+// APIari deia egin
 async function llamarAPI(metodo, endpoint, datos = {}) {
   let url = `${API_URL}/${endpoint}`;  
   const token = localStorage.getItem('token') || sessionStorage.getItem('token');
@@ -40,11 +41,11 @@ async function llamarAPI(metodo, endpoint, datos = {}) {
   }
 
   if (!response.ok) {
-    // Lanzar el mensaje que venga de la API, sea en errors, message o data
-    throw new Error(extraerMensaje(resultado) || `HTTP error ${response.status}`);
+    // APIak emandako mezua kantinatu, erroreak, mezua edo datuak izan daiteke
+    throw new Error(extraerMensaje(resultado) || `HTTP akatsa ${response.status}`);
   }
 
-  // Adjuntar siempre un .message normalizado al resultado
+  // Beti .message normalizatua emaitzari atxiki
   if (resultado && typeof resultado === 'object') {
     resultado.message = extraerMensaje(resultado)
   }
@@ -54,7 +55,7 @@ async function llamarAPI(metodo, endpoint, datos = {}) {
 
 
 // =======================
-// FUNCIONES CRUD
+// CRUD FUNTZIOAK
 // =======================
 export async function cargarObjetos(endpoint) {
   try {
@@ -107,7 +108,7 @@ export async function crearObjektua(datos, endpoint) {
 }
 
 
-// LOGIN
+// SAIOA HASI
 export async function login(email, password, recordar = false) {
   const response = await fetch(API_URL + '/login', {
     method: 'POST',
@@ -123,7 +124,7 @@ export async function login(email, password, recordar = false) {
 
   const data = await response.json()
 
-  console.log('Respuesta del servidor:', data)
+  console.log('Zerbitzariaren erantzuna:', data)
 
   if (response.ok) {
     const storage = recordar ? localStorage : sessionStorage
@@ -135,7 +136,7 @@ export async function login(email, password, recordar = false) {
   }
 }
 
-// LOGOUT
+// SAIOA ITXI
 export async function logout() {
   const token = localStorage.getItem('token') || sessionStorage.getItem('token')
 
@@ -154,7 +155,7 @@ export async function logout() {
   sessionStorage.removeItem('usuario')
 }
 
-// COMPROBAR SI ESTÁ LOGUEADO
+// LOGUEATU DEN EGIAZTATU
 export function isAuthenticated() {
   const token = localStorage.getItem('token') || sessionStorage.getItem('token')
   return !!token

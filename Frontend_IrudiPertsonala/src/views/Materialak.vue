@@ -176,7 +176,7 @@ const cargarDatos = async () => {
   }
 }
 const materialSacado = (equipment_id) => {
-  // Devuelve true si hay un material con ese equipment_id sin end_datetime
+  // Ez du equipment_id duten materialik gabe end_datetime osoa
   return Materiala.value.some(m => m.equipment_id === equipment_id && !m.end_datetime)
 }
 
@@ -244,7 +244,7 @@ const guardarDevolver = async () => {
     const ss = String(now.getSeconds()).padStart(2, '0')
     const end_datetime = `${yyyy}-${mm}-${dd} ${hh}:${min}:${ss}`
     const payload = { ...devolverFila.value, end_datetime }
-    // Eliminar campos de solo lectura
+    // Irakurri-soilik datuak kendu
     delete payload.created_at
     delete payload.updated_at
     delete payload.deleted_at
@@ -366,5 +366,12 @@ onMounted(cargarDatos)
   color: white;
   font-weight: 500;
   border: none;
+}
+
+/* Image filters for action buttons */
+.btn-primary img,
+.btn-danger img,
+.btn-dark img {
+  filter: brightness(0) invert(1);
 }
 </style>

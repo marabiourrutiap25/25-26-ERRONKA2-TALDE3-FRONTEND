@@ -5,7 +5,7 @@
     <ToastComponent />
 
     <TaulaComponent :filas="Txandak" titulo="Txandak" etiqueta-tabla="Txandak"
-      texto-btn-crear="Txanda Sortu" :mapa-headers="{ student_name: 'IKASLEA' }"
+      texto-btn-crear="Txanda Sortu" :mapa-headers="{ student_name: 'IKASLEA', type: 'MOTA', date: 'DATA' }"
       :columnas-excluidas="['id', 'student_id', 'created_at', 'updated_at', 'deleted_at']"
       @crear="abrirCrear" @editar="prepararEdicion" @borrar="borrar" />
 
@@ -29,6 +29,20 @@
                   {{ alumno.name }} {{ alumno.surnames }}
                 </option>
               </select>
+            </div>
+
+            <div class="mb-4">
+              <label class="custom-label">MOTA</label>
+              <select v-model="form.type" class="form-control custom-input" required>
+                <option value="" disabled>Mota bat hautatu</option>
+                <option value="G">Garbiketa</option>
+                <option value="M">Mahaia</option>
+              </select>
+            </div>
+
+            <div class="mb-4">
+              <label for="date" class="custom-label">DATA</label>
+              <input id="date" v-model="form.date" type="date" class="form-control custom-input" required />
             </div>
 
             <div v-for="key in Object.keys(form)" :key="key">
@@ -71,7 +85,7 @@ const modoEdicion = ref(false)
 const form = reactive({})
 
 const esCampoEditable = (key) => {
-  const excluidos = ['id', 'student_id', 'student_name', 'created_at', 'updated_at', 'deleted_at']
+  const excluidos = ['id', 'student_id', 'student_name', 'type', 'date', 'start_date', 'end_date', 'created_at', 'updated_at', 'deleted_at']
   return !excluidos.includes(key.toLowerCase())
 }
 
@@ -103,6 +117,8 @@ const abrirCrear = () => {
     Object.keys(Txandak.value[0]).forEach(key => { if (esCampoEditable(key)) form[key] = "" })
   }
   form.student_id = ""
+  form.type = ""
+  form.date = ""
   modalRef.value?.showModal()
 }
 
@@ -110,6 +126,9 @@ const prepararEdicion = (fila) => {
   modoEdicion.value = true
   for (let k in form) delete form[k]
   Object.assign(form, fila)
+  // Convertir tipo visible a valor de API (Mahaia -> M, Garbiketa -> G)
+  if (form.type === 'Mahaia') form.type = 'M'
+  else if (form.type === 'Garbiketa') form.type = 'G'
   modalRef.value?.showModal()
 }
 
@@ -202,5 +221,12 @@ onMounted(cargarDatos)
   color: white;
   font-weight: 500;
   border: none;
+}
+
+/* Image filters for action buttons */
+.btn-primary img,
+.btn-danger img,
+.btn-dark img {
+  filter: brightness(0) invert(1);
 }
 </style>

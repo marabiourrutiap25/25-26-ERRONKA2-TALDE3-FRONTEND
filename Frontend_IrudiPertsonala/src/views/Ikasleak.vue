@@ -207,7 +207,10 @@ onMounted(cargarDatos)
   border: none;
 }
 
-img {
+/* Image filters for action buttons only */
+.btn-primary img,
+.btn-danger img,
+.btn-dark img {
   max-width: 20px;
   filter: brightness(0) invert(1);
 }

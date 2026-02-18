@@ -13,13 +13,9 @@
         <tr v-for="hour in hours" :key="hour">
           <th>{{ hour }}:00</th>
           <td v-for="day in days" :key="day.toDateString() + '-' + hour">
-            <div
-              v-for="item in citasInicioCelda(day, hour)"
-              :key="item.id"
+            <div v-for="item in citasInicioCelda(day, hour)" :key="item.id"
               class="bg-secondary text-white p-1 mb-1 rounded"
-              :style="{ height: calcularAltura(item), cursor: 'pointer' }"
-              @click="$emit('editar', item)"
-            >
+              :style="{ height: calcularAltura(item), cursor: 'pointer' }" @click="$emit('editar', item)">
               Seat {{ item.seat }} <br>
               {{ item.start_time }} - {{ item.end_time }}
             </div>
@@ -39,10 +35,10 @@ const props = defineProps({
   datos: { type: Array, default: () => [] }
 })
 
-// Horas del calendario (8 a 20)
+// Egutegiko orduak (8etik 20etara)
 const hours = Array.from({ length: 8 }, (_, i) => i + 8)
 
-// Días de la semana
+// Asteko egunak
 const days = computed(() => {
   if (!props.week) return []
   const [year, week] = props.week.split('-W').map(Number)
@@ -50,22 +46,22 @@ const days = computed(() => {
   return Array.from({ length: 7 }, (_, i) => addDays(firstDay, i))
 })
 
-// Formatear fecha para la cabecera
+// Goiburuaren eguna formatatu
 function formatDate(date) {
   return format(date, 'EEE dd/MM')
 }
 
-// Devuelve las citas que comienzan en esta hora
+// Ordu honetan hasten diren hitzorduak itzuli
 function citasInicioCelda(day, hour) {
   return props.datos.filter(item => {
     if (!item.id || !item.date || !item.start_time) return false
 
-    // Crear fecha local robusta, incluyendo segundos
+    // Adimen-data lokala sortu, segundoak barne
     const [year, month, date] = item.date.split('-').map(Number)
     const [h, m, s] = item.start_time.split(':').map(Number)
     const start = new Date(year, month - 1, date, h, m, s)
 
-    // Comparar solo la hora (entera) para colocar en la celda
+    // Ordua soilik konparatu (osoa) gelaxkan jartzeko
     return (
       start.getFullYear() === day.getFullYear() &&
       start.getMonth() === day.getMonth() &&
@@ -75,7 +71,7 @@ function citasInicioCelda(day, hour) {
   })
 }
 
-// Calcular altura proporcional según duración de la cita
+// Hitzorduaren iraupenaren arabera altuera proportzionala kalkulatu
 function calcularAltura(item) {
   if (!item.start_time || !item.end_time) return '60px'
 

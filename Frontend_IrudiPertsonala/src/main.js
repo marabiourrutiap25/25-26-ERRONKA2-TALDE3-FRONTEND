@@ -3,7 +3,7 @@ import { createPinia } from "pinia";
 import App from './App.vue'
 import router from "./router";
 
-// Importar Bootstrap CSS y JS (opcional el JS si solo usas estilos)
+// Bootstrap CSS eta JS inportatu (aukerakoa JS-a baldin eta estiloak soilik erabiltzen badituzu)
 import 'bootstrap/dist/css/bootstrap.min.css'
 import 'bootstrap/dist/js/bootstrap.bundle.min.js'
 

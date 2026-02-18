@@ -21,9 +21,9 @@ import Api from '../composables/Api.js'
 import TaulaComponent from '@/components/TaulaComponent.vue'
 const menuAbierto = ref(false)
 const Egutegia = ref([])
-const tableName = "schedules" // Nombre de la tabla en la API
+const tableName = "schedules" // APIan taularen izena
 
-//   Cargar datos iniciales
+// Hasierako datuak kargatu
 const cargarDatos = async () => {
   try {
     Egutegia.value = await Api.cargarObjetos(tableName)
@@ -34,12 +34,12 @@ const cargarDatos = async () => {
   }
 }
 
-// Cargar datos cuando se ejecute el componente
+// Datuak kargatu komponente biltzen denean
 onMounted(() => {
   cargarDatos()
 })
 
-//   Crear un registro
+// Erregistro bat sortu
 const crear = async (data) => {
   try {
     console.log("Datos a crear:", data)
@@ -48,7 +48,7 @@ const crear = async (data) => {
 
     if (resultado) {
       alert("Registro creado correctamente")
-      await cargarDatos() // refresca la tabla
+      await cargarDatos() // Taula berritu
     } else {
       alert("Error al crear el registro")
     }
@@ -58,7 +58,7 @@ const crear = async (data) => {
   }
 }
 
-//   Editar un registro
+// Erregistro bat editatu
 const editar = async ({ id, ...data }) => {
   console.log("ID:", id)
   console.log("Datos:", data)
@@ -79,7 +79,7 @@ const editar = async ({ id, ...data }) => {
   }
 }
 
-//   Borrar un registro
+// Erregistro bat ezabatu
 const borrar = async (id) => {
   try {
     const resultado = await Api.ezabatuObjektua({ id }, tableName)

@@ -53,7 +53,7 @@ const { toasts } = useToast()
     font-weight: 700;
 }
 
-/* Animación entrada/salida */
+/* Sarrera/Irteera animazioa */
 .toast-enter-active,
 .toast-leave-active {
     transition: all 0.3s ease;

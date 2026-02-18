@@ -1,76 +1,78 @@
 <template>
   <dialog ref="dialogRef" class="custom-dialog p-0 border-0 shadow-lg rounded-4">
     <div class="modal-content border-0">
-        <div class="modal-header border-bottom-0 pt-4 px-4 pb-2 d-flex justify-content-between align-items-center">
-          <h4 class="modal-title fw-bold text-dark">{{ title }}</h4>
-          <button type="button" class="btn-close-custom" @click="onCancel">✕</button>
-        </div>
-
-        <div class="modal-body px-4 pb-4">
-          <form @submit.prevent="handleSubmit">
-            <!-- Campos normales -->
-            <div v-for="header in normalizedHeaders" :key="header.key" class="mb-4">
-              <label :for="header.key" class="custom-label">{{ header.label }}</label>
-              <input
-                v-if="header.key !== 'comments'"
-                :id="header.key"
-                v-model="form[header.key]"
-                type="text"
-                class="form-control custom-input"
-                :readonly="header.key === 'id'"
-                :placeholder="'Introduce ' + header.key"
-              />
-              <textarea
-                v-else
-                :id="header.key"
-                v-model="form[header.key]"
-                class="form-control custom-input"
-                rows="3"
-                :placeholder="'Introduce ' + header.key"
-              ></textarea>
-            </div>
-
-            <!-- Select Cliente -->
-            <div class="mb-4">
-              <label for="client_id" class="custom-label">Bezeroa</label>
-              <select id="client_id" v-model.number="form.client_id" class="form-select custom-input">
-                <option value="" disabled>Bezeroa aukeratu</option>
-                <option v-for="c in clients" :key="c.id" :value="c.id">{{ c.name }}</option>
-              </select>
-            </div>
-
-            <!-- Select Alumno -->
-            <div class="mb-4">
-              <label for="student_id" class="custom-label">Ikaslea</label>
-              <select id="student_id" v-model.number="form.student_id" class="form-select custom-input">
-                <option value="" disabled>Ikaslea aukeratu</option>
-                <option v-for="s in students" :key="s.id" :value="s.id">{{ s.name }}</option>
-              </select>
-            </div>
-
-            <div class="d-flex justify-content-end gap-3 pt-3">
-              <!-- Botón borrar -->
-              <!-- Botón de borrar -->
-              <button
-                v-if="form.id"
-                type="button"
-                class="btn btn-danger"
-                @click="borrarHitzordua"
-                >
-                Ezabatu
-              </button>
-
-
-              <div class="ms-auto">
-                <button type="button" class="btn btn-cancel px-4" @click="onCancel">Cancelar</button>
-                <button type="submit" class="btn btn-save px-4">Guardar</button>
-              </div>
-            </div>
-
-          </form>
-        </div>
+      <div class="modal-header border-bottom-0 pt-4 px-4 pb-2 d-flex justify-content-between align-items-center">
+        <h4 class="modal-title fw-bold text-dark">{{ title }}</h4>
+        <button type="button" class="btn-close-custom" @click="onCancel">✕</button>
       </div>
-    </dialog>
+
+      <div class="modal-body px-4 pb-4">
+        <form @submit.prevent="handleSubmit">
+          <!-- Campos normales -->
+          <div v-for="header in normalizedHeaders" :key="header.key" class="mb-4">
+            <label :for="header.key" class="custom-label">{{ header.label }}</label>
+
+            <!-- ID (readonly) -->
+            <input v-if="header.key === 'id'" :id="header.key" v-model="form[header.key]" type="text"
+              class="form-control custom-input" readonly />
+
+            <!-- Seat: number -->
+            <input v-else-if="header.key === 'seat'" :id="header.key" v-model.number="form[header.key]" type="number"
+              min="1" class="form-control custom-input" :placeholder="header.label" />
+
+            <!-- Date: date picker -->
+            <input v-else-if="header.key === 'date'" :id="header.key" v-model="form[header.key]" type="date"
+              class="form-control custom-input" :placeholder="header.label" />
+
+            <!-- Start/End time: time picker (HH:MM) -->
+            <input v-else-if="header.key === 'start_time' || header.key === 'end_time'" :id="header.key"
+              v-model="form[header.key]" type="time" class="form-control custom-input" :placeholder="header.label" />
+
+            <!-- Comments: textarea -->
+            <textarea v-else-if="header.key === 'comments'" :id="header.key" v-model="form[header.key]"
+              class="form-control custom-input" rows="3" :placeholder="header.label"></textarea>
+
+            <!-- Fallback text input -->
+            <input v-else :id="header.key" v-model="form[header.key]" type="text" class="form-control custom-input"
+              :placeholder="header.label" />
+          </div>
+
+          <!-- Select Cliente -->
+          <div class="mb-4">
+            <label for="client_id" class="custom-label">Bezeroa</label>
+            <select id="client_id" v-model.number="form.client_id" class="form-select custom-input">
+              <option value="" disabled>Bezeroa aukeratu</option>
+              <option v-for="c in clients" :key="c.id" :value="c.id">{{ c.name }} {{ c.surnames ?? '' }}</option>
+            </select>
+          </div>
+
+          <!-- Select Alumno -->
+          <div class="mb-4">
+            <label for="student_id" class="custom-label">Ikaslea</label>
+            <select id="student_id" v-model.number="form.student_id" class="form-select custom-input">
+              <option value="" disabled>Ikaslea aukeratu</option>
+              <option v-for="s in students" :key="s.id" :value="s.id">{{ s.name }} {{ s.surnames ?? '' }}</option>
+            </select>
+          </div>
+
+          <div class="d-flex justify-content-end gap-3 pt-3">
+            <!-- Botón borrar -->
+            <!-- Botón de borrar -->
+            <button v-if="form.id" type="button" class="btn btn-danger" @click="borrarHitzordua">
+              Ezabatu
+            </button>
+
+
+            <div class="ms-auto">
+              <button type="button" class="btn btn-cancel px-4" @click="onCancel">Cancelar</button>
+              <button type="submit" class="btn btn-save px-4">Guardar</button>
+            </div>
+          </div>
+
+        </form>
+      </div>
+    </div>
+  </dialog>
 </template>
 
 <script setup>
@@ -84,16 +86,25 @@ const props = defineProps({
   students: { type: Array, default: () => [] }
 })
 
-const emit = defineEmits(['submit', 'cancel', 'deleted'])
+const emit = defineEmits(['submit', 'cancel', 'deleted', 'recargar'])
 const dialogRef = ref(null)
 const form = reactive({})
 
-// Normalizar headers
+// Normalizar headers y mapear etiquetas en euskera
+const labelMap = {
+  seat: 'Eserlekua',
+  date: 'Data',
+  start_time: 'Hasierako ordua',
+  end_time: 'Amaierako ordua',
+  comments: 'Komentarioak',
+  id: 'ID'
+}
+
 const normalizedHeaders = computed(() => {
   return props.headers.map(h => {
-    if (typeof h === 'string') return { key: h, label: capitalize(h) }
-    if (h.key) return { key: h.key, label: h.label ?? capitalize(h.key) }
-    return { key: String(h), label: String(h) }
+    const key = typeof h === 'string' ? h : (h.key ?? String(h))
+    const label = (typeof h === 'object' && h.label) ? h.label : (labelMap[key] ?? capitalize(key))
+    return { key, label }
   })
 })
 
@@ -102,11 +113,19 @@ watch(normalizedHeaders, (newHeaders) => {
   newHeaders.forEach(h => { if (form[h.key] === undefined) form[h.key] = '' })
 }, { immediate: true })
 
-// Configurar datos
+// Datuak osatu
 const setFormData = (data) => {
   Object.keys(form).forEach(key => {
     if (key === 'client_id') form[key] = data.client_id ?? null
     else if (key === 'student_id') form[key] = data.student_id ?? null
+    else if (key === 'start_time' && data.start_time) {
+      // HH:MM:SS formatua HH:MM formatuan bihurtu orduaren baliogilea
+      form[key] = data.start_time.length === 8 ? data.start_time.slice(0, 5) : (data.start_time ?? '')
+    }
+    else if (key === 'end_time' && data.end_time) {
+      // HH:MM:SS formatua HH:MM formatuan bihurtu orduaren baliogilea
+      form[key] = data.end_time.length === 8 ? data.end_time.slice(0, 5) : (data.end_time ?? '')
+    }
     else form[key] = data[key] ?? ''
   })
   // Asegurarse de tener el id
@@ -123,11 +142,11 @@ const close = () => {
 
 // Enviar datos
 const handleSubmit = () => {
-  // Asegurarse de formato HH:MM:SS
+  // HH:MM:SS formatua zihestatu
   if (form.start_time && form.start_time.length === 5) form.start_time += ':00'
   if (form.end_time && form.end_time.length === 5) form.end_time += ':00'
 
-  console.log('Payload que se enviará a API:', JSON.parse(JSON.stringify(form)))
+  console.log('APIra bidaltzen den kargua:', JSON.parse(JSON.stringify(form)))
 
   emit('submit', { ...form })
   close()
@@ -139,8 +158,8 @@ const borrarHitzordua = async () => {
 
   try {
     await Api.ezabatuObjektua({ id: form.id }, "appointments");
-    close();                // cierra el modal
-    emit('recargar');       // avisa al padre para recargar
+    close();                // Modala itxi
+    emit('recargar');       // Gurasoa bergarritzeko abisatu
   } catch (err) {
     console.error(err);
   }
@@ -154,10 +173,10 @@ const onCancel = () => {
 
 function capitalize(str) {
   if (!str) return ''
-  return str.charAt(0).toUpperCase() + str.slice(1).replace(/_/g,' ')
+  return str.charAt(0).toUpperCase() + str.slice(1).replace(/_/g, ' ')
 }
 
-// Exponer métodos
+// Metodoak esposatu
 defineExpose({ open, close, setFormData })
 </script>
 

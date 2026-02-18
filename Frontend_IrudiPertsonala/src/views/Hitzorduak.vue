@@ -41,6 +41,7 @@ import HitzorduakComponent from '../components/HitzorduakComponent.vue'
 import SidebarMenu from '@/components/SidebarMenu.vue'
 import SortuHitzordua from '../components/sortuHitzordua.vue'
 import Api from '../composables/Api.js'
+import { useToast } from '../composables/UseToast.js'
 
 const menuAbierto = ref(false)
 const tableName = 'appointments'
@@ -49,20 +50,21 @@ const Egutegia = ref([])
 const clients = ref([])
 const students = ref([])
 
-// Referencia al modal
+// Modalaren erreferentzia
 const sortuHitzorduaRef = ref(null)
+const { ok, err } = useToast()
 
-// Headers (solo keys)
+// Goiburuak (gakoak soilik)
 const headers = ['seat', 'date', 'start_time', 'end_time','comments']
 
-// ---------- FUNCIONES DE SEMANA ----------
+// ---------- ASTERA FUNTZIOAK ----------
 function getCurrentWeek() {
   const now = new Date()
   const weekNumber = getWeek(now, { weekStartsOn: 1 })
   return `${now.getFullYear()}-W${String(weekNumber).padStart(2,'0')}`
 }
 
-// Genera todas las semanas del año actual
+// Unean dauden urteko asteak guztiak sortzen ditu
 const todasLasSemanas = computed(() => {
   const semanas = []
   const now = new Date()
@@ -78,7 +80,7 @@ const todasLasSemanas = computed(() => {
   return semanas
 })
 
-// ---------- FILTRADO DE CITAS ----------
+// ---------- HITZORDUEN FILTRATZEA ----------
 const egutegiaFiltrada = computed(() => {
   if (!Egutegia.value?.length || !selectedWeek.value) return []
 
@@ -94,7 +96,7 @@ const egutegiaFiltrada = computed(() => {
   })
 })
 
-// ---------- CARGA DE DATOS ----------
+// ---------- DATUEN KARGA ----------
 const cargarDatos = async () => {
   try { 
     Egutegia.value = await Api.cargarObjetos(tableName) 
@@ -118,7 +120,7 @@ const cargarDatos = async () => {
   }
 }
 
-// ---------- MODALES ----------
+// ---------- MODALAK ----------
 const abrirCrear = () => {
   sortuHitzorduaRef.value?.setFormData({})
   sortuHitzorduaRef.value?.open()
@@ -129,31 +131,38 @@ const editarHitzordua = (data) => {
   sortuHitzorduaRef.value?.open()
 }
 
-// ---------- GUARDAR CITAS ----------
+// ---------- HITZORDUAK GORDE ----------
 const guardarHitzordua = async (data) => {
   try {
-    console.log("Payload que llega a Api.js:", data) //   Aquí vemos lo que se envía
+    console.log("Api.js-era heltzen den kargua:", data) // Hemen bidaltzen denaren frogak ikusi ditzakegu
 
     const payload = JSON.parse(JSON.stringify(data))
+    let result
     if (data.id) {
-      await Api.aldatuObjeto(payload, tableName)
+      result = await Api.aldatuObjeto(payload, tableName)
     } else {
-      await Api.crearObjektua(payload, tableName)
+      result = await Api.crearObjektua(payload, tableName)
     }
     await cargarDatos()
+    const mensaje = result?.message || (data.id ? 'Hitzordua eguneratu egin da' : 'Hitzordua sortu egin da')
+    ok(mensaje)
   } catch(e) {
     console.error('Error guardando Hitzordua:', e)
+    err(e.message || 'Errore bat gertatu da hitzordua gordetzean')
   }
 }
 
 
-// ---------- BORRAR CITAS ----------
+// ---------- HITZORDUAK EZABATU ----------
 const borrarHitzordua = async (id) => {
   try { 
-    await Api.ezabatuObjektua({id}, tableName)
-    await cargarDatos() 
+    const result = await Api.ezabatuObjektua({id}, tableName)
+    await cargarDatos()
+    const mensaje = result?.message || 'Hitzordua ezabatu egin da'
+    ok(mensaje)
   } catch(e){
     console.error(e)
+    err(e.message || 'Errore bat gertatu da hitzordua ezabatzean')
   }
 }
 

@@ -42,46 +42,46 @@
 import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
-// Los jodidos props hechos por el asistente de IA del MediaMarkt.
+// Props osoa egindako proposamenak
 const props = defineProps({
-    // Datos a mostrar
+    // Erakusteko datuak
     filas: {
         type: Array,
         default: () => []
     },
-    // Título encima de la tabla  ("Kontsumible - Ikasle")
+    // Taularen gaineko izenburua ("Kontsumible - Ikaslea")
     titulo: {
         type: String,
         default: ''
     },
-    // Negrita dentro de la primera fila de la tabla ("Consumable")
+    // Taularen lehenengo errenkadan lodia ("Kontsumible")
     etiquetaTabla: {
         type: String,
         default: ''
     },
-    // Texto del botón de creación
+    // Sortze botoiaren testua
     textoBtnCrear: {
         type: String,
         default: 'Sortu'
     },
-    // Columnas que nunca deben mostrarse en la tabla
+    // Taulan ez daitezke bistaratu osoa denean zutabeak
     columnasExcluidas: {
         type: Array,
         default: () => ['id', 'student_id', 'consumable_id', 'equipment_id', 'created_at', 'updated_at', 'deleted_at', 'consumable_category_id']
     },
-    // Mapa de cabeceras personalizadas { clave: 'Texto visible' }
+    // Pertsonalizatutako goiburuaren mapa { gakoa: 'Ikusgarri testua' }
     mapaHeaders: {
         type: Object,
         default: () => ({ student_name: 'IKASLEA', item_name: 'PRODUKTUA' })
     },
-    // Longitud máxima antes de truncar el texto de una celda
+    // Gelaxka baten testua ebakitzeko aurreko gehienezko luzera
     maxLongitud: {
         type: Number,
         default: 20
     }
 })
 
-// Emit de mierda, puede no funcionar.
+// Sortu, editatu eta ezabatu emit-ak
 defineEmits(['crear', 'editar', 'borrar'])
 
 const route = useRoute()
@@ -98,14 +98,14 @@ const verHistorial = (fila) => {
     router.push({ name: 'historiala', query: { id } })
 }
 
-// sí
+// Ikusgarri dauden goiburuak
 const headersVisibles = computed(() => {
     if (!props.filas.length) return []
     const excluidos = props.columnasExcluidas.map(c => c.toLowerCase())
     return Object.keys(props.filas[0]).filter(h => !excluidos.includes(h.toLowerCase()))
 })
 
-// Helpers (como Egoitz)
+// Laguntza funtzioak
 const formatHeader = (h) => {
     if (props.mapaHeaders[h]) return props.mapaHeaders[h]
     return h.toUpperCase().replace(/_/g, ' ')

@@ -85,7 +85,7 @@ const cargarDatos = async () => {
   }
 }
 
-/* 🔥 SOLO para mostrar texto en la tabla */
+/* Taula txikitzeko testua erakusteko soilik */
 const BezeroaFormateado = computed(() =>
   Bezeroa.value.map(item => ({
     ...item,
