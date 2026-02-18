@@ -130,6 +130,8 @@ export async function login(email, password, recordar = false) {
     const storage = recordar ? localStorage : sessionStorage
     storage.setItem('token', data.token)
     storage.setItem('usuario', JSON.stringify(data.user))
+    // Guardar rol del usuario para control de accesos
+    if (data.user && data.user.role) storage.setItem('role', data.user.role)
     return data
   } else {
     throw { status: response.status, data: data }
@@ -151,8 +153,10 @@ export async function logout() {
 
   localStorage.removeItem('token')
   localStorage.removeItem('usuario')
+  localStorage.removeItem('role')
   sessionStorage.removeItem('token')
   sessionStorage.removeItem('usuario')
+  sessionStorage.removeItem('role')
 }
 
 // LOGUEATU DEN EGIAZTATU
@@ -166,6 +170,13 @@ export const getCurrentUser = () => {
   return usuario ? JSON.parse(usuario) : null
 }
 
+// OBTENER ROL
+export const getRole = () => {
+  return localStorage.getItem('role') || sessionStorage.getItem('role') || null
+}
+
+export const isAdmin = () => getRole() === 'A'
+
 // OBTENER TOKEN
 export const getToken = () => {
   return localStorage.getItem('token') || sessionStorage.getItem('token')
@@ -177,6 +188,8 @@ export default {
   isAuthenticated,
   getCurrentUser,
   getToken,
+  getRole,
+  isAdmin,
   cargarObjetos,
   cargarObjeto,
   aldatuObjeto,
