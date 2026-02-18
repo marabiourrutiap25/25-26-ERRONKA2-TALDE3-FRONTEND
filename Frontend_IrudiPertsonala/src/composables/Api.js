@@ -2,7 +2,7 @@ const API_URL = 'http://localhost:8000/api'
 
 async function llamarAPI(metodo, endpoint, datos = {}) {
   let url = `${API_URL}/${endpoint}`;  
-  const token = localStorage.getItem('token') 
+  const token = localStorage.getItem('token') || sessionStorage.getItem('token')
   const headers = { 
     'Content-Type': 'application/json', 
     'Authorization': `Bearer ${token}` 
