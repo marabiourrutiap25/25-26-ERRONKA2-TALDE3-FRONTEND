@@ -12,7 +12,7 @@
     </div>
 
     <TaulaComponent :filas="Produktuak" titulo="Produktuak" etiqueta-tabla="Consumables"
-      texto-btn-crear="Produktua Sortu" :mapa-headers="{ category_name: 'KATEGORIA' }"
+      texto-btn-crear="Produktua Sortu" :mapa-headers="{ name: 'IZENA', description: 'DESKRIBAPENA',  batch: 'LOTE' , brand: 'MARKA', expiration_date: 'IRAUNGITZE-DATA', category_name: 'KATEGORIA' }"
       :columnas-excluidas="['id', 'consumable_category_id', 'created_at', 'updated_at', 'deleted_at']"
       @crear="abrirCrear" @editar="prepararEdicion" @borrar="borrar" />
 

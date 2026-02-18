@@ -12,7 +12,7 @@
     </div>
 
     <TaulaComponent :filas="Materiala" titulo="Materialak" etiqueta-tabla="Equipment"
-      texto-btn-crear="Materiala Sortu" :mapa-headers="{ category_name: 'KATEGORIA' }"
+      texto-btn-crear="Materiala Sortu" :mapa-headers="{ category_name: 'KATEGORIA', label: 'ETIKETA', name: 'IZENA', description: 'DESKRIBAPENA', brand: 'MARKA'}"
       :columnas-excluidas="['id', 'equipment_category_id', 'created_at', 'updated_at', 'deleted_at']"
       @crear="abrirCrear" @editar="prepararEdicion" @borrar="borrar">
       <template #default="{ fila }">

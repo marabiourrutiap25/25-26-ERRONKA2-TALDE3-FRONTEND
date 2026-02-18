@@ -22,13 +22,13 @@
                         </td>
                         <td class="text-center">
                             <button v-if="isBezeroView" class="btn btn-dark p-2 me-3" @click="verHistorial(fila)">
-                                <img src="@/assets/ikusi.png" alt="Ikusi" style="max-width: 24px;" />
+                                <img src="@/assets/ikusi.png" alt="Ikusi" />
                             </button>
                             <button class="btn btn-primary p-2 me-3" @click="$emit('editar', fila)">
-                                <img src="@/assets/editatu.png" alt="Editar" style="max-width: 24px;" />
+                                <img src="@/assets/editatu.png" alt="Editar" />
                             </button>
                             <button class="btn btn-danger p-2 me-2" @click="$emit('borrar', fila.id)">
-                                <img src="@/assets/ezabatu.png" alt="Borrar" style="max-width: 24px;" />
+                                <img src="@/assets/ezabatu.png" alt="Borrar" />
                             </button>
                         </td>
                     </tr>
@@ -123,5 +123,6 @@ const truncar = (t) => {
 .btn-danger img,
 .btn-dark img {
     filter: brightness(0) invert(1);
+    max-width: 24px;
 }
 </style>

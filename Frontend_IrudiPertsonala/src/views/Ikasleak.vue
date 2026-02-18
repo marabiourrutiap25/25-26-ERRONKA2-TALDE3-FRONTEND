@@ -9,7 +9,7 @@
         Egutegiak Ikusi</button>
     </div>
     <TaulaComponent :filas="ikasleak" titulo="Ikasleak" etiqueta-tabla="Students" texto-btn-crear="Ikaslea Sortu"
-      :mapa-headers="{ group_name: 'TALDEA' }"
+      :mapa-headers="{ name: 'IZENA', surnames: 'ABIZENAK', group_name: 'TALDEA' }"
       :columnas-excluidas="['id', 'group_id', 'created_at', 'updated_at', 'deleted_at']" @crear="abrirCrear"
       @editar="prepararEdicion" @borrar="borrar" />
 
@@ -210,7 +210,8 @@ onMounted(cargarDatos)
 /* Image filters for action buttons only */
 .btn-primary img,
 .btn-danger img,
-.btn-dark img {
+.btn-dark img,
+.btn-success img {
   max-width: 20px;
   filter: brightness(0) invert(1);
 }

@@ -3,7 +3,7 @@
     <table class="table table-bordered text-center">
       <thead class="table-light">
         <tr>
-          <th>Hora</th>
+          <th>Ordua</th>
           <th v-for="day in days" :key="day.toDateString()">
             {{ formatDate(day) }}
           </th>
