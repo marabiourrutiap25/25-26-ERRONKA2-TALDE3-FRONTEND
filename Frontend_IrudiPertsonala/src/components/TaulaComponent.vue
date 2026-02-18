@@ -21,6 +21,9 @@
                             {{ truncar(fila[header]) }}
                         </td>
                         <td class="text-center">
+                            <button v-if="isBezeroView" class="btn btn-dark p-2 me-3" @click="verHistorial(fila)">
+                                <img src="@/assets/ikusi.png" alt="Ikusi" style="max-width: 24px;" />
+                            </button>
                             <button class="btn btn-primary p-2 me-3" @click="$emit('editar', fila)">
                                 <img src="@/assets/editatu.png" alt="Editar" style="max-width: 24px;" />
                             </button>
@@ -37,6 +40,7 @@
 
 <script setup>
 import { computed } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 
 // Los jodidos props hechos por el asistente de IA del MediaMarkt.
 const props = defineProps({
@@ -80,6 +84,20 @@ const props = defineProps({
 // Emit de mierda, puede no funcionar.
 defineEmits(['crear', 'editar', 'borrar'])
 
+const route = useRoute()
+const router = useRouter()
+const isBezeroView = computed(() => {
+    const name = route && route.name ? String(route.name).toLowerCase() : ''
+    const path = route && route.path ? String(route.path).toLowerCase() : ''
+    return name.includes('bezero') || path.includes('bezero')
+})
+
+const verHistorial = (fila) => {
+    const id = fila.id
+    if (!id) return
+    router.push({ name: 'historiala', query: { id } })
+}
+
 // sí
 const headersVisibles = computed(() => {
     if (!props.filas.length) return []
@@ -102,7 +120,8 @@ const truncar = (t) => {
 
 <style scoped>
 .btn-primary img,
-.btn-danger img {
+.btn-danger img,
+.btn-dark img {
     filter: brightness(0) invert(1);
 }
 </style>

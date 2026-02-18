@@ -27,8 +27,8 @@
                 <!-- SELECT solo para home_client -->
                 <select v-if="key === 'home_client'" :id="key" v-model.number="form[key]"
                   class="form-control custom-input">
-                  <option :value="0">kanpokoa</option>
-                  <option :value="1">etxekoa</option>
+                  <option :value="0">Kanpokoa</option>
+                  <option :value="1">Etxekoa</option>
                 </select>
 
                 <!-- INPUT normal -->
@@ -89,7 +89,7 @@ const cargarDatos = async () => {
 const BezeroaFormateado = computed(() =>
   Bezeroa.value.map(item => ({
     ...item,
-    home_client: item.home_client == 1 ? 'etxekoa' : 'kanpokoa'
+    home_client: item.home_client == 1 ? 'Etxekoa' : 'Kanpokoa'
   }))
 )
 

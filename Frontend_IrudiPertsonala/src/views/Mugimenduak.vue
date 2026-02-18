@@ -17,19 +17,38 @@
   <div class="container my-4">
     <ToastContainer />
 
-    <TaulaComponent v-if="tablaActiva === 'consumables'" :filas="Consumables" titulo="Mugimenduak"
-      etiqueta-tabla="Consumable" texto-btn-crear="Kontsumible Mugimendua Sortu"
-      :mapa-headers="{ student_name: 'IKASLEA', item_name: 'KONTSUMIBLEA' }"
-      :columnas-excluidas="['id', 'student_id', 'consumable_id', 'created_at', 'updated_at', 'deleted_at']"
-      @crear="abrirCrear('consumable')" @editar="(fila) => prepararEdicion(fila, 'consumable')"
-      @borrar="(id) => borrar(id, 'consumable')" />
 
-    <TaulaComponent v-if="tablaActiva === 'equipments'" :filas="Equipments" titulo="Mugimenduak"
-      etiqueta-tabla="Equipment" texto-btn-crear="Ekipamendu Mugimendua Sortu"
-      :mapa-headers="{ student_name: 'IKASLEA', item_name: 'EKIPAMENDUA' }"
-      :columnas-excluidas="['id', 'student_id', 'equipment_id', 'created_at', 'updated_at', 'deleted_at']"
-      @crear="abrirCrear('equipment')" @editar="(fila) => prepararEdicion(fila, 'equipment')"
-      @borrar="(id) => borrar(id, 'equipment')" />
+    <!-- Kontsumibleak cards -->
+    <div v-if="tablaActiva === 'consumables'">
+      <div class="row">
+        <div class="col-md-6 mb-3" v-for="c in Consumables" :key="c.id">
+          <div class="card h-100">
+            <div class="card-header fw-bold">{{ c.item_name }}</div>
+            <div class="card-body">
+              <div><strong>Ikasle izena:</strong> {{ c.student_name }}</div>
+              <div><strong>Data:</strong> {{ c.date }}</div>
+              <div><strong>Kopurua:</strong> {{ c.quantity }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Materialak cards -->
+    <div v-if="tablaActiva === 'equipments'">
+      <div class="row">
+        <div class="col-md-6 mb-3" v-for="e in Equipments" :key="e.id">
+          <div class="card h-100">
+            <div class="card-header fw-bold">{{ e.item_name }}</div>
+            <div class="card-body">
+              <div><strong>Ikasle izena:</strong> {{ e.student_name }}</div>
+              <div><strong>Hasiera:</strong> {{ e.start_datetime }}</div>
+              <div><strong>Bukaera:</strong> {{ e.end_datetime }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <dialog ref="modalRef" class="custom-dialog p-0 border-0 shadow-lg rounded-4">
       <div class="modal-content border-0">

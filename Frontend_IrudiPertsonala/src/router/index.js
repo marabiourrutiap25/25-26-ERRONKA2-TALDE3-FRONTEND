@@ -11,6 +11,7 @@ import Mugimenduak from "../views/Mugimenduak.vue";
 import Login from "../views/Login.vue";
 import Txandak from "../views/Txandak.vue";
 import Dashboard from "../views/Dashboard.vue";
+import BezeroHistoriala from "@/views/BezeroHistoriala.vue";
 
 const routes = [
   { path: "/", name: "login", component: Login },
@@ -24,6 +25,7 @@ const routes = [
   { path: "/hitzorduak", name: "hitzorduak", component: Hitzorduak, meta: { requiresAuth: true } },
   { path: "/mugimenduak", name: "mugimenduak", component: Mugimenduak, meta: { requiresAuth: true } },
   { path: "/txandak", name: "txandak", component: Txandak, meta: { requiresAuth: true } },
+  { path: "/historiala", name: "historiala", component: BezeroHistoriala, meta: { requiresAuth: true } },
 ];
 
 const router = createRouter({

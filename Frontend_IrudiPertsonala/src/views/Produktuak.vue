@@ -4,10 +4,56 @@
   <div class="container">
     <ToastComponent />
 
+
+    <div class="d-flex justify-content-between justify-content-md-end mt-5 mb-4">
+      <div>
+        <button class="btn btn-success text-white fw-bold" @click="abrirSacar">Produktua atera</button>
+      </div>
+    </div>
+
     <TaulaComponent :filas="Produktuak" titulo="Produktuak" etiqueta-tabla="Consumables"
       texto-btn-crear="Produktua Sortu" :mapa-headers="{ category_name: 'KATEGORIA' }"
       :columnas-excluidas="['id', 'consumable_category_id', 'created_at', 'updated_at', 'deleted_at']"
       @crear="abrirCrear" @editar="prepararEdicion" @borrar="borrar" />
+
+    <dialog ref="modalSacarRef" class="custom-dialog p-0 border-0 shadow-lg rounded-4">
+      <div class="modal-content border-0">
+        <div class="modal-header border-bottom-0 pt-4 px-4 pb-2 d-flex justify-content-between align-items-center">
+          <h4 class="modal-title fw-bold text-dark">Produktua atera</h4>
+          <button type="button" class="btn-close-custom" @click="cerrarModalSacar">✕</button>
+        </div>
+        <div class="modal-body px-4 pb-4">
+          <form @submit.prevent="guardarSacar">
+            <div class="mb-4">
+              <label class="custom-label">IKASLEA</label>
+              <select v-model="formSacar.student_id" class="form-control custom-input" required>
+                <option value="" disabled>Ikasle bat hautatu</option>
+                <option v-for="a in listaAlumnos" :key="a.id" :value="a.id">
+                  {{ a.name }} {{ a.surnames }}
+                </option>
+              </select>
+            </div>
+            <div class="mb-4">
+              <label class="custom-label">PRODUKTUA</label>
+              <select v-model="formSacar.consumable_id" class="form-control custom-input" required>
+                <option value="" disabled>Produktua hautatu</option>
+                <option v-for="c in listaConsumables" :key="c.id" :value="c.id" :disabled="!c.stock || c.stock < 1">
+                  {{ c.name }} (Stock: {{ c.stock ?? '?' }})
+                </option>
+              </select>
+            </div>
+            <div class="mb-4">
+              <label class="custom-label">Kopurua</label>
+              <input v-model="formSacar.quantity" type="number" min="1" class="form-control custom-input" required placeholder="Kopurua" />
+            </div>
+            <div class="d-flex justify-content-end gap-3 pt-3">
+              <button type="button" class="btn btn-cancel px-4" @click="cerrarModalSacar">Kantzelatu</button>
+              <button type="submit" class="btn btn-save px-4">Sartu</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </dialog>
 
     <dialog ref="modalRef" class="custom-dialog p-0 border-0 shadow-lg rounded-4">
       <div class="modal-content border-0">
@@ -65,6 +111,10 @@ const menuAbierto = ref(false)
 const Produktuak = ref([])
 const listaCategorias = ref([])
 const tableName = "consumables"
+const listaAlumnos = ref([])
+const listaConsumables = ref([])
+const modalSacarRef = ref(null)
+const formSacar = reactive({ student_id: '', consumable_id: '', quantity: 1 })
 
 const modalRef = ref(null)
 const modoEdicion = ref(false)
@@ -77,9 +127,11 @@ const esCampoEditable = (key) => {
 
 const cargarDatos = async () => {
   try {
-    const [resConsumables, resCat] = await Promise.all([
+    const [resConsumables, resCat, resAlumnos, resConsumablesList] = await Promise.all([
       Api.cargarObjetos(tableName),
-      Api.cargarObjetos("consumable-categories")
+      Api.cargarObjetos("consumable-categories"),
+      Api.cargarObjetos("students"),
+      Api.cargarObjetos("consumables")
     ])
     listaCategorias.value = resCat?.data || resCat || []
     const consumablesRaw = resConsumables?.data || resConsumables || []
@@ -87,9 +139,70 @@ const cargarDatos = async () => {
       const cat = listaCategorias.value.find(c => c.id === item.consumable_category_id)
       return { ...item, category_name: cat ? cat.name : `ID: ${item.consumable_category_id}` }
     })
+    listaAlumnos.value = resAlumnos?.data || resAlumnos || []
+    listaConsumables.value = resConsumablesList?.data || resConsumablesList || []
   } catch (e) {
     console.error("Error cargando datos:", e)
     Produktuak.value = []
+    listaAlumnos.value = []
+    listaConsumables.value = []
+  }
+}
+const abrirSacar = () => {
+  formSacar.student_id = ''
+  formSacar.consumable_id = ''
+  formSacar.quantity = 1
+  modalSacarRef.value?.showModal()
+}
+
+const cerrarModalSacar = () => modalSacarRef.value?.close()
+
+const guardarSacar = async () => {
+  try {
+    const selected = listaConsumables.value.find(c => c.id == formSacar.consumable_id)
+    const stock = selected?.stock ?? 0
+    const qty = Number(formSacar.quantity)
+    if (!selected) {
+      err('Debes seleccionar un producto')
+      return
+    }
+    if (stock < 1) {
+      err('No hay stock disponible de este producto')
+      return
+    }
+    if (qty > stock) {
+      err('No puedes sacar más de lo disponible (stock: ' + stock + ')')
+      return
+    }
+    // date automático
+    const today = new Date()
+    const yyyy = today.getFullYear()
+    const mm = String(today.getMonth() + 1).padStart(2, '0')
+    const dd = String(today.getDate()).padStart(2, '0')
+    const date = `${yyyy}-${mm}-${dd}`
+    const payload = {
+      student_id: formSacar.student_id,
+      consumable_id: formSacar.consumable_id,
+      date,
+      quantity: qty
+    }
+    // endpoint para movimientos
+    const res = await Api.crearObjektua(payload, 'student-consumables')
+    if (res) {
+      // Actualizar stock del producto (enviando todos los campos)
+      const productoCompleto = { ...selected, stock: stock - qty }
+      // Eliminar campos que no deben enviarse
+      delete productoCompleto.created_at
+      delete productoCompleto.updated_at
+      delete productoCompleto.deleted_at
+      delete productoCompleto.category_name
+      await Api.aldatuObjeto(productoCompleto, 'consumables')
+      cerrarModalSacar()
+      await cargarDatos()
+      ok(res.message || 'Producto sacado correctamente')
+    }
+  } catch (e) {
+    err(e.message || 'Error al sacar producto')
   }
 }
 
