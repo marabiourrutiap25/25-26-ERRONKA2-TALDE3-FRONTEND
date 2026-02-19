@@ -39,12 +39,7 @@
                 <option value="M">Mahaia</option>
               </select>
             </div>
-
-            <div class="mb-4">
-              <label for="date" class="custom-label">DATA</label>
-              <input id="date" v-model="form.date" type="date" class="form-control custom-input" required />
-            </div>
-
+            
             <div v-for="key in Object.keys(form)" :key="key">
               <div v-if="esCampoEditable(key)" class="mb-4">
                 <label :for="key" class="custom-label">{{ key.toUpperCase().replace(/_/g, ' ') }}</label>
