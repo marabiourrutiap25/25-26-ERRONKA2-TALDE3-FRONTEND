@@ -1,5 +1,166 @@
 <template>
-  <div class="container mt-5">
-    <h1>Txandak</h1>
+  <SidebarMenu titulo="Txandak" v-model="menuAbierto" />
+
+  <div class="container">
+    <ToastComponent />
+
+    <TaulaComponent :filas="Txandak" titulo="Txandak" etiqueta-tabla="Txandak"
+      texto-btn-crear="Txanda Sortu" :mapa-headers="{ student_name: 'IKASLEA', type: 'MOTA', date: 'DATA' }"
+      :columnas-excluidas="['id', 'student_id', 'created_at', 'updated_at', 'deleted_at']"
+      @crear="abrirCrear" @editar="prepararEdicion" @borrar="borrar" />
+
+    <dialog ref="modalRef" class="custom-dialog p-0 border-0 shadow-lg rounded-4">
+      <div class="modal-content border-0">
+        <div class="modal-header border-bottom-0 pt-4 px-4 pb-2 d-flex justify-content-between align-items-center">
+          <h4 class="modal-title fw-bold text-dark">
+            {{ modoEdicion ? 'Editatu' : 'Sortu' }} Txanda
+          </h4>
+          <button type="button" class="btn-close-custom" @click="cerrarModal">✕</button>
+        </div>
+
+        <div class="modal-body px-4 pb-4">
+          <form @submit.prevent="guardar">
+
+            <div class="mb-4">
+              <label class="custom-label">IKASLEA</label>
+              <select v-model="form.student_id" class="form-control custom-input" required>
+                <option value="" disabled>Ikasle bat hautatu</option>
+                <option v-for="alumno in alumnosLista" :key="alumno.id" :value="alumno.id">
+                  {{ alumno.name }} {{ alumno.surnames }}
+                </option>
+              </select>
+            </div>
+
+            <div class="mb-4">
+              <label class="custom-label">MOTA</label>
+              <select v-model="form.type" class="form-control custom-input" required>
+                <option value="" disabled>Mota bat hautatu</option>
+                <option value="G">Garbiketa</option>
+                <option value="M">Mahaia</option>
+              </select>
+            </div>
+
+            <div class="mb-4">
+              <label for="date" class="custom-label">DATA</label>
+              <input id="date" v-model="form.date" type="date" class="form-control custom-input" required />
+            </div>
+
+            <div v-for="key in Object.keys(form)" :key="key">
+              <div v-if="esCampoEditable(key)" class="mb-4">
+                <label :for="key" class="custom-label">{{ key.toUpperCase().replace(/_/g, ' ') }}</label>
+                <input :id="key" v-model="form[key]" type="text" class="form-control custom-input"
+                  :placeholder="'Sartu ' + key" />
+              </div>
+            </div>
+
+            <div class="d-flex justify-content-end gap-3 pt-3">
+              <button type="button" class="btn btn-cancel px-4" @click="cerrarModal">Kantzelatu</button>
+              <button type="submit" class="btn btn-save px-4">Aldaketak Gorde</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </dialog>
   </div>
 </template>
+
+<script setup>
+import { ref, reactive, onMounted } from 'vue'
+import Api from '../composables/Api.js'
+import { useToast } from '../composables/UseToast.js'
+import ToastComponent from '../components/ToastComponent.vue'
+import TaulaComponent from '@/components/TaulaComponent.vue'
+import SidebarMenu from '@/components/SidebarMenu.vue'
+
+const { ok, err } = useToast()
+
+const menuAbierto = ref(false)
+
+const Txandak = ref([])
+const alumnosLista = ref([])
+const tableName = "shifts"
+
+const modalRef = ref(null)
+const modoEdicion = ref(false)
+const form = reactive({})
+
+const esCampoEditable = (key) => {
+  const excluidos = ['id', 'student_id', 'student_name', 'type', 'date', 'start_date', 'end_date', 'created_at', 'updated_at', 'deleted_at']
+  return !excluidos.includes(key.toLowerCase())
+}
+
+const cargarDatos = async () => {
+  try {
+    const [resShifts, resStudents] = await Promise.all([
+      Api.cargarObjetos(tableName),
+      Api.cargarObjetos("students")
+    ])
+    alumnosLista.value = resStudents?.data || resStudents || []
+    const listaRaw = resShifts?.data || resShifts || []
+    Txandak.value = listaRaw.map(turno => {
+      const alumno = alumnosLista.value.find(a => a.id === turno.student_id)
+      let tipo = turno.type
+      if (tipo === 'M') tipo = 'Mahaia'
+      else if (tipo === 'G') tipo = 'Garbiketa'
+      return { ...turno, student_name: alumno ? `${alumno.name} ${alumno.surnames}` : `ID: ${turno.student_id}`, type: tipo }
+    })
+  } catch (e) {
+    console.error("Error cargando datos:", e)
+    Txandak.value = []
+  }
+}
+
+const abrirCrear = () => {
+  modoEdicion.value = false
+  for (let k in form) delete form[k]
+  if (Txandak.value.length > 0) {
+    Object.keys(Txandak.value[0]).forEach(key => { if (esCampoEditable(key)) form[key] = "" })
+  }
+  form.student_id = ""
+  form.type = ""
+  form.date = ""
+  modalRef.value?.showModal()
+}
+
+const prepararEdicion = (fila) => {
+  modoEdicion.value = true
+  for (let k in form) delete form[k]
+  Object.assign(form, fila)
+  if (form.type === 'Mahaia') form.type = 'M'
+  else if (form.type === 'Garbiketa') form.type = 'G'
+  modalRef.value?.showModal()
+}
+
+const cerrarModal = () => modalRef.value?.close()
+
+const guardar = async () => {
+  try {
+    const { id, student_name, created_at, updated_at, deleted_at, ...payload } = form
+    let res
+    if (modoEdicion.value) res = await Api.aldatuObjeto({ id, ...payload }, tableName)
+    else res = await Api.crearObjektua(payload, tableName)
+    if (res) {
+      cerrarModal()
+      await cargarDatos()
+      ok(res.message || (modoEdicion.value ? 'Txanda actualizada correctamente' : 'Txanda creada correctamente'))
+    }
+  } catch (e) {
+    err(e.message || 'Error al guardar')
+  }
+}
+
+const borrar = async (id) => {
+  if (!confirm('Ziur zaude ezabatu nahi duzulaz?')) return
+  try {
+    const res = await Api.ezabatuObjektua({ id }, tableName)
+    if (res) {
+      await cargarDatos()
+      ok(res.message || 'Txanda eliminada correctamente')
+    }
+  } catch (e) {
+    err(e.message || 'Error al eliminar')
+  }
+}
+
+onMounted(cargarDatos)
+</script>

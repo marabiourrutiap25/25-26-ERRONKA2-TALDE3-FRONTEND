@@ -2,19 +2,25 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 
 export const useMainStore = defineStore('main', () => {
-  // STATE: Propiedades reactivas
+  // EGOERA: Aldaketa ditzaketen propietateak
   const usuario = ref(null)
   const cargando = ref(false)
   const error = ref(null)
   const items = ref([])
+  const token = ref(null)
 
   // GETTERS: Propiedades calculadas
   const usuarioNombre = computed(() => usuario.value?.nombre || 'Anónimo')
   const tieneItems = computed(() => items.value.length > 0)
 
-  // ACTIONS: Métodos/funciones
-  const setUsuario = (nuevoUsuario) => {
+  // AKZIOAK: Metodoak/Funtzioak
+  const setUsuario = (nuevoUsuario,token) => {
     usuario.value = nuevoUsuario
+    token.value = token // Ziurtatu tokena eguneratuta dagoen erabiltzailean
+  }
+
+  const setToken = (nuevoToken) => {
+    token.value = nuevoToken
   }
 
   const agregarItem = (item) => {
@@ -25,6 +31,7 @@ export const useMainStore = defineStore('main', () => {
     usuario.value = null
     items.value = []
     error.value = null
+    token.value = null
   }
 
   return {
@@ -36,6 +43,7 @@ export const useMainStore = defineStore('main', () => {
     // Getters
     usuarioNombre,
     tieneItems,
+    token,
     // Actions
     setUsuario,
     agregarItem,

@@ -1,135 +1,205 @@
-const API_URL = 'http://127.0.0.1:8000/api';
-const token = "1|Xr2d43nuEFANkdsFYvvaZuwpcCjpqQ1DjI6xmHqr1a321027";
+const API_URL = 'http://localhost:8000/api'
 
-async function llamarAPI(metodo, table, datos = {}) {
-    let url = `${API_URL}/${table}`;  
-    const headers = { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` };
-    const options = { method: metodo, headers };
+// APIaren edozein erantzunetik gehien interesatzen den mezua jaso
+function extraerMensaje(resultado) {
+  if (!resultado) return null
+  return resultado.message || resultado.errors || resultado.data || null
+}
 
-    // Separar id si existe
-    let bodyDatos = { ...datos };
-    if (datos.id) {
-        url += `/${datos.id}`; // id en la URL
-        delete bodyDatos.id;   // quitar id del body
-    }
+// APIari deia egin
+async function llamarAPI(metodo, endpoint, datos = {}) {
+  let url = `${API_URL}/${endpoint}`;  
+  const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+  const headers = { 
+    'Content-Type': 'application/json', 
+    'Authorization': `Bearer ${token}` 
+  };
+  const options = { method: metodo, headers };
 
-    // Enviar body solo para métodos distintos de GET/HEAD
-    if (metodo !== "GET" && metodo !== "HEAD") {
-        options.body = JSON.stringify(bodyDatos);
-    } else if (Object.keys(bodyDatos).length > 0) {
-        const query = new URLSearchParams(bodyDatos).toString();
-        url += `?${query}`;
-    }
+  let bodyDatos = { ...datos };
+  if (datos.id) {
+    url += `/${datos.id}`;
+    delete bodyDatos.id;
+  }
 
-    const response = await fetch(url, options);
+  if (metodo !== "GET" && metodo !== "HEAD") {
+    options.body = JSON.stringify(bodyDatos);
+  } else if (Object.keys(bodyDatos).length > 0) {
+    const query = new URLSearchParams(bodyDatos).toString();
+    url += `?${query}`;
+  }
 
-    const text = await response.text();
-    let resultado = null;
-    try {
-        resultado = text ? JSON.parse(text) : null;
-    } catch (err) {
-        console.error('Respuesta no es JSON:', { status: response.status, text });
-        throw new Error(`API devolvió no JSON. Estado: ${response.status}`);
-    }
+  const response = await fetch(url, options);
+  const text = await response.text();
+  let resultado = null;
 
-    if (!response.ok) {
-        const mensaje = resultado?.error || `HTTP error ${response.status}`;
-        throw new Error(mensaje);
-    }
+  try {
+    resultado = text ? JSON.parse(text) : null;
+  } catch (err) {
+    console.error('Respuesta no es JSON:', { status: response.status, text });
+    throw new Error(`API devolvió no JSON. Estado: ${response.status}`);
+  }
 
-    return resultado;
+  if (!response.ok) {
+    // APIak emandako mezua kantinatu, erroreak, mezua edo datuak izan daiteke
+    throw new Error(extraerMensaje(resultado) || `HTTP akatsa ${response.status}`);
+  }
+
+  // Beti .message normalizatua emaitzari atxiki
+  if (resultado && typeof resultado === 'object') {
+    resultado.message = extraerMensaje(resultado)
+  }
+
+  return resultado;
 }
 
 
-
-// GET --> Lortu lerro guztiak
-async function cargarObjetos(table) {
-    try {
-        // Llamada a la API
-        const resultado = await llamarAPI('GET', table);
-        console.log('Respuesta bruta de API:', resultado);
-        
-        // Verificar si es un array directamente
-        if (Array.isArray(resultado)) {
-            console.log('Es un array:', resultado);
-            return resultado;
-        }
-        
-        // Si es un objeto, buscar el array dentro (común: data, results, items, etc.)
-        if (resultado && typeof resultado === 'object') {
-            const dataArray = resultado.data || resultado.results || resultado.items || resultado;
-            console.log('Datos extraídos:', dataArray);
-            if (Array.isArray(dataArray)) {
-                return dataArray;
-            }
-        }
-        
-        console.warn('Estructura inesperada, devolviendo array vacío');
-        return [];
-    } catch (err) {
-        console.error('Error al cargar datos:', err);
-        // Devolver array vacío si falla
-        return [];
+// =======================
+// CRUD FUNTZIOAK
+// =======================
+export async function cargarObjetos(endpoint) {
+  try {
+    const resultado = await llamarAPI('GET', endpoint);
+    if (Array.isArray(resultado)) return resultado;
+    if (resultado && typeof resultado === 'object') {
+      return resultado.data || resultado.results || resultado.items || resultado;
     }
+    return [];
+  } catch (err) {
+    console.error('Error al cargar datos:', err);
+    return [];
+  }
 }
 
-// GET --> Lortu lerro bat
-async function cargarObjeto(aldagaia, table) {
-    try {
-        //APIra deitu eta emaitza jaso
-        const resultado = await llamarAPI('GET', table, aldagaia);
-        return resultado;
-    } catch (err) {
-        console.error('Error al cargar datos:', err);
-        return null;
-    }
+export async function cargarObjeto(filtros, endpoint) {
+  try {
+    return await llamarAPI('GET', endpoint, filtros);
+  } catch (err) {
+    console.error('Error al cargar objeto:', err);
+    return null;
+  }
 }
 
-// PUT --> Aldatu objektu bat
-async function aldatuObjeto(aldagaiak, table) {
-    try {
-        // API deia egin PUT metodoarekin
-        const result = await llamarAPI('PUT', table, aldagaiak);
-        return result;
-    } catch (err) {
-        console.error('Error:', err);
-        return null;
-    }
+export async function aldatuObjeto(datos, endpoint) {
+  try {
+    return await llamarAPI('PUT', endpoint, datos);
+  } catch (err) {
+    console.error('Error al actualizar objeto:', err);
+    throw err;
+  }
 }
 
-// DEL --> Ezabatu objektu bat
-async function ezabatuObjektua(aldagaia, table) {
-    try {
-        const result = await llamarAPI('DELETE', table, aldagaia);
-        return result;
-    } catch (err) {
-        console.error('Error al eliminar:', err);
-        alert('Error al eliminar el equipo: ' + err.message);
-        return null;
-    }
+export async function ezabatuObjektua(datos, endpoint) {
+  try {
+    return await llamarAPI('DELETE', endpoint, datos);
+  } catch (err) {
+    console.error('Error al eliminar objeto:', err);
+    throw err;
+  }
 }
 
-// POST --> Sortu objektu bat
-async function crearObjektua(aldagaiak, table) {
-    try {
-        const result = await llamarAPI('POST', table, aldagaiak);
-        return result;
-    } catch (err) {
-        console.error('Error al crear erabiltzailea:', err);
-        return null;
-    }
+export async function crearObjektua(datos, endpoint) {
+  try {
+    return await llamarAPI('POST', endpoint, datos);
+  } catch (err) {
+    console.error('Error al crear objeto:', err);
+    throw err;
+  }
 }
 
-// Funtzio laguntzailea: API URL eguneratua lortzeko
-async function revisarSesion(tablename){
-    return API_URL + '/' + tablename;
+
+// SAIOA HASI
+export async function login(email, password, recordar = false) {
+  const response = await fetch(API_URL + '/login', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json'
+    },
+    body: JSON.stringify({
+      email: email,
+      password: password
+    })
+  })
+
+  const data = await response.json()
+
+  console.log('Zerbitzariaren erantzuna:', data)
+
+  if (response.ok) {
+    const storage = recordar ? localStorage : sessionStorage
+    storage.setItem('token', data.token)
+    storage.setItem('usuario', JSON.stringify(data.user))
+    // Guardar rol del usuario para control de accesos.
+    // Algunas respuestas devuelven role en data.user.role y otras en root `role`.
+    const roleFromResponse = data.role || (data.user && data.user.role)
+    if (roleFromResponse) storage.setItem('role', roleFromResponse)
+    return data
+  } else {
+    throw { status: response.status, data: data }
+  }
+}
+
+// SAIOA ITXI
+export async function logout() {
+  const token = localStorage.getItem('token') || sessionStorage.getItem('token')
+
+  await fetch(API_URL + '/logout', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+      'Authorization': 'Bearer ' + token
+    }
+  })
+
+  localStorage.removeItem('token')
+  localStorage.removeItem('usuario')
+  localStorage.removeItem('role')
+  sessionStorage.removeItem('token')
+  sessionStorage.removeItem('usuario')
+  sessionStorage.removeItem('role')
+}
+
+// LOGUEATU DEN EGIAZTATU
+export function isAuthenticated() {
+  const token = localStorage.getItem('token') || sessionStorage.getItem('token')
+  return !!token
+}
+
+export const getCurrentUser = () => {
+  const usuario = localStorage.getItem('usuario') || sessionStorage.getItem('usuario')
+  return usuario ? JSON.parse(usuario) : null
+}
+
+// OBTENER ROL
+export const getRole = () => {
+  return localStorage.getItem('role') || sessionStorage.getItem('role') || null
+}
+
+export const isAdmin = () => {
+  const r = getRole()
+  // Normalizar: eliminar comillas y espacios, dejar solo caracteres alfanuméricos
+  const cleaned = String(r || '').replace(/[^a-zA-Z0-9]/g, '').trim().toUpperCase()
+  return cleaned === 'A'
+}
+
+// OBTENER TOKEN
+export const getToken = () => {
+  return localStorage.getItem('token') || sessionStorage.getItem('token')
 }
 
 export default {
+  login,
+  logout,
+  isAuthenticated,
+  getCurrentUser,
+  getToken,
+  getRole,
+  isAdmin,
   cargarObjetos,
   cargarObjeto,
   aldatuObjeto,
   ezabatuObjektua,
-  crearObjektua,
-  revisarSesion
+  crearObjektua
 }

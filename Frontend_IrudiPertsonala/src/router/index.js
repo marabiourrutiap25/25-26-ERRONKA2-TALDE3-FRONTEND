@@ -1,34 +1,53 @@
 import { createRouter, createWebHistory } from "vue-router";
+import Api from "@/composables/Api.js";
 import Egutegiak from "../views/Egutegiak.vue";
 import Ikasleak from "../views/Ikasleak.vue";
 import Materialak from "../views/Materialak.vue";
 import Produktuak from "../views/Produktuak.vue";
 import Zerbitzuak from "../views/Zerbitzuak.vue";
-import Menu from "../views/Menu.vue";
 import Bezeroak from "../views/Bezeroak.vue";
 import Hitzorduak from "../views/Hitzorduak.vue";
 import Mugimenduak from "../views/Mugimenduak.vue";
-import Saioa from "../views/Saioa-Hasi.vue";
+import Login from "../views/Login.vue";
 import Txandak from "../views/Txandak.vue";
-
+import Dashboard from "../views/Dashboard.vue";
+import BezeroHistoriala from "@/views/BezeroHistoriala.vue";
 
 const routes = [
-  { path: "/egutegiak", component: Egutegiak },
-  { path: "/ikasleak", component: Ikasleak },
-  { path: "/materialak", component: Materialak },
-  { path: "/produktuak", component: Produktuak },
-  { path: "/zerbitzuak", component: Zerbitzuak },
-  { path: "/menu", component: Menu },
-  { path: "/bezeroak", component: Bezeroak },
-  { path: "/hitzorduak", component: Hitzorduak },
-  { path: "/mugimenduak", component: Mugimenduak },
-  { path: "/saioa-hasi", component: Saioa },
-  { path: "/txandak", component: Txandak },
+  { path: "/", name: "login", component: Login },
+  { path: "/dashboard", name: "dashboard", component: Dashboard, meta: { requiresAuth: true } },
+  { path: "/egutegiak", name: "egutegiak", component: Egutegiak, meta: { requiresAuth: true } },
+  { path: "/ikasleak", name: "ikasleak", component: Ikasleak, meta: { requiresAuth: true} },
+  { path: "/materialak", name: "materialak", component: Materialak, meta: { requiresAuth: true } },
+  { path: "/produktuak", name: "produktuak", component: Produktuak, meta: { requiresAuth: true } },
+  { path: "/zerbitzuak", name: "zerbitzuak", component: Zerbitzuak, meta: { requiresAuth: true } },
+  { path: "/bezeroak", name: "bezeroak", component: Bezeroak, meta: { requiresAuth: true } },
+  { path: "/hitzorduak", name: "hitzorduak", component: Hitzorduak, meta: { requiresAuth: true } },
+  { path: "/mugimenduak", name: "mugimenduak", component: Mugimenduak, meta: { requiresAuth: true } },
+  { path: "/txandak", name: "txandak", component: Txandak, meta: { requiresAuth: true } },
+  { path: "/historiala", name: "historiala", component: BezeroHistoriala, meta: { requiresAuth: true } },
 ];
 
 const router = createRouter({
   history: createWebHistory(),
   routes,
+});
+
+// Babesa: Ruta-k auth eskatzen badu eta ez dagoen tokena, login-era bideratzen du
+router.beforeEach((to) => {
+  if (to.meta.requiresAuth && !Api.isAuthenticated()) {
+    return { name: "login" };
+  }
+  // Si la ruta requiere rol 'A' y el usuario no lo tiene, redirige a dashboard
+  if (to.meta.requiresRoleA && !Api.isAdmin()) {
+    console.debug('Acceso denegado por rol:', Api.getRole())
+    alert('Ez duzu baimen egokirik orrialde hau ikusteko.');
+    return { name: 'dashboard' };
+  }
+  // Logeatu badago eta login-era joaten badira, dashboard-ara bideratzen du
+  if (to.name === "login" && Api.isAuthenticated()) {
+    return { name: "dashboard" };
+  }
 });
 
 export default router;
