@@ -64,7 +64,7 @@ const cargarHistorial = async () => {
   }
 
   try {
-    // 1️⃣ Cargar appointments del cliente
+    // Cargar appointments del cliente
     let appointmentsRes = await Api.cargarObjeto({ client_id: bezeroId }, 'appointments')
     let appointments = normalizeArray(appointmentsRes)
 
@@ -74,7 +74,7 @@ const cargarHistorial = async () => {
       return
     }
 
-    // 2️⃣ Cargar todos los services y categories
+    // Cargar todos los services y categories
     const servicesRes = await Api.cargarObjeto({}, 'services')
     const categoriesRes = await Api.cargarObjeto({}, 'services_categories')
     const services = normalizeArray(servicesRes)
@@ -82,7 +82,7 @@ const cargarHistorial = async () => {
     const servicesMap = new Map(services.map(s => [s.id, s]))
     const categoriesMap = new Map(categories.map(c => [c.id, c]))
 
-    // 3️⃣ Cargar appointment_service de cada cita en paralelo
+    // Cargar appointment_service de cada cita en paralelo
     const citasConServicios = await Promise.all(
       appointments.map(async (c) => {
         let apsRes = await Api.cargarObjeto({ appointment_id: c.id }, 'appointment_service')
@@ -102,10 +102,10 @@ const cargarHistorial = async () => {
       })
     )
 
-    // 4️⃣ Filtrar solo citas que tengan al menos un servicio
+    // Filtrar solo citas que tengan al menos un servicio
     citas.value = citasConServicios.filter(c => c._appointment_services.length > 0)
 
-    // 5️⃣ Cargar nombre del cliente
+    // Cargar nombre del cliente
     let clienteRes = await Api.cargarObjeto({ id: bezeroId }, 'clients')
     let cliente = normalizeArray(clienteRes)[0]
     if (!cliente) {
