@@ -16,7 +16,10 @@
             <div v-for="item in citasInicioCelda(day, hour)" :key="item.id"
               class="bg-secondary text-white p-1 mb-1 rounded"
               :style="{ height: calcularAltura(item), cursor: 'pointer' }" @click="$emit('editar', item)">
-              Seat {{ item.seat }} <br>
+              <b>Eserlekua:</b> {{ item.seat }} <br>
+              <b>Bezeroa:</b> {{ getClientName(item.client_id) }} <br>
+              <b>Ikaslea:</b> {{ getStudentName(item.student_id) }} <br>
+
               {{ item.start_time }} - {{ item.end_time }}
             </div>
           </td>
@@ -32,13 +35,15 @@ import { startOfWeek, addDays, format } from 'date-fns'
 
 const props = defineProps({
   week: { type: String, required: true },
-  datos: { type: Array, default: () => [] }
+  datos: { type: Array, default: () => [] },
+  clients: { type: Array, default: () => [] },
+  students: { type: Array, default: () => [] }
 })
 
-// Egutegiko orduak (8etik 20etara)
+// Horas del calendario
 const hours = Array.from({ length: 8 }, (_, i) => i + 8)
 
-// Asteko egunak
+// Días de la semana
 const days = computed(() => {
   if (!props.week) return []
   const [year, week] = props.week.split('-W').map(Number)
@@ -46,22 +51,17 @@ const days = computed(() => {
   return Array.from({ length: 7 }, (_, i) => addDays(firstDay, i))
 })
 
-// Goiburuaren eguna formatatu
 function formatDate(date) {
   return format(date, 'EEE dd/MM')
 }
 
-// Ordu honetan hasten diren hitzorduak itzuli
+// Filtrar citas que comienzan en esta celda
 function citasInicioCelda(day, hour) {
   return props.datos.filter(item => {
     if (!item.id || !item.date || !item.start_time) return false
-
-    // Adimen-data lokala sortu, segundoak barne
     const [year, month, date] = item.date.split('-').map(Number)
     const [h, m, s] = item.start_time.split(':').map(Number)
     const start = new Date(year, month - 1, date, h, m, s)
-
-    // Ordua soilik konparatu (osoa) gelaxkan jartzeko
     return (
       start.getFullYear() === day.getFullYear() &&
       start.getMonth() === day.getMonth() &&
@@ -71,20 +71,27 @@ function citasInicioCelda(day, hour) {
   })
 }
 
-// Hitzorduaren iraupenaren arabera altuera proportzionala kalkulatu
+// Altura proporcional a duración
 function calcularAltura(item) {
   if (!item.start_time || !item.end_time) return '60px'
-
   const [year, month, date] = item.date.split('-').map(Number)
-
   const [sh, sm, ss] = item.start_time.split(':').map(Number)
   const [eh, em, es] = item.end_time.split(':').map(Number)
-
   const start = new Date(year, month - 1, date, sh, sm, ss)
   const end = new Date(year, month - 1, date, eh, em, es)
-
   const diffHoras = (end - start) / (1000 * 60 * 60)
-  const altura = Math.max(diffHoras * 60, 30)
-  return `${altura}px`
+  return `${Math.max(diffHoras * 60, 30)}px`
+}
+
+// Obtener nombre del cliente
+function getClientName(client_id) {
+  const client = props.clients.find(c => c.id === client_id)
+  return client ? `${client.name} ${client.surnames || ''}` : `ID:${client_id}`
+}
+
+// Obtener nombre del estudiante
+function getStudentName(student_id) {
+  const student = props.students.find(s => s.id === student_id)
+  return student ? `${student.name} ${student.surnames || ''}` : `ID:${student_id}`
 }
 </script>

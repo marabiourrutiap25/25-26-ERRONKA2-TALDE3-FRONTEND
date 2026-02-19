@@ -5,10 +5,7 @@
 
     <!-- Botón confirmar -->
     <div class="d-flex justify-content-end">
-      <button 
-        class="btn btn-success text-white mt-4 mb-2 fw-bold"
-        @click="abrirConfirmar"
-      >
+      <button class="btn btn-success text-white mt-4 mb-2 fw-bold" @click="abrirConfirmar">
         Hitzorduak konfirmatu
       </button>
     </div>
@@ -27,22 +24,12 @@
     </div>
 
     <!-- Calendario -->
-    <HitzorduakComponent 
-      :week="selectedWeek" 
-      :datos="egutegiaFiltrada" 
-      @editar="editarHitzordua"
-      @borrar="borrarHitzordua" 
-    />
+    <HitzorduakComponent :week="selectedWeek" :datos="egutegiaFiltrada" @editar="editarHitzordua"
+      @borrar="borrarHitzordua" />
 
     <!-- Modal Crear / Editar Hitzordua -->
-    <SortuHitzordua 
-      ref="sortuHitzorduaRef" 
-      :headers="headers" 
-      :clients="clients" 
-      :students="students"
-      title="Hitzordua sortu / editatu" 
-      @submit="guardarHitzordua" 
-    />
+    <SortuHitzordua ref="sortuHitzorduaRef" :headers="headers" :clients="clients" :students="students"
+      title="Hitzordua sortu / editatu" @submit="guardarHitzordua" />
 
     <!-- Modal Confirmar Hitzordua -->
     <dialog ref="modalConfirmarRef" class="custom-dialog p-0 border-0 shadow-lg rounded-4">
@@ -61,10 +48,11 @@
               <select v-model="formConfirmar.appointment_id" class="form-control custom-input" required>
                 <option value="" disabled>Hitzordu bat hautatu</option>
                 <option v-for="a in Egutegia" :key="a.id" :value="a.id">
-                  {{ a.date }} - {{ a.start_time }} (ID: {{ a.id }})
+                  {{ getClientName(a.client_id) }} - {{ a.date }}
                 </option>
               </select>
             </div>
+
 
             <!-- SERVICE -->
             <div class="mb-4">
@@ -80,11 +68,8 @@
             <!-- COMMENTS -->
             <div class="mb-4">
               <label class="custom-label">IRUZKINAK</label>
-              <textarea
-                v-model="formConfirmar.comments"
-                class="form-control custom-input"
-                placeholder="Idatzi iruzkin bat..."
-              ></textarea>
+              <textarea v-model="formConfirmar.comments" class="form-control custom-input"
+                placeholder="Idatzi iruzkin bat..."></textarea>
             </div>
 
             <div class="d-flex justify-content-end gap-3 pt-3">
@@ -209,6 +194,11 @@ const abrirCrear = () => {
 const editarHitzordua = (data) => {
   sortuHitzorduaRef.value?.setFormData(data)
   sortuHitzorduaRef.value?.open()
+}
+
+const getClientName = (client_id) => {
+  const client = clients.value.find(c => c.id === client_id)
+  return client ? client.name && client.surnames : `ID: ${client_id}`
 }
 
 // ---------- HITZORDUA CRUD ----------
