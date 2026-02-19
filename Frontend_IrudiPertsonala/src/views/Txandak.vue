@@ -126,7 +126,6 @@ const prepararEdicion = (fila) => {
   modoEdicion.value = true
   for (let k in form) delete form[k]
   Object.assign(form, fila)
-  // Convertir tipo visible a valor de API (Mahaia -> M, Garbiketa -> G)
   if (form.type === 'Mahaia') form.type = 'M'
   else if (form.type === 'Garbiketa') form.type = 'G'
   modalRef.value?.showModal()

@@ -89,11 +89,11 @@ const iniciarSesion = async () => {
     router.push({ name: 'dashboard' })
   } catch (err) {
     if (err.status === 422) {
-      error.value = 'Credenciales incorrectas. Verifica tu email y contraseña.'
+      error.value = 'Kredentzial okerrak. Egiaztatu zure emaila eta pasahitza.'
     } else if (err.status === 401) {
-      error.value = 'No autorizado. Verifica tus credenciales.'
+      error.value = 'Baimenik gabe. Egiaztatu zure kredentzialak.'
     } else {
-      error.value = 'Error de conexión. Intenta de nuevo más tarde.'
+      error.value = 'Konexio-errorea. Saiatu berriz.'
     }
     console.error('Error login:', err)
   } finally {

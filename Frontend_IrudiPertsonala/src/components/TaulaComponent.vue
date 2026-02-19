@@ -117,12 +117,3 @@ const truncar = (t) => {
     return str.length > props.maxLongitud ? str.slice(0, props.maxLongitud) + '…' : str
 }
 </script>
-
-<style scoped>
-.btn-primary img,
-.btn-danger img,
-.btn-dark img {
-    filter: brightness(0) invert(1);
-    max-width: 24px;
-}
-</style>

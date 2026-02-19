@@ -43,7 +43,7 @@
               </select>
             </div>
             <div class="mb-4">
-              <label class="custom-label">Kopurua</label>
+              <label class="custom-label">KOPURUA</label>
               <input v-model="formSacar.quantity" type="number" min="1" class="form-control custom-input" required placeholder="Kopurua" />
             </div>
             <div class="d-flex justify-content-end gap-3 pt-3">
