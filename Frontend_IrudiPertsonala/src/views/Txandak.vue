@@ -4,10 +4,10 @@
   <div class="container">
     <ToastComponent />
 
-    <TaulaComponent :filas="Txandak" titulo="Txandak" etiqueta-tabla="Txandak"
-      texto-btn-crear="Txanda Sortu" :mapa-headers="{ student_name: 'IKASLEA', type: 'MOTA', date: 'DATA' }"
-      :columnas-excluidas="['id', 'student_id', 'created_at', 'updated_at', 'deleted_at']"
-      @crear="abrirCrear" @editar="prepararEdicion" @borrar="borrar" />
+    <TaulaComponent :filas="Txandak" titulo="Txandak" etiqueta-tabla="Txandak" texto-btn-crear="Txanda Sortu"
+      :mapa-headers="{ student_name: 'IKASLEA', type: 'MOTA', date: 'DATA' }"
+      :columnas-excluidas="['id', 'student_id', 'created_at', 'updated_at', 'deleted_at']" @crear="abrirCrear"
+      @editar="prepararEdicion" @borrar="borrar" />
 
     <dialog ref="modalRef" class="custom-dialog p-0 border-0 shadow-lg rounded-4">
       <div class="modal-content border-0">
@@ -39,7 +39,7 @@
                 <option value="M">Mahaia</option>
               </select>
             </div>
-            
+
             <div v-for="key in Object.keys(form)" :key="key">
               <div v-if="esCampoEditable(key)" class="mb-4">
                 <label :for="key" class="custom-label">{{ key.toUpperCase().replace(/_/g, ' ') }}</label>

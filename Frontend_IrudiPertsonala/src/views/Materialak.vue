@@ -11,12 +11,13 @@
       </div>
     </div>
 
-    <TaulaComponent :filas="Materiala" titulo="Materialak" etiqueta-tabla="Equipment"
-      texto-btn-crear="Materiala Sortu" :mapa-headers="{ category_name: 'KATEGORIA', label: 'ETIKETA', name: 'IZENA', description: 'DESKRIBAPENA', brand: 'MARKA'}"
+    <TaulaComponent :filas="Materiala" titulo="Materialak" etiqueta-tabla="Equipment" texto-btn-crear="Materiala Sortu"
+      :mapa-headers="{ category_name: 'KATEGORIA', label: 'ETIKETA', name: 'IZENA', description: 'DESKRIBAPENA', brand: 'MARKA' }"
       :columnas-excluidas="['id', 'equipment_category_id', 'created_at', 'updated_at', 'deleted_at']"
       @crear="abrirCrear" @editar="prepararEdicion" @borrar="borrar">
       <template #default="{ fila }">
-        <button v-if="fila && !fila.end_datetime" class="btn btn-warning btn-sm ms-2" @click="abrirDevolver(fila)">Devolver</button>
+        <button v-if="fila && !fila.end_datetime" class="btn btn-warning btn-sm ms-2"
+          @click="abrirDevolver(fila)">Devolver</button>
       </template>
     </TaulaComponent>
 

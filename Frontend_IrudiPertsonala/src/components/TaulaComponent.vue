@@ -2,7 +2,8 @@
     <div>
         <div class="d-flex justify-content-between align-items-center mt-5 mb-4">
             <h3 class="mb-0 table-title fw-bold">{{ titulo }} kudeatu</h3>
-            <button v-if="!props.onlyView" class="btn btn-primary text-white fw-bold" @click="$emit('crear')">+ {{ textoBtnCrear }}</button>
+            <button v-if="!props.onlyView" class="btn btn-primary text-white fw-bold" @click="$emit('crear')">+ {{
+                textoBtnCrear }}</button>
         </div>
 
         <div v-if="filas.length" class="table-responsive mb-5">

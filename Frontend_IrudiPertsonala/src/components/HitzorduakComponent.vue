@@ -40,10 +40,10 @@ const props = defineProps({
   students: { type: Array, default: () => [] }
 })
 
-// Horas del calendario
+// Egutegiko orduak
 const hours = Array.from({ length: 8 }, (_, i) => i + 8)
 
-// Días de la semana
+// Asteko egunak
 const days = computed(() => {
   if (!props.week) return []
   const [year, week] = props.week.split('-W').map(Number)
@@ -55,7 +55,7 @@ function formatDate(date) {
   return format(date, 'EEE dd/MM')
 }
 
-// Filtrar citas que comienzan en esta celda
+// Hitzorduak filtratu
 function citasInicioCelda(day, hour) {
   return props.datos.filter(item => {
     if (!item.id || !item.date || !item.start_time) return false
@@ -71,7 +71,7 @@ function citasInicioCelda(day, hour) {
   })
 }
 
-// Altura proporcional a duración
+// Iraupenarekiko altuera proportzionala
 function calcularAltura(item) {
   if (!item.start_time || !item.end_time) return '60px'
   const [year, month, date] = item.date.split('-').map(Number)
@@ -83,13 +83,13 @@ function calcularAltura(item) {
   return `${Math.max(diffHoras * 60, 30)}px`
 }
 
-// Obtener nombre del cliente
+// Bezeroaren izena lortu
 function getClientName(client_id) {
   const client = props.clients.find(c => c.id === client_id)
   return client ? `${client.name} ${client.surnames || ''}` : `ID:${client_id}`
 }
 
-// Obtener nombre del estudiante
+// Ikaslearen izena lortu
 function getStudentName(student_id) {
   const student = props.students.find(s => s.id === student_id)
   return student ? `${student.name} ${student.surnames || ''}` : `ID:${student_id}`

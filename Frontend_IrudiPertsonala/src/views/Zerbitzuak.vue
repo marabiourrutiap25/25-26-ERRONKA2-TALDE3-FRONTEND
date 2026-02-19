@@ -4,18 +4,10 @@
   <div class="container">
     <ToastComponent />
 
-    <TaulaComponent
-      :filas="Zerbitzua"
-      titulo="Zerbitzuak"
-      etiqueta-tabla="Services"
-      texto-btn-crear="Zerbitzua Sortu"
+    <TaulaComponent :filas="Zerbitzua" titulo="Zerbitzuak" etiqueta-tabla="Services" texto-btn-crear="Zerbitzua Sortu"
       :mapa-headers="{ name: 'IZENA', price: 'PREZIOA', home_price: 'ETXEKO PREZIOA', duration: 'IRAUPENA', category_name: 'KATEGORIA' }"
-      :columnas-excluidas="['id', 'service_category_id', 'created_at', 'updated_at', 'deleted_at']"
-      @crear="abrirCrear"
-      @editar="prepararEdicion"
-      @borrar="borrar"
-      :only-view="!isRoleA"
-    />
+      :columnas-excluidas="['id', 'service_category_id', 'created_at', 'updated_at', 'deleted_at']" @crear="abrirCrear"
+      @editar="prepararEdicion" @borrar="borrar" :only-view="!isRoleA" />
 
     <dialog ref="modalRef" class="custom-dialog p-0 border-0 shadow-lg rounded-4">
       <div class="modal-content border-0">
@@ -42,13 +34,8 @@
             <div v-for="key in Object.keys(form)" :key="key">
               <div v-if="esCampoEditable(key)" class="mb-4">
                 <label :for="key" class="custom-label">{{ key.toUpperCase().replace(/_/g, ' ') }}</label>
-                <input
-                  :id="key"
-                  v-model="form[key]"
-                  type="text"
-                  class="form-control custom-input"
-                  :placeholder="'Sartu ' + key"
-                />
+                <input :id="key" v-model="form[key]" type="text" class="form-control custom-input"
+                  :placeholder="'Sartu ' + key" />
               </div>
             </div>
 

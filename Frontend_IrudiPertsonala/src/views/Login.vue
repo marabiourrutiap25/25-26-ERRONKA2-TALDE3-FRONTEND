@@ -13,36 +13,20 @@
         <div class="mb-3">
           <label for="email" class="form-label">Email</label>
           <div class="input-group">
-            <input
-              id="email"
-              type="email"
-              class="form-control"
-              v-model="email"
-              required
-              placeholder="niremail@adibide.com"
-            />
+            <input id="email" type="email" class="form-control" v-model="email" required
+              placeholder="niremail@adibide.com" />
           </div>
         </div>
 
         <div class="mb-3">
           <label for="password" class="form-label">Pasahitza</label>
           <div class="input-group">
-            <input
-              id="password"
-              :type="mostrarPassword ? 'text' : 'password'"
-              class="form-control"
-              v-model="password"
-              required
-              minlength="1"
-              placeholder="••••••••"
-            />
-            <button
-              type="button"
-              class="btn btn-outline-secondary btn-eye"
-              @click="mostrarPassword = !mostrarPassword"
-              :aria-label="mostrarPassword ? 'Ez ikusi' : 'Ikusi'"
-            >
-              <img :src="mostrarPassword ? ezIkusi : ikusi" :alt="mostrarPassword ? 'Ez ikusi' : 'Ikusi'" class="eye-icon" />
+            <input id="password" :type="mostrarPassword ? 'text' : 'password'" class="form-control" v-model="password"
+              required minlength="1" placeholder="••••••••" />
+            <button type="button" class="btn btn-outline-secondary btn-eye" @click="mostrarPassword = !mostrarPassword"
+              :aria-label="mostrarPassword ? 'Ez ikusi' : 'Ikusi'">
+              <img :src="mostrarPassword ? ezIkusi : ikusi" :alt="mostrarPassword ? 'Ez ikusi' : 'Ikusi'"
+                class="eye-icon" />
             </button>
           </div>
         </div>
@@ -51,11 +35,7 @@
           {{ error }}
         </div>
 
-        <button 
-          type="submit" 
-          class="btn btn-primary w-100 py-2"
-          :disabled="cargando"
-        >
+        <button type="submit" class="btn btn-primary w-100 py-2" :disabled="cargando">
           <span v-if="cargando" class="spinner-border spinner-border-sm me-2"></span>
           {{ cargando ? 'Sartzen...' : 'Saioa hasi' }}
         </button>
@@ -85,7 +65,7 @@ const iniciarSesion = async () => {
 
   try {
     await login(email.value, password.value, recordar.value)
-    
+
     router.push({ name: 'dashboard' })
   } catch (err) {
     if (err.status === 422) {

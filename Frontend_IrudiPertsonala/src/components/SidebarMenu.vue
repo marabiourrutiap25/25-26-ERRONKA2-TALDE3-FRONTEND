@@ -24,7 +24,7 @@
   </nav>
 
 
-  <!-- Overlay para cerrar el menú -->
+  <!-- Overlay menua ixteko -->
   <div class="sidebar-overlay" :class="{ active: modelValue }" @click="$emit('update:modelValue', false)"></div>
 
   <!-- Sidebar Menu -->
@@ -39,7 +39,7 @@
     </div>
 
     <nav class="sidebar-nav">
-      <!-- Sección Biltegia -->
+      <!-- Biltegia Section -->
       <div class="sidebar-section">
         <div class="sidebar-section-header">
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="white" viewBox="0 0 16 16">
@@ -59,7 +59,7 @@
         </ul>
       </div>
 
-      <!-- Sección Inbentarioa -->
+      <!-- Inbentarioa Section -->
       <div class="sidebar-section">
         <div class="sidebar-section-header">
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="white" viewBox="0 0 16 16">
@@ -76,7 +76,7 @@
         </ul>
       </div>
 
-      <!-- Sección Kudeaketak -->
+      <!-- Kudeaketak Section -->
       <div class="sidebar-section">
         <div class="sidebar-section-header">
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="white" viewBox="0 0 16 16">
@@ -93,7 +93,7 @@
       </div>
     </nav>
 
-    <!-- Logo en la parte inferior -->
+    <!-- Logoa behealdean -->
     <div class="sidebar-footer">
       <a @click="router.push('/')">
         <img src="@/assets/IMP_Logotipoa.png" alt="Logo" class="sidebar-logo" />

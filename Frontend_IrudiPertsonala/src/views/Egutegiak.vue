@@ -3,18 +3,12 @@
 
   <div class="container">
     <ToastComponent />
-    
-    <TaulaComponent
-      titulo="Egutegiak"
-      :filas="Egutegia"
+
+    <TaulaComponent titulo="Egutegiak" :filas="Egutegia"
       :mapa-headers="{ day: 'EGUNA', start_date: 'HASIERA DATA', end_date: 'AMAIERA DATA', start_time: 'HASIERA ORDUA', end_time: 'AMAIERA ORDUA', group_name: 'TALDEA' }"
       :columnas-excluidas="['id', 'group_id', 'created_at', 'updated_at', 'deleted_at']"
-      texto-btn-crear="Egutegia Sortu"
-      @crear="abrirCrear"
-      @editar="prepararEdicion"
-      @borrar="borrar"
-    />
-    
+      texto-btn-crear="Egutegia Sortu" @crear="abrirCrear" @editar="prepararEdicion" @borrar="borrar" />
+
     <dialog ref="modalRef" class="custom-dialog p-0 border-0 shadow-lg rounded-4">
       <div class="modal-content border-0">
         <div class="modal-header border-bottom-0 pt-4 px-4 pb-2 d-flex justify-content-between align-items-center">
@@ -34,7 +28,7 @@
                 </option>
               </select>
             </div>
-            
+
             <div class="mb-4">
               <label class="custom-label">EGUNA</label>
               <select v-model="form.day" class="form-control custom-input" required>
@@ -44,20 +38,15 @@
                 </option>
               </select>
             </div>
-            
+
             <div v-for="key in Object.keys(form)" :key="key">
               <div v-if="esCampoEditable(key)" class="mb-4">
                 <label :for="key" class="custom-label">{{ key.toUpperCase().replace(/_/g, ' ') }}</label>
-                <input
-                  :id="key"
-                  v-model="form[key]"
-                  type="text"
-                  class="form-control custom-input"
-                  :placeholder="'Sartu ' + key"
-                />
+                <input :id="key" v-model="form[key]" type="text" class="form-control custom-input"
+                  :placeholder="'Sartu ' + key" />
               </div>
             </div>
-            
+
             <div class="d-flex justify-content-end gap-3 pt-3">
               <button type="button" class="btn btn-cancel px-4" @click="cerrarModal">Kantzelatu</button>
               <button type="submit" class="btn btn-save px-4">Aldaketak Gorde</button>
@@ -69,7 +58,6 @@
   </div>
 </template>
 
-                      :only-view="!isRoleA"
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
 import SidebarMenu from '@/components/SidebarMenu.vue'
@@ -146,7 +134,7 @@ const guardar = async () => {
   try {
     const { id, group_name, created_at, updated_at, deleted_at, ...payload } = form
     let res
-                const isRoleA = computed(() => Api.isAdmin())
+    const isRoleA = computed(() => Api.isAdmin())
     if (modoEdicion.value) res = await Api.aldatuObjeto({ id, ...payload }, tableName)
     else res = await Api.crearObjektua(payload, tableName)
     if (res) {

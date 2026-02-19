@@ -3,11 +3,11 @@
 
   <div class="container">
     <ToastComponent />
-        <div class="d-flex justify-content-end">
-          <button class="btn btn-success text-white mt-4 fw-bold" @click="router.push('/egutegiak')">
-            <img src="@/assets/ikusi.png" alt="Egutegiak Ikusi" />
-            Egutegiak Ikusi</button>
-        </div>
+    <div class="d-flex justify-content-end">
+      <button class="btn btn-success text-white mt-4 fw-bold" @click="router.push('/egutegiak')">
+        <img src="@/assets/ikusi.png" alt="Egutegiak Ikusi" />
+        Egutegiak Ikusi</button>
+    </div>
     <TaulaComponent :filas="ikasleak" titulo="Ikasleak" etiqueta-tabla="Students" texto-btn-crear="Ikaslea Sortu"
       :mapa-headers="{ name: 'IZENA', surnames: 'ABIZENAK', group_name: 'TALDEA' }"
       :columnas-excluidas="['id', 'group_id', 'created_at', 'updated_at', 'deleted_at']" @crear="abrirCrear"

@@ -12,7 +12,8 @@
     </div>
 
     <TaulaComponent :filas="Produktuak" titulo="Produktuak" etiqueta-tabla="Consumables"
-      texto-btn-crear="Produktua Sortu" :mapa-headers="{ name: 'IZENA', description: 'DESKRIBAPENA',  batch: 'LOTE' , brand: 'MARKA', expiration_date: 'IRAUNGITZE-DATA', category_name: 'KATEGORIA' }"
+      texto-btn-crear="Produktua Sortu"
+      :mapa-headers="{ name: 'IZENA', description: 'DESKRIBAPENA', batch: 'LOTE', brand: 'MARKA', expiration_date: 'IRAUNGITZE-DATA', category_name: 'KATEGORIA' }"
       :columnas-excluidas="['id', 'consumable_category_id', 'created_at', 'updated_at', 'deleted_at']"
       @crear="abrirCrear" @editar="prepararEdicion" @borrar="borrar" />
 
@@ -44,7 +45,8 @@
             </div>
             <div class="mb-4">
               <label class="custom-label">KOPURUA</label>
-              <input v-model="formSacar.quantity" type="number" min="1" class="form-control custom-input" required placeholder="Kopurua" />
+              <input v-model="formSacar.quantity" type="number" min="1" class="form-control custom-input" required
+                placeholder="Kopurua" />
             </div>
             <div class="d-flex justify-content-end gap-3 pt-3">
               <button type="button" class="btn btn-cancel px-4" @click="cerrarModalSacar">Kantzelatu</button>

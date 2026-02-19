@@ -5,7 +5,7 @@
     <ToastComponent />
 
     <TaulaComponent :filas="BezeroaFormateado" titulo="Bezeroak" etiqueta-tabla="Clients"
-    :mapa-headers="{ name: 'IZENA', surnames: 'ABIZENAK', telephone: 'TELEFONOA', home_client: 'MOTA' }"
+      :mapa-headers="{ name: 'IZENA', surnames: 'ABIZENAK', telephone: 'TELEFONOA', home_client: 'MOTA' }"
       texto-btn-crear="Bezeroa Sortu" @crear="abrirCrear" @editar="prepararEdicion" @borrar="borrar" />
 
     <dialog ref="modalRef" class="custom-dialog p-0 border-0 shadow-lg rounded-4">

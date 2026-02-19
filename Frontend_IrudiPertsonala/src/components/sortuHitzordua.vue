@@ -90,7 +90,7 @@ const emit = defineEmits(['submit', 'cancel', 'deleted', 'recargar'])
 const dialogRef = ref(null)
 const form = reactive({})
 
-// Normalizar headers y mapear etiquetas en euskera
+// Headerrak normalizatu eta etiketak mapeatu euskaraz
 const labelMap = {
   seat: 'Eserlekua',
   date: 'Data',
@@ -108,7 +108,7 @@ const normalizedHeaders = computed(() => {
   })
 })
 
-// Inicializar form
+// Inicializatu form
 watch(normalizedHeaders, (newHeaders) => {
   newHeaders.forEach(h => { if (form[h.key] === undefined) form[h.key] = '' })
 }, { immediate: true })
@@ -128,19 +128,19 @@ const setFormData = (data) => {
     }
     else form[key] = data[key] ?? ''
   })
-  // Asegurarse de tener el id
+  // Ziurtatu IDa
   form.id = data.id ?? null
 }
 
 
-// Abrir / cerrar modal
+// Ireki / itxi modal
 const open = () => dialogRef.value?.showModal()
 const close = () => {
   dialogRef.value?.close()
   Object.keys(form).forEach(key => form[key] = '')
 }
 
-// Enviar datos
+// Bidali datuak gurasoari
 const handleSubmit = () => {
   // HH:MM:SS formatua zihestatu
   if (form.start_time && form.start_time.length === 5) form.start_time += ':00'
@@ -179,61 +179,3 @@ function capitalize(str) {
 // Metodoak esposatu
 defineExpose({ open, close, setFormData })
 </script>
-
-<style scoped>
-.custom-dialog {
-  width: 100%;
-  max-width: 450px;
-  background: white;
-}
-
-.custom-dialog::backdrop {
-  background: rgba(0, 0, 0, 0.4);
-  backdrop-filter: blur(4px);
-}
-
-.custom-label {
-  display: block;
-  font-weight: 600;
-  font-size: 0.85rem;
-  color: #333;
-  margin-bottom: 8px;
-}
-
-.custom-input {
-  background-color: #f0f0f0;
-  border: none;
-  border-radius: 50px;
-  padding: 12px 20px;
-  font-size: 0.95rem;
-}
-
-.custom-input:focus {
-  background-color: #f0f0f0;
-  box-shadow: 0 0 0 2px #3b82f6;
-  outline: none;
-}
-
-.btn-close-custom {
-  background: none;
-  border: none;
-  font-size: 1.5rem;
-  cursor: pointer;
-}
-
-.btn-cancel {
-  background-color: #e9ecef;
-  border-radius: 50px;
-  color: #333;
-  font-weight: 600;
-  border: none;
-}
-
-.btn-save {
-  background-color: #1d7eda;
-  border-radius: 50px;
-  color: white;
-  font-weight: 500;
-  border: none;
-}
-</style>
