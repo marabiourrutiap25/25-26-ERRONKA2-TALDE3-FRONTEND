@@ -2,7 +2,7 @@
     <div>
         <div class="d-flex justify-content-between align-items-center mt-5 mb-4">
             <h3 class="mb-0 table-title fw-bold">{{ titulo }} kudeatu</h3>
-            <button class="btn btn-primary text-white fw-bold" @click="$emit('crear')">+ {{ textoBtnCrear }}</button>
+            <button v-if="!props.onlyView" class="btn btn-primary text-white fw-bold" @click="$emit('crear')">+ {{ textoBtnCrear }}</button>
         </div>
 
         <div v-if="filas.length" class="table-responsive mb-5">
@@ -12,7 +12,7 @@
                         <th v-for="header in headersVisibles" :key="header">
                             {{ formatHeader(header) }}
                         </th>
-                        <th class="text-center">AKZIOAK</th>
+                        <th v-if="!props.onlyView" class="text-center">AKZIOAK</th>
                     </tr>
                 </thead>
                 <tbody class="bg-white">
@@ -20,7 +20,7 @@
                         <td v-for="header in headersVisibles" :key="header" class="align-middle">
                             {{ truncar(fila[header]) }}
                         </td>
-                        <td class="text-center">
+                        <td v-if="!props.onlyView" class="text-center">
                             <button v-if="isBezeroView" class="btn btn-dark p-2 me-3" @click="verHistorial(fila)">
                                 <img src="@/assets/ikusi.png" alt="Ikusi" />
                             </button>
@@ -63,6 +63,11 @@ const props = defineProps({
     textoBtnCrear: {
         type: String,
         default: 'Sortu'
+    },
+    // Si true, oculta todos los controles (solo ver tabla)
+    onlyView: {
+        type: Boolean,
+        default: false
     },
     // Taulan ez daitezke bistaratu osoa denean zutabeak
     columnasExcluidas: {

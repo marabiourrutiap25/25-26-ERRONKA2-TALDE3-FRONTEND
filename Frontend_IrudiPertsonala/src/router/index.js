@@ -17,7 +17,7 @@ const routes = [
   { path: "/", name: "login", component: Login },
   { path: "/dashboard", name: "dashboard", component: Dashboard, meta: { requiresAuth: true } },
   { path: "/egutegiak", name: "egutegiak", component: Egutegiak, meta: { requiresAuth: true } },
-  { path: "/ikasleak", name: "ikasleak", component: Ikasleak, meta: { requiresAuth: true } },
+  { path: "/ikasleak", name: "ikasleak", component: Ikasleak, meta: { requiresAuth: true} },
   { path: "/materialak", name: "materialak", component: Materialak, meta: { requiresAuth: true } },
   { path: "/produktuak", name: "produktuak", component: Produktuak, meta: { requiresAuth: true } },
   { path: "/zerbitzuak", name: "zerbitzuak", component: Zerbitzuak, meta: { requiresAuth: true } },
@@ -37,6 +37,12 @@ const router = createRouter({
 router.beforeEach((to) => {
   if (to.meta.requiresAuth && !Api.isAuthenticated()) {
     return { name: "login" };
+  }
+  // Si la ruta requiere rol 'A' y el usuario no lo tiene, redirige a dashboard
+  if (to.meta.requiresRoleA && !Api.isAdmin()) {
+    console.debug('Acceso denegado por rol:', Api.getRole())
+    alert('Ez duzu baimen egokirik orrialde hau ikusteko.');
+    return { name: 'dashboard' };
   }
   // Logeatu badago eta login-era joaten badira, dashboard-ara bideratzen du
   if (to.name === "login" && Api.isAuthenticated()) {
