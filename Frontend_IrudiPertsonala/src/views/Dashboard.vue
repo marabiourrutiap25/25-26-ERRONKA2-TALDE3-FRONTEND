@@ -11,8 +11,9 @@
       </div>
 
       <!-- Botones superiores -->
-      <div class="d-flex justify-content-center gap-3 mb-4 flex-wrap">
-        <button class="menu-btn-white" @click="router.push('/hitzorduak')">
+      <div class="buttons-wrapper">
+        <div class="d-flex justify-content-center gap-4 mb-4 flex-wrap">
+          <button class="menu-btn-white" @click="router.push('/hitzorduak')">
           <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" viewBox="0 0 16 16">
             <path d="M11 6.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1z"/>
             <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1z"/>
@@ -39,6 +40,7 @@
           </svg>
           <div>Bezeroak</div>
         </button>
+        </div>
       </div>
 
       <!-- Contenedor de secciones -->
@@ -77,13 +79,13 @@
             <span>Kudeaketak</span>
           </div>
           <div class="section-content">
-            <button class="card-btn">
+            <button class="card-btn" @click="router.push('/ikasleak')">
               <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="currentColor" viewBox="0 0 16 16">
                 <path d="M15 14s1 0 1-1-1-4-5-4-5 3-5 4 1 1 1 1h8Zm-7.978-1A.261.261 0 0 1 7 12.996c.001-.264.167-1.03.76-1.72C8.312 10.629 9.282 10 11 10c1.717 0 2.687.63 3.24 1.276.593.69.758 1.457.76 1.72l-.008.002a.274.274 0 0 1-.014.002H7.022ZM11 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4Zm3-2a3 3 0 1 1-6 0 3 3 0 0 1 6 0ZM6.936 9.28a5.88 5.88 0 0 0-1.23-.247A7.35 7.35 0 0 0 5 9c-4 0-5 3-5 4 0 .667.333 1 1 1h4.216A2.238 2.238 0 0 1 5 13c0-1.01.377-2.042 1.09-2.904.243-.294.526-.569.846-.816ZM4.92 10A5.493 5.493 0 0 0 4 13H1c0-.26.164-1.03.76-1.724.545-.636 1.492-1.256 3.16-1.275ZM1.5 5.5a3 3 0 1 1 6 0 3 3 0 0 1-6 0Zm3-2a2 2 0 1 0 0 4 2 2 0 0 0 0-4Z"/>
               </svg>
               <div>Ikasleak</div>
             </button>
-            <button class="card-btn">
+            <button class="card-btn" @click="router.push('/zerbitzuak')">
               <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="currentColor" viewBox="0 0 16 16">
                 <path d="M3.5 3.5c-.614-.884-.074-1.962.858-2.5L8 7.226 11.642 1c.932.538 1.472 1.616.858 2.5L8.81 8.61l1.556 2.661a2.5 2.5 0 1 1-.794.637L8 9.73l-1.572 2.177a2.5 2.5 0 1 1-.794-.637L7.19 8.61 3.5 3.5zm2.5 10a1.5 1.5 0 1 0-3 0 1.5 1.5 0 0 0 3 0zm7 0a1.5 1.5 0 1 0-3 0 1.5 1.5 0 0 0 3 0z"/>
               </svg>
@@ -98,9 +100,8 @@
 
 <script setup>
 import { ref } from 'vue'
-import { useRouter } from 'vue-router'
 import SidebarMenu from '@/components/SidebarMenu.vue'
-
+import { useRouter } from 'vue-router'
 const router = useRouter()
 const menuAbierto = ref(false)
 </script>
@@ -127,14 +128,15 @@ const menuAbierto = ref(false)
   background-color: white;
   border: 1px solid #ddd;
   border-radius: 12px;
-  padding: 1.5rem 1.75rem;
+  padding: 2rem 2.5rem;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 0.75rem;
   cursor: pointer;
   transition: all 0.2s;
-  min-width: 140px;
+  flex: 1;
+  min-width: 160px;
   box-shadow: 0 2px 4px rgba(0,0,0,0.08);
 }
 
@@ -162,6 +164,15 @@ const menuAbierto = ref(false)
   margin: 0 auto;
 }
 
+.buttons-wrapper {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.buttons-wrapper .d-flex {
+  width: 100%;
+}
+
 .section-container {
   background-color: #2c4666;
   border-radius: 16px;
@@ -175,6 +186,7 @@ const menuAbierto = ref(false)
 .section-header {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 0.75rem;
   background-color: rgba(255,255,255,0.1);
   padding: 0.75rem 1.25rem;

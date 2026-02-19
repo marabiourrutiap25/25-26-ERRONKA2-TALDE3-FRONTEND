@@ -11,12 +11,13 @@ import Mugimenduak from "../views/Mugimenduak.vue";
 import Login from "../views/Login.vue";
 import Txandak from "../views/Txandak.vue";
 import Dashboard from "../views/Dashboard.vue";
+import BezeroHistoriala from "@/views/BezeroHistoriala.vue";
 
 const routes = [
   { path: "/", name: "login", component: Login },
   { path: "/dashboard", name: "dashboard", component: Dashboard, meta: { requiresAuth: true } },
   { path: "/egutegiak", name: "egutegiak", component: Egutegiak, meta: { requiresAuth: true } },
-  { path: "/ikasleak", name: "ikasleak", component: Ikasleak, meta: { requiresAuth: true } },
+  { path: "/ikasleak", name: "ikasleak", component: Ikasleak, meta: { requiresAuth: true} },
   { path: "/materialak", name: "materialak", component: Materialak, meta: { requiresAuth: true } },
   { path: "/produktuak", name: "produktuak", component: Produktuak, meta: { requiresAuth: true } },
   { path: "/zerbitzuak", name: "zerbitzuak", component: Zerbitzuak, meta: { requiresAuth: true } },
@@ -24,6 +25,7 @@ const routes = [
   { path: "/hitzorduak", name: "hitzorduak", component: Hitzorduak, meta: { requiresAuth: true } },
   { path: "/mugimenduak", name: "mugimenduak", component: Mugimenduak, meta: { requiresAuth: true } },
   { path: "/txandak", name: "txandak", component: Txandak, meta: { requiresAuth: true } },
+  { path: "/historiala", name: "historiala", component: BezeroHistoriala, meta: { requiresAuth: true } },
 ];
 
 const router = createRouter({
@@ -31,12 +33,18 @@ const router = createRouter({
   routes,
 });
 
-// Guard: si la ruta requiere auth y no hay token, redirige a login
+// Babesa: Ruta-k auth eskatzen badu eta ez dagoen tokena, login-era bideratzen du
 router.beforeEach((to) => {
   if (to.meta.requiresAuth && !Api.isAuthenticated()) {
     return { name: "login" };
   }
-  // Si ya está logeado e intenta ir al login, redirige a dashboard
+  // Si la ruta requiere rol 'A' y el usuario no lo tiene, redirige a dashboard
+  if (to.meta.requiresRoleA && !Api.isAdmin()) {
+    console.debug('Acceso denegado por rol:', Api.getRole())
+    alert('Ez duzu baimen egokirik orrialde hau ikusteko.');
+    return { name: 'dashboard' };
+  }
+  // Logeatu badago eta login-era joaten badira, dashboard-ara bideratzen du
   if (to.name === "login" && Api.isAuthenticated()) {
     return { name: "dashboard" };
   }

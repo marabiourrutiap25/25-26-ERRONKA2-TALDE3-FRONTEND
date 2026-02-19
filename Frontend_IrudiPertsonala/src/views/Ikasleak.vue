@@ -1,97 +1,153 @@
 <template>
-  <div class="container">
-    <div class="d-flex justify-content-between align-items-center my-4">
-      <h2 class="mb-0">Gestión de Ikasleak</h2>
-    </div>
+  <SidebarMenu titulo="Ikasleak" v-model="menuAbierto" />
 
-    <!-- Tabla con acciones crear, editar y borrar -->
-    <Tabla
-      :filas="ikasleak"
-      @crear="crear"
-      @editar="editar"
-      @borrar="borrar"
-    />
+  <div class="container">
+    <ToastComponent />
+        <div class="d-flex justify-content-end">
+          <button class="btn btn-success text-white mt-4 fw-bold" @click="router.push('/egutegiak')">
+            <img src="@/assets/ikusi.png" alt="Egutegiak Ikusi" />
+            Egutegiak Ikusi</button>
+        </div>
+    <TaulaComponent :filas="ikasleak" titulo="Ikasleak" etiqueta-tabla="Students" texto-btn-crear="Ikaslea Sortu"
+      :mapa-headers="{ name: 'IZENA', surnames: 'ABIZENAK', group_name: 'TALDEA' }"
+      :columnas-excluidas="['id', 'group_id', 'created_at', 'updated_at', 'deleted_at']" @crear="abrirCrear"
+      @editar="prepararEdicion" @borrar="borrar" :only-view="!isRoleA" />
+
+    <dialog ref="modalRef" class="custom-dialog p-0 border-0 shadow-lg rounded-4">
+      <div class="modal-content border-0">
+        <div class="modal-header border-bottom-0 pt-4 px-4 pb-2 d-flex justify-content-between align-items-center">
+          <h4 class="modal-title fw-bold text-dark">
+            Ikaslea {{ modoEdicion ? 'editatu' : 'sortu' }}
+          </h4>
+          <button type="button" class="btn-close-custom" @click="cerrarModal">✕</button>
+        </div>
+
+        <div class="modal-body px-4 pb-4">
+          <form @submit.prevent="guardar">
+
+            <div class="mb-4">
+              <label class="custom-label">TALDEA</label>
+              <select v-model="form.group_id" class="form-control custom-input" required>
+                <option value="" disabled>Talde bat hautatu</option>
+                <option v-for="g in listaGrupos" :key="g.id" :value="g.id">
+                  {{ g.name }}
+                </option>
+              </select>
+            </div>
+
+            <div v-for="key in Object.keys(form)" :key="key">
+              <div v-if="esCampoEditable(key)" class="mb-4">
+                <label :for="key" class="custom-label">{{ key.toUpperCase().replace(/_/g, ' ') }}</label>
+                <input :id="key" v-model="form[key]" type="text" class="form-control custom-input"
+                  :placeholder="'Sartu ' + key" />
+              </div>
+            </div>
+
+            <div class="d-flex justify-content-end gap-3 pt-3">
+              <button type="button" class="btn btn-cancel px-4" @click="cerrarModal">Kantzelatu</button>
+              <button type="submit" class="btn btn-save px-4">Aldaketak Gorde</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </dialog>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import Tabla from '../components/tabla.vue'
+import { ref, reactive, onMounted, computed } from 'vue'
+import { useRouter } from 'vue-router'
 import Api from '../composables/Api.js'
+import { useToast } from '../composables/UseToast.js'
+import ToastComponent from '../components/ToastComponent.vue'
+import SidebarMenu from '@/components/SidebarMenu.vue'
+import TaulaComponent from '@/components/TaulaComponent.vue'
+import Egutegiak from './Egutegiak.vue'
 
+const { ok, err } = useToast()
+const router = useRouter()
+
+const menuAbierto = ref(false)
 const ikasleak = ref([])
-const tableName = "students" // Nombre de la tabla en la API
+const listaGrupos = ref([])
+const tableName = "students"
 
-// 🔹 Cargar datos iniciales
+const modalRef = ref(null)
+const modoEdicion = ref(false)
+const form = reactive({})
+
+const isRoleA = computed(() => Api.isAdmin())
+
+const esCampoEditable = (key) => {
+  const excluidos = ['id', 'group_id', 'group_name', 'created_at', 'updated_at', 'deleted_at']
+  return !excluidos.includes(key.toLowerCase())
+}
+
 const cargarDatos = async () => {
   try {
-    ikasleak.value = await Api.cargarObjetos(tableName)
-    console.log("Datos cargados:", ikasleak.value)
-  } catch (error) {
-    console.error("Error cargando datos:", error)
+    const [resStudents, resGroups] = await Promise.all([
+      Api.cargarObjetos(tableName),
+      Api.cargarObjetos("groups")
+    ])
+    listaGrupos.value = resGroups?.data || resGroups || []
+    const studentsRaw = resStudents?.data || resStudents || []
+    ikasleak.value = studentsRaw.map(item => {
+      const g = listaGrupos.value.find(gr => gr.id === item.group_id)
+      return { ...item, group_name: g ? g.name : `ID: ${item.group_id}` }
+    })
+  } catch (e) {
+    console.error("Error cargando datos:", e)
     ikasleak.value = []
   }
 }
 
-// Cargar datos cuando se ejecute el componente
-onMounted(() => {
-  cargarDatos()
-})
-
-// 🔹 Crear un registro
-const crear = async (data) => {
-  try {
-    console.log("Datos a crear:", data)
-
-    const resultado = await Api.crearObjektua(data,tableName)
-
-    if (resultado) {
-      alert("Registro creado correctamente")
-      await cargarDatos() // refresca la tabla
-    } else {
-      alert("Error al crear el registro")
-    }
-  } catch (error) {
-    console.error("Error en crear:", error)
-    alert("Error al crear: " + error.message)
+const abrirCrear = () => {
+  modoEdicion.value = false
+  for (let k in form) delete form[k]
+  if (ikasleak.value.length > 0) {
+    Object.keys(ikasleak.value[0]).forEach(key => { if (esCampoEditable(key)) form[key] = "" })
   }
+  form.group_id = ""
+  modalRef.value?.showModal()
 }
 
-// 🔹 Editar un registro
-const editar = async ({ id, ...data }) => {
-  console.log("ID:", id)
-  console.log("Datos:", data)
-  
+const prepararEdicion = (fila) => {
+  modoEdicion.value = true
+  for (let k in form) delete form[k]
+  Object.assign(form, fila)
+  modalRef.value?.showModal()
+}
+
+const cerrarModal = () => modalRef.value?.close()
+
+const guardar = async () => {
   try {
-    const datosParaAPI = { id, ...data }
-    const resultado = await Api.aldatuObjeto(datosParaAPI, tableName)
-    
-    if (resultado) {
-      alert("Registro actualizado correctamente")
+    const { id, group_name, created_at, updated_at, deleted_at, ...payload } = form
+    let res
+    if (modoEdicion.value) res = await Api.aldatuObjeto({ id, ...payload }, tableName)
+    else res = await Api.crearObjektua(payload, tableName)
+    if (res) {
+      cerrarModal()
       await cargarDatos()
-    } else {
-      alert("Error al actualizar el registro")
+      ok(res.message || (modoEdicion.value ? 'Student actualizado correctamente' : 'Student creado correctamente'))
     }
-  } catch (error) {
-    console.error("Error en editar:", error)
-    alert("Error al actualizar: " + error.message)
+  } catch (e) {
+    err(e.message || 'Error al guardar')
   }
 }
 
-// 🔹 Borrar un registro
 const borrar = async (id) => {
+  if (!confirm('Ziur zaude ezabatu nahi duzulaz?')) return
   try {
-    const resultado = await Api.ezabatuObjektua({ id }, tableName)
-    
-    if (resultado) {
-      alert("Registro eliminado correctamente")
+    const res = await Api.ezabatuObjektua({ id }, tableName)
+    if (res) {
       await cargarDatos()
-    } else {
-      alert("Error al eliminar el registro")
+      ok(res.message || 'Student eliminado correctamente')
     }
-  } catch (error) {
-    console.error("Error en borrar:", error)
-    alert("Error al eliminar: " + error.message)
+  } catch (e) {
+    err(e.message || 'Error al eliminar')
   }
 }
+
+onMounted(cargarDatos)
 </script>

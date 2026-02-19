@@ -1,97 +1,174 @@
 <template>
-  <div class="container">
-    <div class="d-flex justify-content-between align-items-center my-4">
-      <h2 class="mb-0">Gestión de Zerbitzuak</h2>
-    </div>
+  <SidebarMenu titulo="Zerbitzuak" v-model="menuAbierto" />
 
-    <!-- Tabla con acciones crear, editar y borrar -->
-    <Tabla
+  <div class="container">
+    <ToastComponent />
+
+    <TaulaComponent
       :filas="Zerbitzua"
-      @crear="crear"
-      @editar="editar"
+      titulo="Zerbitzuak"
+      etiqueta-tabla="Services"
+      texto-btn-crear="Zerbitzua Sortu"
+      :mapa-headers="{ name: 'IZENA', price: 'PREZIOA', home_price: 'ETXEKO PREZIOA', duration: 'IRAUPENA', category_name: 'KATEGORIA' }"
+      :columnas-excluidas="['id', 'service_category_id', 'created_at', 'updated_at', 'deleted_at']"
+      @crear="abrirCrear"
+      @editar="prepararEdicion"
       @borrar="borrar"
+      :only-view="!isRoleA"
     />
+
+    <dialog ref="modalRef" class="custom-dialog p-0 border-0 shadow-lg rounded-4">
+      <div class="modal-content border-0">
+        <div class="modal-header border-bottom-0 pt-4 px-4 pb-2 d-flex justify-content-between align-items-center">
+          <h4 class="modal-title fw-bold text-dark">
+            {{ modoEdicion ? 'Editatu' : 'Sortu' }} Service
+          </h4>
+          <button type="button" class="btn-close-custom" @click="cerrarModal">✕</button>
+        </div>
+
+        <div class="modal-body px-4 pb-4">
+          <form @submit.prevent="guardar">
+
+            <div class="mb-4">
+              <label class="custom-label">KATEGORIA</label>
+              <select v-model="form.service_category_id" class="form-control custom-input" required>
+                <option value="" disabled>Kategoria bat hautatu</option>
+                <option v-for="cat in listaCategorias" :key="cat.id" :value="cat.id">
+                  {{ cat.name }}
+                </option>
+              </select>
+            </div>
+
+            <div v-for="key in Object.keys(form)" :key="key">
+              <div v-if="esCampoEditable(key)" class="mb-4">
+                <label :for="key" class="custom-label">{{ key.toUpperCase().replace(/_/g, ' ') }}</label>
+                <input
+                  :id="key"
+                  v-model="form[key]"
+                  type="text"
+                  class="form-control custom-input"
+                  :placeholder="'Sartu ' + key"
+                />
+              </div>
+            </div>
+
+            <div class="d-flex justify-content-end gap-3 pt-3">
+              <button type="button" class="btn btn-cancel px-4" @click="cerrarModal">Kantzelatu</button>
+              <button type="submit" class="btn btn-save px-4">Aldaketak Gorde</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </dialog>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import Tabla from '../components/tabla.vue'
+import { ref, reactive, onMounted, computed } from 'vue'
 import Api from '../composables/Api.js'
+import { useToast } from '../composables/UseToast.js'
+import ToastComponent from '../components/ToastComponent.vue'
+import SidebarMenu from '@/components/SidebarMenu.vue'
+import TaulaComponent from '@/components/TaulaComponent.vue'
 
+const { ok, err } = useToast()
+
+const menuAbierto = ref(false)
 const Zerbitzua = ref([])
-const tableName = "services" // Nombre de la tabla en la API
+const listaCategorias = ref([])
+const tableName = "services"
 
-// 🔹 Cargar datos iniciales
+const modalRef = ref(null)
+const modoEdicion = ref(false)
+const form = reactive({})
+
+const isRoleA = computed(() => Api.isAdmin())
+
+// --- HELPERS ---
+const esCampoEditable = (key) => {
+  const excluidos = ['id', 'service_category_id', 'category_name', 'created_at', 'updated_at', 'deleted_at']
+  return !excluidos.includes(key.toLowerCase())
+}
+
+// --- CARGA ---
 const cargarDatos = async () => {
   try {
-    Zerbitzua.value = await Api.cargarObjetos(tableName)
-    console.log("Datos cargados:", Zerbitzua.value)
-  } catch (error) {
-    console.error("Error cargando datos:", error)
+    const [resServices, resCat] = await Promise.all([
+      Api.cargarObjetos(tableName),
+      Api.cargarObjetos("service-categories")
+    ])
+
+    listaCategorias.value = resCat?.data || resCat || []
+    const servicesRaw = resServices?.data || resServices || []
+
+    Zerbitzua.value = servicesRaw.map(item => {
+      const cat = listaCategorias.value.find(c => c.id === item.service_category_id)
+      return {
+        ...item,
+        category_name: cat ? cat.name : `ID: ${item.service_category_id}`
+      }
+    })
+  } catch (e) {
+    console.error("Error cargando datos:", e)
     Zerbitzua.value = []
   }
 }
 
-// Cargar datos cuando se ejecute el componente
-onMounted(() => {
-  cargarDatos()
-})
+// --- MODAL ---
+const abrirCrear = () => {
+  modoEdicion.value = false
+  for (let k in form) delete form[k]
 
-// 🔹 Crear un registro
-const crear = async (data) => {
-  try {
-    console.log("Datos a crear:", data)
-
-    const resultado = await Api.crearObjektua(data,tableName)
-
-    if (resultado) {
-      alert("Registro creado correctamente")
-      await cargarDatos() // refresca la tabla
-    } else {
-      alert("Error al crear el registro")
-    }
-  } catch (error) {
-    console.error("Error en crear:", error)
-    alert("Error al crear: " + error.message)
+  if (Zerbitzua.value.length > 0) {
+    Object.keys(Zerbitzua.value[0]).forEach(key => {
+      if (esCampoEditable(key)) form[key] = ""
+    })
   }
+  form.service_category_id = ""
+
+  modalRef.value?.showModal()
 }
 
-// 🔹 Editar un registro
-const editar = async ({ id, ...data }) => {
-  console.log("ID:", id)
-  console.log("Datos:", data)
-  
+const prepararEdicion = (fila) => {
+  modoEdicion.value = true
+  for (let k in form) delete form[k]
+  Object.assign(form, fila)
+  modalRef.value?.showModal()
+}
+
+const cerrarModal = () => modalRef.value?.close()
+
+// --- CRUD ---
+const guardar = async () => {
   try {
-    const datosParaAPI = { id, ...data }
-    const resultado = await Api.aldatuObjeto(datosParaAPI, tableName)
-    
-    if (resultado) {
-      alert("Registro actualizado correctamente")
+    const { id, category_name, created_at, updated_at, deleted_at, ...payload } = form
+
+    let res
+    if (modoEdicion.value) res = await Api.aldatuObjeto({ id, ...payload }, tableName)
+    else res = await Api.crearObjektua(payload, tableName)
+
+    if (res) {
+      cerrarModal()
       await cargarDatos()
-    } else {
-      alert("Error al actualizar el registro")
+      ok(res.message || (modoEdicion.value ? 'Service actualizado correctamente' : 'Service creado correctamente'))
     }
-  } catch (error) {
-    console.error("Error en editar:", error)
-    alert("Error al actualizar: " + error.message)
+  } catch (e) {
+    err(e.message || 'Error al guardar')
   }
 }
 
-// 🔹 Borrar un registro
 const borrar = async (id) => {
+  if (!confirm('Ziur zaude ezabatu nahi duzulaz?')) return
   try {
-    const resultado = await Api.ezabatuObjektua({ id }, tableName)
-    
-    if (resultado) {
-      alert("Registro eliminado correctamente")
+    const res = await Api.ezabatuObjektua({ id }, tableName)
+    if (res) {
       await cargarDatos()
-    } else {
-      alert("Error al eliminar el registro")
+      ok(res.message || 'Service eliminado correctamente')
     }
-  } catch (error) {
-    console.error("Error en borrar:", error)
-    alert("Error al eliminar: " + error.message)
+  } catch (e) {
+    err(e.message || 'Error al eliminar')
   }
 }
+
+onMounted(cargarDatos)
 </script>

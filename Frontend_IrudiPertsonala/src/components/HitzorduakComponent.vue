@@ -3,7 +3,7 @@
     <table class="table table-bordered text-center">
       <thead class="table-light">
         <tr>
-          <th>Hora</th>
+          <th>Ordua</th>
           <th v-for="day in days" :key="day.toDateString()">
             {{ formatDate(day) }}
           </th>
@@ -13,14 +13,13 @@
         <tr v-for="hour in hours" :key="hour">
           <th>{{ hour }}:00</th>
           <td v-for="day in days" :key="day.toDateString() + '-' + hour">
-            <div
-              v-for="item in citasInicioCelda(day, hour)"
-              :key="item.id"
+            <div v-for="item in citasInicioCelda(day, hour)" :key="item.id"
               class="bg-secondary text-white p-1 mb-1 rounded"
-              :style="{ height: calcularAltura(item), cursor: 'pointer' }"
-              @click="$emit('editar', item)"
-            >
-              Seat {{ item.seat }} <br>
+              :style="{ height: calcularAltura(item), cursor: 'pointer' }" @click="$emit('editar', item)">
+              <b>Eserlekua:</b> {{ item.seat }} <br>
+              <b>Bezeroa:</b> {{ getClientName(item.client_id) }} <br>
+              <b>Ikaslea:</b> {{ getStudentName(item.student_id) }} <br>
+
               {{ item.start_time }} - {{ item.end_time }}
             </div>
           </td>
@@ -36,11 +35,13 @@ import { startOfWeek, addDays, format } from 'date-fns'
 
 const props = defineProps({
   week: { type: String, required: true },
-  datos: { type: Array, default: () => [] }
+  datos: { type: Array, default: () => [] },
+  clients: { type: Array, default: () => [] },
+  students: { type: Array, default: () => [] }
 })
 
-// Horas del calendario (8 a 20)
-const hours = Array.from({ length: 13 }, (_, i) => i + 8)
+// Horas del calendario
+const hours = Array.from({ length: 8 }, (_, i) => i + 8)
 
 // Días de la semana
 const days = computed(() => {
@@ -50,22 +51,17 @@ const days = computed(() => {
   return Array.from({ length: 7 }, (_, i) => addDays(firstDay, i))
 })
 
-// Formatear fecha para la cabecera
 function formatDate(date) {
   return format(date, 'EEE dd/MM')
 }
 
-// Devuelve las citas que comienzan en esta hora
+// Filtrar citas que comienzan en esta celda
 function citasInicioCelda(day, hour) {
   return props.datos.filter(item => {
     if (!item.id || !item.date || !item.start_time) return false
-
-    // Crear fecha local robusta, incluyendo segundos
     const [year, month, date] = item.date.split('-').map(Number)
     const [h, m, s] = item.start_time.split(':').map(Number)
     const start = new Date(year, month - 1, date, h, m, s)
-
-    // Comparar solo la hora (entera) para colocar en la celda
     return (
       start.getFullYear() === day.getFullYear() &&
       start.getMonth() === day.getMonth() &&
@@ -75,20 +71,27 @@ function citasInicioCelda(day, hour) {
   })
 }
 
-// Calcular altura proporcional según duración de la cita
+// Altura proporcional a duración
 function calcularAltura(item) {
   if (!item.start_time || !item.end_time) return '60px'
-
   const [year, month, date] = item.date.split('-').map(Number)
-
   const [sh, sm, ss] = item.start_time.split(':').map(Number)
   const [eh, em, es] = item.end_time.split(':').map(Number)
-
   const start = new Date(year, month - 1, date, sh, sm, ss)
   const end = new Date(year, month - 1, date, eh, em, es)
-
   const diffHoras = (end - start) / (1000 * 60 * 60)
-  const altura = Math.max(diffHoras * 60, 30)
-  return `${altura}px`
+  return `${Math.max(diffHoras * 60, 30)}px`
+}
+
+// Obtener nombre del cliente
+function getClientName(client_id) {
+  const client = props.clients.find(c => c.id === client_id)
+  return client ? `${client.name} ${client.surnames || ''}` : `ID:${client_id}`
+}
+
+// Obtener nombre del estudiante
+function getStudentName(student_id) {
+  const student = props.students.find(s => s.id === student_id)
+  return student ? `${student.name} ${student.surnames || ''}` : `ID:${student_id}`
 }
 </script>

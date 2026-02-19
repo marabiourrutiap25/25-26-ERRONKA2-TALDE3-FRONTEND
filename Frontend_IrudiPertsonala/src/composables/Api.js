@@ -1,8 +1,15 @@
 const API_URL = 'http://localhost:8000/api'
 
+// APIaren edozein erantzunetik gehien interesatzen den mezua jaso
+function extraerMensaje(resultado) {
+  if (!resultado) return null
+  return resultado.message || resultado.errors || resultado.data || null
+}
+
+// APIari deia egin
 async function llamarAPI(metodo, endpoint, datos = {}) {
   let url = `${API_URL}/${endpoint}`;  
-  const token = localStorage.getItem('token') 
+  const token = localStorage.getItem('token') || sessionStorage.getItem('token');
   const headers = { 
     'Content-Type': 'application/json', 
     'Authorization': `Bearer ${token}` 
@@ -34,8 +41,13 @@ async function llamarAPI(metodo, endpoint, datos = {}) {
   }
 
   if (!response.ok) {
-    const mensaje = resultado?.error || `HTTP error ${response.status}`;
-    throw new Error(mensaje);
+    // APIak emandako mezua kantinatu, erroreak, mezua edo datuak izan daiteke
+    throw new Error(extraerMensaje(resultado) || `HTTP akatsa ${response.status}`);
+  }
+
+  // Beti .message normalizatua emaitzari atxiki
+  if (resultado && typeof resultado === 'object') {
+    resultado.message = extraerMensaje(resultado)
   }
 
   return resultado;
@@ -43,7 +55,7 @@ async function llamarAPI(metodo, endpoint, datos = {}) {
 
 
 // =======================
-// FUNCIONES CRUD
+// CRUD FUNTZIOAK
 // =======================
 export async function cargarObjetos(endpoint) {
   try {
@@ -73,7 +85,7 @@ export async function aldatuObjeto(datos, endpoint) {
     return await llamarAPI('PUT', endpoint, datos);
   } catch (err) {
     console.error('Error al actualizar objeto:', err);
-    return null;
+    throw err;
   }
 }
 
@@ -82,8 +94,7 @@ export async function ezabatuObjektua(datos, endpoint) {
     return await llamarAPI('DELETE', endpoint, datos);
   } catch (err) {
     console.error('Error al eliminar objeto:', err);
-    alert('Error al eliminar: ' + err.message);
-    return null;
+    throw err;
   }
 }
 
@@ -92,18 +103,12 @@ export async function crearObjektua(datos, endpoint) {
     return await llamarAPI('POST', endpoint, datos);
   } catch (err) {
     console.error('Error al crear objeto:', err);
-    return null;
+    throw err;
   }
 }
 
 
-
-
-
-
-
-
-// LOGIN
+// SAIOA HASI
 export async function login(email, password, recordar = false) {
   const response = await fetch(API_URL + '/login', {
     method: 'POST',
@@ -119,21 +124,23 @@ export async function login(email, password, recordar = false) {
 
   const data = await response.json()
 
-  console.log('Respuesta del servidor:', data)
+  console.log('Zerbitzariaren erantzuna:', data)
 
   if (response.ok) {
-    // Si el usuario marca "Recordarme", usar localStorage (persistente)
-    // Si no, usar sessionStorage (se borra al cerrar la ventana)
     const storage = recordar ? localStorage : sessionStorage
     storage.setItem('token', data.token)
     storage.setItem('usuario', JSON.stringify(data.user))
+    // Guardar rol del usuario para control de accesos.
+    // Algunas respuestas devuelven role en data.user.role y otras en root `role`.
+    const roleFromResponse = data.role || (data.user && data.user.role)
+    if (roleFromResponse) storage.setItem('role', roleFromResponse)
     return data
   } else {
     throw { status: response.status, data: data }
   }
 }
 
-// LOGOUT
+// SAIOA ITXI
 export async function logout() {
   const token = localStorage.getItem('token') || sessionStorage.getItem('token')
 
@@ -146,14 +153,15 @@ export async function logout() {
     }
   })
 
-  // Limpiar ambos storages
   localStorage.removeItem('token')
   localStorage.removeItem('usuario')
+  localStorage.removeItem('role')
   sessionStorage.removeItem('token')
   sessionStorage.removeItem('usuario')
+  sessionStorage.removeItem('role')
 }
 
-// COMPROBAR SI ESTÁ LOGUEADO
+// LOGUEATU DEN EGIAZTATU
 export function isAuthenticated() {
   const token = localStorage.getItem('token') || sessionStorage.getItem('token')
   return !!token
@@ -164,21 +172,34 @@ export const getCurrentUser = () => {
   return usuario ? JSON.parse(usuario) : null
 }
 
+// OBTENER ROL
+export const getRole = () => {
+  return localStorage.getItem('role') || sessionStorage.getItem('role') || null
+}
+
+export const isAdmin = () => {
+  const r = getRole()
+  // Normalizar: eliminar comillas y espacios, dejar solo caracteres alfanuméricos
+  const cleaned = String(r || '').replace(/[^a-zA-Z0-9]/g, '').trim().toUpperCase()
+  return cleaned === 'A'
+}
+
 // OBTENER TOKEN
 export const getToken = () => {
   return localStorage.getItem('token') || sessionStorage.getItem('token')
 }
 
-export default{
+export default {
   login,
   logout,
   isAuthenticated,
   getCurrentUser,
   getToken,
+  getRole,
+  isAdmin,
   cargarObjetos,
   cargarObjeto,
   aldatuObjeto,
   ezabatuObjektua,
   crearObjektua
-
 }
