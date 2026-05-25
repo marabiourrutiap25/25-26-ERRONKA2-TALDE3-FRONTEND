@@ -12,6 +12,8 @@ import Login from "../views/Login.vue";
 import Txandak from "../views/Txandak.vue";
 import Dashboard from "../views/Dashboard.vue";
 import BezeroHistoriala from "@/views/BezeroHistoriala.vue";
+import Profilak from "@/views/Profilak.vue";
+import Kategoriak from "@/views/Kategoriak.vue";
 
 const routes = [
   { path: "/", name: "login", component: Login },
@@ -26,6 +28,8 @@ const routes = [
   { path: "/mugimenduak", name: "mugimenduak", component: Mugimenduak, meta: { requiresAuth: true } },
   { path: "/txandak", name: "txandak", component: Txandak, meta: { requiresAuth: true } },
   { path: "/historiala", name: "historiala", component: BezeroHistoriala, meta: { requiresAuth: true } },
+  { path: "/profilak", name: "profilak", component: Profilak, meta: { requiresAuth: true } },
+  { path: "/kategoriak", name: "kategoriak", component: Kategoriak, meta: { requiresAuth: true } },
 ];
 
 const router = createRouter({
