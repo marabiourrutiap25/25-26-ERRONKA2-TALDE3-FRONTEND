@@ -13,19 +13,26 @@
     <!-- Encabezado y botón Crear -->
     <div class="d-flex justify-content-between align-items-center mb-3">
       <div class="d-flex align-items-center">
-        <label for="week" class="me-2 text-nowrap fw-bold">Aukeratu astea:</label>
-        <select class="form-select" v-model="selectedWeek">
-          <option v-for="semana in todasLasSemanas" :key="semana.value" :value="semana.value">
-            {{ semana.label }}
-          </option>
-        </select>
+        <label for="date-picker" class="me-2 text-nowrap fw-bold">Aukeratu eguna:</label>
+        <input 
+          id="date-picker" 
+          type="date" 
+          class="form-select" 
+          v-model="selectedDate" 
+        />
       </div>
       <button class="btn btn-primary text-white fw-bold" @click="abrirCrear">+ Hitzordua Sortu</button>
     </div>
 
-    <!-- Calendario -->
-    <HitzorduakComponent :week="selectedWeek" :datos="egutegiaFiltrada" @editar="editarHitzordua"
-      @borrar="borrarHitzordua" />
+    <!-- Calendario/Asientos -->
+    <HitzorduakComponent 
+      :selectedDate="selectedDate" 
+      :datos="egutegiaFiltrada" 
+      :clients="clients"
+      :students="students"
+      @editar="editarHitzordua"
+      @borrar="borrarHitzordua" 
+    />
 
     <!-- Modal Crear / Editar Hitzordua -->
     <SortuHitzordua ref="sortuHitzorduaRef" :headers="headers" :clients="clients" :students="students"
@@ -52,7 +59,6 @@
                 </option>
               </select>
             </div>
-
 
             <!-- SERVICE -->
             <div class="mb-4">
@@ -86,7 +92,6 @@
 
 <script setup>
 import { ref, computed, reactive, onMounted } from 'vue'
-import { startOfWeek, addDays, format, getWeek } from 'date-fns'
 import HitzorduakComponent from '../components/HitzorduakComponent.vue'
 import SidebarMenu from '@/components/SidebarMenu.vue'
 import SortuHitzordua from '../components/sortuHitzordua.vue'
@@ -96,7 +101,8 @@ import ToastComponent from '../components/ToastComponent.vue'
 
 const menuAbierto = ref(false)
 const tableName = 'appointments'
-const selectedWeek = ref(getCurrentWeek())
+
+const selectedDate = ref('2026-05-25') 
 const Egutegia = ref([])
 const clients = ref([])
 const students = ref([])
@@ -104,11 +110,9 @@ const services = ref([])
 
 const { ok, err } = useToast()
 
-// Modal Create/Edit
 const sortuHitzorduaRef = ref(null)
 const headers = ['seat', 'date', 'start_time', 'end_time', 'comments']
 
-// Modal Confirm
 const modalConfirmarRef = ref(null)
 const formConfirmar = reactive({
   appointment_id: '',
@@ -116,66 +120,44 @@ const formConfirmar = reactive({
   comments: ''
 })
 
-// ---------- FUNCIONES DE SEMANA ----------
-function getCurrentWeek() {
-  const now = new Date()
-  const weekNumber = getWeek(now, { weekStartsOn: 1 })
-  return `${now.getFullYear()}-W${String(weekNumber).padStart(2, '0')}`
-}
-
-const todasLasSemanas = computed(() => {
-  const semanas = []
-  const now = new Date()
-  const year = now.getFullYear()
-  const firstDay = startOfWeek(new Date(year, 0, 1), { weekStartsOn: 1 })
-  for (let i = 0; i < 52; i++) {
-    const start = addDays(firstDay, i * 7)
-    const weekNum = getWeek(start, { weekStartsOn: 1 })
-    const value = `${year}-W${String(weekNum).padStart(2, '0')}`
-    const label = `Astea ${weekNum} (${format(start, 'dd/MM')})`
-    semanas.push({ value, label })
-  }
-  return semanas
-})
-
-// ---------- FILTRADO POR SEMANA ----------
 const egutegiaFiltrada = computed(() => {
-  if (!Egutegia.value?.length || !selectedWeek.value) return []
-
-  const [year, week] = selectedWeek.value.split('-W').map(Number)
-  const firstDay = startOfWeek(new Date(year, 0, 1 + (week - 1) * 7), { weekStartsOn: 1 })
-  const lastDay = new Date(firstDay)
-  lastDay.setDate(firstDay.getDate() + 6)
-
-  return Egutegia.value.filter(item => {
-    if (!item.date) return false
-    const fecha = new Date(item.date)
-    return fecha >= firstDay && fecha <= lastDay
-  })
+  if (!Egutegia.value?.length || !selectedDate.value) return []
+  return Egutegia.value.filter(item => item.date === selectedDate.value)
 })
 
-// ---------- CARGAR DATOS ----------
 const cargarDatos = async () => {
-  try {
-    Egutegia.value = await Api.cargarObjetos(tableName)
-  } catch (e) {
-    console.error(e);
-    Egutegia.value = []
-  }
+  clients.value = [
+    { id: 10, name: 'Mikel', surnames: 'Agirre Bilbao' },
+    { id: 11, name: 'Ane', surnames: 'Gomez Urkijo' }
+  ]
 
-  try {
-    clients.value = await Api.cargarObjetos('clients')
-  } catch (e) {
-    console.error(e)
-    clients.value = []
-  }
+  students.value = [
+    { id: 5, name: 'Jon', surnames: 'Lertxundi' },
+    { id: 6, name: 'Elene', surnames: 'Zubiri' }
+  ]
 
-  try {
-    students.value = await Api.cargarObjetos('students')
-  } catch (e) {
-    console.error(e)
-    students.value = []
-  }
+  Egutegia.value = [
+    {
+      id: 999,
+      seat: 2, 
+      date: '2026-05-25',
+      start_time: '09:00:00',
+      end_time: '11:00:00',
+      client_id: 10,
+      student_id: 5,
+      comments: 'Corte de pelo moderno y degradado suave, barba también.'
+    },
+    {
+      id: 998,
+      seat: 5, 
+      date: '2026-05-25',
+      start_time: '12:00:00',
+      end_time: '13:30:00',
+      client_id: 11,
+      student_id: 6,
+      comments: 'Tinte completo y lavado.'
+    }
+  ]
 
   try {
     services.value = await Api.cargarObjetos('services')
@@ -185,7 +167,6 @@ const cargarDatos = async () => {
   }
 }
 
-// ---------- MODALES ----------
 const abrirCrear = () => {
   sortuHitzorduaRef.value?.setFormData({})
   sortuHitzorduaRef.value?.open()
@@ -198,10 +179,9 @@ const editarHitzordua = (data) => {
 
 const getClientName = (client_id) => {
   const client = clients.value.find(c => c.id === client_id)
-  return client ? client.name && client.surnames : `ID: ${client_id}`
+  return client ? `${client.name} ${client.surnames}` : `ID: ${client_id}`
 }
 
-// ---------- HITZORDUA CRUD ----------
 const guardarHitzordua = async (data) => {
   try {
     const payload = JSON.parse(JSON.stringify(data))
@@ -231,7 +211,6 @@ const borrarHitzordua = async (id) => {
   }
 }
 
-// ---------- MODAL CONFIRMAR ----------
 const abrirConfirmar = () => {
   formConfirmar.appointment_id = ''
   formConfirmar.service_id = ''
@@ -250,9 +229,7 @@ const guardarConfirmacion = async () => {
       service_id: formConfirmar.service_id,
       comments: formConfirmar.comments
     }
-
     const res = await Api.crearObjektua(payload, 'appointment-services')
-
     if (res) {
       cerrarModalConfirmar()
       ok(res.message || 'Hitzordua konfirmatu da')

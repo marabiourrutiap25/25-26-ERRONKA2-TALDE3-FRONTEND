@@ -4,24 +4,31 @@
       <thead class="table-light">
         <tr>
           <th>Ordua</th>
-          <th v-for="day in days" :key="day.toDateString()">
-            {{ formatDate(day) }}
+          <th v-for="asiento in asientos" :key="asiento">
+            Eserleku {{ asiento }}
           </th>
         </tr>
       </thead>
       <tbody>
         <tr v-for="hour in hours" :key="hour">
-          <th>{{ hour }}:00</th>
-          <td v-for="day in days" :key="day.toDateString() + '-' + hour">
-            <div v-for="item in citasInicioCelda(day, hour)" :key="item.id"
-              class="bg-secondary text-white p-1 mb-1 rounded"
-              :style="{ height: calcularAltura(item), cursor: 'pointer' }" @click="$emit('editar', item)">
-              <b>Eserlekua:</b> {{ item.seat }} <br>
-              <b>Bezeroa:</b> {{ getClientName(item.client_id) }} <br>
-              <b>Ikaslea:</b> {{ getStudentName(item.student_id) }} <br>
-
-              {{ item.start_time }} - {{ item.end_time }}
+          <th class="align-middle">{{ hour }}:00</th>
+          <td v-for="asiento in asientos" :key="asiento + '-' + hour" style="width: 13%; min-height: 80px; vertical-align: top;">
+            
+            <div v-for="item in citasInicioCelda(asiento, hour)" :key="item.id"
+              class="bg-secondary text-white p-2 mb-1 rounded text-start"
+              :style="{ height: calcularAltura(item), cursor: 'pointer', fontSize: '0.85rem' }" 
+              @click="$emit('editar', item)">
+              
+              <div class="fw-bold text-warning border-bottom border-secondary pb-1 mb-1">
+                {{ item.start_time.substring(0,5) }} - {{ item.end_time.substring(0,5) }}
+              </div>
+              <div><b>Bezeroa:</b> {{ getClientName(item.client_id) }}</div>
+              <div><b>Ikaslea:</b> {{ getStudentName(item.student_id) }}</div>
+              <div v-if="item.comments" class="text-white-50 mt-1" style="font-size: 0.75rem; line-height: 1.1;">
+                <i><b>Iruzkinak:</b> {{ item.comments }}</i>
+              </div>
             </div>
+
           </td>
         </tr>
       </tbody>
@@ -31,67 +38,44 @@
 
 <script setup>
 import { computed } from 'vue'
-import { startOfWeek, addDays, format } from 'date-fns'
 
 const props = defineProps({
-  week: { type: String, required: true },
+  selectedDate: { type: String, required: true },
   datos: { type: Array, default: () => [] },
   clients: { type: Array, default: () => [] },
   students: { type: Array, default: () => [] }
 })
 
-// Egutegiko orduak
 const hours = Array.from({ length: 8 }, (_, i) => i + 8)
+const asientos = [1, 2, 3, 4, 5, 6, 7]
 
-// Asteko egunak
-const days = computed(() => {
-  if (!props.week) return []
-  const [year, week] = props.week.split('-W').map(Number)
-  const firstDay = startOfWeek(new Date(year, 0, 1 + (week - 1) * 7), { weekStartsOn: 1 })
-  return Array.from({ length: 7 }, (_, i) => addDays(firstDay, i))
-})
-
-function formatDate(date) {
-  return format(date, 'EEE dd/MM')
-}
-
-// Hitzorduak filtratu
-function citasInicioCelda(day, hour) {
+function citasInicioCelda(asiento, hour) {
   return props.datos.filter(item => {
-    if (!item.id || !item.date || !item.start_time) return false
-    const [year, month, date] = item.date.split('-').map(Number)
-    const [h, m, s] = item.start_time.split(':').map(Number)
-    const start = new Date(year, month - 1, date, h, m, s)
-    return (
-      start.getFullYear() === day.getFullYear() &&
-      start.getMonth() === day.getMonth() &&
-      start.getDate() === day.getDate() &&
-      start.getHours() === hour
-    )
+    if (!item.id || !item.start_time || item.seat === undefined) return false
+    const [h] = item.start_time.split(':').map(Number)
+    return Number(item.seat) === asiento && h === hour
   })
 }
 
-// Iraupenarekiko altuera proportzionala
 function calcularAltura(item) {
-  if (!item.start_time || !item.end_time) return '60px'
-  const [year, month, date] = item.date.split('-').map(Number)
-  const [sh, sm, ss] = item.start_time.split(':').map(Number)
-  const [eh, em, es] = item.end_time.split(':').map(Number)
-  const start = new Date(year, month - 1, date, sh, sm, ss)
-  const end = new Date(year, month - 1, date, eh, em, es)
-  const diffHoras = (end - start) / (1000 * 60 * 60)
-  return `${Math.max(diffHoras * 60, 30)}px`
+  if (!item.start_time || !item.end_time) return 'auto'
+  const [sh, sm] = item.start_time.split(':').map(Number)
+  const [eh, em] = item.end_time.split(':').map(Number)
+  
+  const startMinutes = sh * 60 + sm
+  const endMinutes = eh * 60 + em
+  const diffHoras = (endMinutes - startMinutes) / 60
+  
+  return `${Math.max(diffHoras * 75, 65)}px`
 }
 
-// Bezeroaren izena lortu
 function getClientName(client_id) {
   const client = props.clients.find(c => c.id === client_id)
-  return client ? `${client.name} ${client.surnames || ''}` : `ID:${client_id}`
+  return client ? `${client.name} ${client.surnames || ''}` : `ID: ${client_id}`
 }
 
-// Ikaslearen izena lortu
 function getStudentName(student_id) {
   const student = props.students.find(s => s.id === student_id)
-  return student ? `${student.name} ${student.surnames || ''}` : `ID:${student_id}`
+  return student ? `${student.name} ${student.surnames || ''}` : `ID: ${student_id}`
 }
 </script>
