@@ -4,7 +4,23 @@
   <div class="container">
     <ToastComponent />
 
-    <TaulaComponent :filas="BezeroaFormateado" titulo="Bezeroak" etiqueta-tabla="Clients"
+    <!-- Buscador -->
+    <div class="search-container mb-4">
+      <div class="search-wrapper">
+        <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+          <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.2.283.487.529.846.708l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a7 7 0 0 0 .078-.86Z"/>
+        </svg>
+        <input 
+          v-model="busqueda" 
+          type="text" 
+          class="search-input" 
+          placeholder="Bilatu izena, abizenak edo telefonoa..."
+        />
+        <button v-if="busqueda" @click="busqueda = ''" class="clear-btn">✕</button>
+      </div>
+    </div>
+
+    <TaulaComponent :filas="BezeroaFiltrado" titulo="Bezeroak" etiqueta-tabla="Clients"
       :mapa-headers="{ name: 'IZENA', surnames: 'ABIZENAK', telephone: 'TELEFONOA', home_client: 'MOTA' }"
       texto-btn-crear="Bezeroa Sortu" @crear="abrirCrear" @editar="prepararEdicion" @borrar="borrar" />
 
@@ -65,6 +81,7 @@ const { ok, err } = useToast()
 
 const menuAbierto = ref(false)
 const Bezeroa = ref([])
+const busqueda = ref('')
 const tableName = "clients"
 
 const modalRef = ref(null)
@@ -93,6 +110,21 @@ const BezeroaFormateado = computed(() =>
     home_client: item.home_client == 1 ? 'Etxekoa' : 'Kanpokoa'
   }))
 )
+
+/* Filtrar por búsqueda */
+const BezeroaFiltrado = computed(() => {
+  if (!busqueda.value.trim()) {
+    return BezeroaFormateado.value
+  }
+
+  const termino = busqueda.value.toLowerCase().trim()
+  
+  return BezeroaFormateado.value.filter(bezeroa => 
+    bezeroa.name?.toLowerCase().includes(termino) ||
+    bezeroa.surnames?.toLowerCase().includes(termino) ||
+    bezeroa.telephone?.toLowerCase().includes(termino)
+  )
+})
 
 const abrirCrear = () => {
   modoEdicion.value = false
@@ -159,3 +191,64 @@ const borrar = async (id) => {
 
 onMounted(cargarDatos)
 </script>
+
+<style scoped>
+.search-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+}
+
+.search-wrapper {
+  position: relative;
+  width: 100%;
+  max-width: 500px;
+}
+
+.search-input {
+  width: 100%;
+  padding: 0.75rem 2.5rem 0.75rem 2.75rem;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: #2c4666;
+  box-shadow: 0 0 0 3px rgba(44, 70, 102, 0.1);
+}
+
+.search-icon {
+  position: absolute;
+  left: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #999;
+  pointer-events: none;
+}
+
+.clear-btn {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: #999;
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 0;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s;
+}
+
+.clear-btn:hover {
+  color: #333;
+}
+</style>
